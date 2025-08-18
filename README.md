@@ -1,58 +1,39 @@
-# Turborepo Tailwind CSS starter
+# HackUTA Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+This repo is the core of HackUTA comprising of all the packages and sites that run the technical backend.
 
-## Using this example
+## How to get started
 
-Run the following command:
-
-```sh
-npx create-turbo@latest -e with-tailwind
-```
+1. Install NodeJS v20+ [NodeJS 22](https://nodejs.org/dist/v22.18.0/node-v22.18.0-x64.msi)
+2. Install pnpm [pnpm Install Docs](https://pnpm.io/installation)
+3. Run `pnpm install` from the **ROOT** of the project
+4. Collect the needed `.env.local` from someone who has it, ask in the tech chat
+5. Begin Development!
 
 ## What's inside?
 
-This Turborepo includes the following packages/apps:
+This Repository includes the following packages/apps:
 
 ### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- `apps/admin`: a [Next.js](https://nextjs.org/) app designed for use by the organizers and super-admins of the organization
+- `apps/auth`: another [Next.js](https://nextjs.org/) app that handles any and all authentication to the supabase project
+- `apps/frontpage`: another [Next.js](https://nextjs.org/) app that presents the frontpage of [HackUTA](https://hackuta.org)
+- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`) *`packages/eslint-config`*
+- `@repo/tailwind-config`: `tailwind` configurations. **CURRENTLY UNUSED, NEED TO FIX THIS** *`packages/tailwind-config`*
+- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo *`packages/typescript-config`*
+- `@repo/supabase`: the core of the database management using supabase *`packages/supabase`*
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-### Building packages/ui
+## The Todo List:
 
-This example is set up to produce compiled styles for `ui` components into the `dist` directory. The component `.tsx` files are consumed by the Next.js apps directly using `transpilePackages` in `next.config.ts`. This was chosen for several reasons:
-
-- Make sharing one `tailwind.config.ts` to apps and packages as easy as possible.
-- Make package compilation simple by only depending on the Next.js Compiler and `tailwindcss`.
-- Ensure Tailwind classes do not overwrite each other. The `ui` package uses a `ui-` prefix for it's classes.
-- Maintain clear package export boundaries.
-
-Another option is to consume `packages/ui` directly from source without building. If using this option, you will need to update the `tailwind.config.ts` in your apps to be aware of your package locations, so it can find all usages of the `tailwindcss` class names for CSS compilation.
-
-For example, in [tailwind.config.ts](packages/tailwind-config/tailwind.config.ts):
-
-```js
-  content: [
-    // app content
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    "../../packages/ui/*.{js,ts,jsx,tsx}",
-  ],
-```
-
-If you choose this strategy, you can remove the `tailwindcss` and `autoprefixer` dependencies from the `ui` package.
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [Tailwind CSS](https://tailwindcss.com/) for styles
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- QR Code Management `@repo/qr`?
+- Better User Management
+- User Dashboard
+- Organizer Tools
+- Schedule Manager
+- Announcements/Messages? `@repo/amqp`?
+- Updates to the Auth Platform
+- Submission Management?
+- Anything else? Ask Dominic/Muhammad/Kevin
