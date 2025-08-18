@@ -1,0 +1,10 @@
+{
+    "tasks": {
+        "build": {
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                ".env.local"
+            ]
+        }
+    }
+}

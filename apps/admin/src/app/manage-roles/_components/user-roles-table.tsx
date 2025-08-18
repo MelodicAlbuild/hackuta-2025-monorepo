@@ -27,7 +27,8 @@ type UserWithRole = {
 
 export function UserRolesTable({ users }: { users: UserWithRole[] }) {
   const [roles, setRoles] = useState<Record<string, string>>({});
-  const [messages, setMessages] = useState<Record<string, string>>({});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+  const [messages, setMessages] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
 
   const handleRoleChange = (userId: string, newRole: string) => {

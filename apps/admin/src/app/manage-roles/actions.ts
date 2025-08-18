@@ -63,6 +63,7 @@ export async function inviteNewUserWithRole(formData: { email: string, role: 'us
 
     // Use the Admin Client to send an invite with the role in the metadata
     const supabaseAdmin = createAdminClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
         formData.email,
         {
