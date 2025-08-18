@@ -127,7 +127,7 @@ export default function InterestForm() {
 
     supabase
       .from("interest-form")
-      .insert(data)
+      .insert({ ...data, status: "pending" })
       .then(({ error }) => {
         if (error) {
           console.error("Error inserting data:", error);
