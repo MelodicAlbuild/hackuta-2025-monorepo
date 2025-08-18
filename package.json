@@ -4,6 +4,9 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:auth": "turbo run dev --filter=auth",
+    "dev:admin": "turbo run dev --filter=admin",
+    "dev:frontpage": "turbo run dev --filter=frontpage",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
