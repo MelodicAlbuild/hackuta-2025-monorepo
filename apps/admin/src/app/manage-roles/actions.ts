@@ -1,11 +1,10 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
+import { createSupabaseServerClient, createSupabaseAdminClient } from '@repo/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export async function updateUserRole(targetUserId: string, newRole: 'user' | 'admin' | 'super-admin') {
-    const supabase = await createClient()
+    const supabase = await createSupabaseServerClient()
 
     // Security Check 1: Verify the current user is a super-admin
     const { data: { user } } = await supabase.auth.getUser()
@@ -29,7 +28,7 @@ export async function updateUserRole(targetUserId: string, newRole: 'user' | 'ad
     }
 
     // If checks pass, use the Admin Client to perform the update
-    const supabaseAdmin = createAdminClient()
+    const supabaseAdmin = createSupabaseAdminClient()
     const { error } = await supabaseAdmin
         .from('profiles')
         .update({ role: newRole })
@@ -45,7 +44,7 @@ export async function updateUserRole(targetUserId: string, newRole: 'user' | 'ad
 }
 
 export async function inviteNewUserWithRole(formData: { email: string, role: 'user' | 'admin' | 'super-admin' }) {
-    const supabase = await createClient()
+    const supabase = await createSupabaseServerClient()
 
     // Security Check: Verify the current user is a super-admin
     const { data: { user } } = await supabase.auth.getUser()
@@ -62,7 +61,7 @@ export async function inviteNewUserWithRole(formData: { email: string, role: 'us
     }
 
     // Use the Admin Client to send an invite with the role in the metadata
-    const supabaseAdmin = createAdminClient()
+    const supabaseAdmin = createSupabaseAdminClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
         formData.email,

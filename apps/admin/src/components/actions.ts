@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createSupabaseServerClient } from '@repo/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
@@ -25,7 +25,7 @@ export async function inviteUser(email: string, registrationId: number) {
         }
 
         // Step 2: If the invite was sent successfully, update the user's status.
-        const supabase = await createClient()
+        const supabase = await createSupabaseServerClient()
         const { error: updateError } = await supabase
             .from('interest-form')
             .update({ status: 'invited' })

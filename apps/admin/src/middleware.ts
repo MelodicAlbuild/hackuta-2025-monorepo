@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/utils/supabase/middleware'
+import { createSupabaseMiddlewareClient } from '@repo/supabase/server'
 
 export async function middleware(request: NextRequest) {
     // This createClient function is the one we copied from the auth app.
     // It refreshes the session cookie.
-    const { supabase, response } = createClient(request)
+    const { supabase, response } = createSupabaseMiddlewareClient(request)
 
     const {
         data: { session },

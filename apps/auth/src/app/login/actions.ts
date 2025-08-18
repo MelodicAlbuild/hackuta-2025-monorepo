@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
+import { createSupabaseServerClient } from '@repo/supabase/server'
 
 function isValidRedirectUrl(url: string | null): boolean {
     if (!url) return false
@@ -16,7 +16,7 @@ export async function signIn(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const redirectTo = formData.get('redirect_to') as string | null
-    const supabase = await createClient()
+    const supabase = await createSupabaseServerClient()
 
     const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -37,7 +37,7 @@ export async function signIn(formData: FormData) {
 export async function signUp(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
-    const supabase = await createClient()
+    const supabase = await createSupabaseServerClient()
 
     const { error } = await supabase.auth.signUp({
         email,
@@ -57,7 +57,7 @@ export async function signUp(formData: FormData) {
 }
 
 export async function signInWithGithub() {
-    const supabase = await createClient()
+    const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
@@ -73,7 +73,7 @@ export async function signInWithGithub() {
 }
 
 export async function signInWithGoogle() {
-    const supabase = await createClient()
+    const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

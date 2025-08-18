@@ -1,9 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { createClient } from "@/utils/supabase/server";
+import { createSupabaseServerClient } from "@repo/supabase/server";
 import { Users } from "lucide-react";
 
 export default async function AdminDashboard() {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServerClient();
 
   const {
     data: { user },

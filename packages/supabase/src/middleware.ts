@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export function createClient(request: NextRequest) {
+export function createSupabaseMiddlewareClient(request: NextRequest) {
     // Create an unmodified response
     const response = NextResponse.next({
         request: {

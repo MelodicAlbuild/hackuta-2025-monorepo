@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/utils/supabase/admin";
+import { createSupabaseAdminClient } from "@repo/supabase/server";
 import { UserRolesTable } from "./_components/user-roles-table";
 import {
   Card,
@@ -10,7 +10,7 @@ import {
 import { InviteUserDialog } from "./_components/invite-user-dialog";
 
 export default async function ManageRolesPage() {
-  const supabaseAdmin = createAdminClient();
+  const supabaseAdmin = createSupabaseAdminClient();
 
   // Fetch all users from the auth schema
   const {

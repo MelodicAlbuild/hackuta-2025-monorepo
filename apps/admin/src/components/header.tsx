@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/server";
+import { createSupabaseServerClient } from "@repo/supabase/server";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/app/auth/actions";
 
 export async function Header() {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { createSupabaseServerClient } from "@repo/supabase/server";
 import { RegistrationsTable } from "@/components/registrations-table";
 import {
   Card,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 
 export default async function RegistrationsPage() {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServerClient();
 
   const { data: registrations, error } = await supabase
     .from("interest-form")

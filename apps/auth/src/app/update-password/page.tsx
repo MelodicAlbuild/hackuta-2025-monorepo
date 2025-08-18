@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"; // Import useEffect
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js"; // Import Session type
 
-import { createClient } from "@/utils/supabase/client";
+import { createSupabaseBrowserClient } from "@repo/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -41,7 +41,7 @@ const formSchema = z
   });
 
 export default function UpdatePasswordPage() {
-  const supabase = createClient();
+  const supabase = createSupabaseBrowserClient();
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");

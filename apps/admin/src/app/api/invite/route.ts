@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
+import { createSupabaseServerClient, createSupabaseAdminClient } from '@repo/supabase/server'
 
 export async function POST(request: Request) {
-    const supabase = await createClient()
+    const supabase = await createSupabaseServerClient()
 
     // 1. Check if the current user is authenticated
     const { data: { user } } = await supabase.auth.getUser()
@@ -23,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     // 4. Use the Admin client to send the invite
-    const supabaseAdmin = createAdminClient()
+    const supabaseAdmin = createSupabaseAdminClient()
     const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email)
 
     if (error) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+import { createSupabaseBrowserClient } from "@repo/supabase/client";
 import { UserProfileForm } from "@/components/dashboard/user-profile-form";
 import { UpdatePasswordForm } from "@/components/dashboard/update-password-form";
 import {
@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 
 export default function DashboardPage() {
-  const supabase = createClient();
+  const supabase = createSupabaseBrowserClient();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {

@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "label": "How do I contact an organizer?",
+        "content": "Through our Discord! Join using the button above!"
+    },
+    {
+        "id": 2,
+        "label": "How many people can be on a team?",
+        "content": "HackUTA Teams consist of four members per team. You can either apply with a team, or apply without a team and get matched with one for the event."
+    },
+    {
+        "id": 3,
+        "label": "How long do we have to work on our projects?",
+        "content": "Hacking begins October 4th at 12:00 PM and ends October 5th at 12:00 PM. You will have 24 hours to work on your project."
+    },
+    {
+        "id": 4,
+        "label": "Will there be food?",
+        "content": "We will provide lunch, dinner, breakfast, and a final lunch, times will be available on the schedule above."
+    },
+    {
+        "id": 5,
+        "label": "Where is the event?",
+        "content": "The event is being held at the SWSH and SEIR at UTA!"
+    }
+]

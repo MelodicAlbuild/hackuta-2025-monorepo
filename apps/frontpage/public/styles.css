@@ -1,0 +1,170 @@
+@font-face {
+    font-family: "Franklin Gothic Condensed";
+    src: url("../fonts/FranklinGothicCondensed.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Global Font Application */
+body, .navbar ul li a, .info-container {
+    font-family: "Franklin Gothic Condensed", sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to top, #000000, #230074, #6a0572);
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Creates space for scrolling */
+.scroll-container {
+    position: relative;
+    width: 100vw;
+    min-height: 200vh; /* Ensures scrolling */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Buildings + Glow move together */
+.buildings-container {
+    position: absolute;
+    width: 100vw;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    will-change: transform;
+}
+
+/* Adjusted glow effect */
+.building-glow {
+    position: absolute;
+    width: 100vw;
+    height: auto;
+    bottom: -500px; /* Adjusted for a better blend */
+    left: 0;
+    filter: drop-shadow(0 0 50px #ff3c00) drop-shadow(0 0 80px rgb(255, 0, 0));
+    z-index: 1;
+    mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+}
+
+/* Buildings and glow should move together */
+.buildings {
+    position: absolute;
+    width: 100vw;
+    height: auto;
+    bottom: -500px; /* Adjusted for better blending */
+    left: 0;
+    z-index: 2;
+    mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+}
+
+/* Logo Container - Moves Both Logos Together */
+/* Container to keep both logos aligned */
+.logo-container {
+    position: absolute;
+    width: 100vw;
+    top: 20%; /* Adjust to position them correctly */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4; /* Ensures they stay above buildings */
+    display: flex;
+    flex-direction: column; /* Stack them vertically */
+    align-items: center; /* Center them */
+}
+
+/* Main Logo (HackUTA) */
+.logo {
+    width: 20%; /* Adjust size */
+    height: auto;
+    filter: drop-shadow(0 0 15px #ff0000) drop-shadow(0 0 30px #0000ff);
+    z-index: 4;
+}
+
+/* Hack Day Logo - Positioned Directly Below */
+.hackday-logo {
+    width: 30%; /* Adjust size */
+    height: auto;
+    margin-top: 0px; /* Slightly overlaps Logo */
+    filter: drop-shadow(0 0 15px #ff000052) drop-shadow(0 0 30px #0000ff4b);
+}
+
+
+/* Main container styling */
+.info-container {
+    color: white; /* Keeps text white */
+    text-align: center; /* Centers content */
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+    margin-top: -150px; /* Moves it up slightly */
+}
+
+/* Style for each section */
+.info-section {
+    margin: 60px 0; /* More spacing between sections */
+    padding: 50px;
+    background: rgba(28, 0, 59, 0.1); /* Light translucent background */
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(60, 0, 78, 0.15); /* Soft glow */
+}
+
+/* Increase heading size and add drop shadow */
+.info-section h2 {
+    font-size: 40px; /* Larger heading */
+    text-shadow: 4px 4px 12px rgba(110, 0, 114, 0.5);
+    margin-bottom: 20px;
+}
+
+/* Increase paragraph size and add spacing */
+.info-section p {
+    font-size: 22px;
+    text-shadow: 2px 2px 8px rgba(141, 1, 111, 0.397);
+    line-height: 1.8;
+}
+
+/* Navbar Styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to right, #20002c, #3a0ca3, #6a0572);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    padding: 15px 0;
+    text-align: center;
+    z-index: 100;
+}
+
+/* Navbar List Styling */
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 40px; /* More spacing between items */
+}
+
+/* Navbar Links */
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    text-transform: uppercase;
+    padding: 10px 20px; /* Adds more clickable space */
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover Effect */
+.navbar ul li a:hover {
+    color: #ff00ea;
+    transform: scale(1.1);
+}
+
+.nav-logo {
+    transform: translate(0, -30%);
+}
