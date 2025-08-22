@@ -15,6 +15,10 @@ export default async function PortalPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    return <></>;
+  }
+
   // Fetch the user's profile and points in one query
   const { data: profile } = await supabase
     .from("profiles")
