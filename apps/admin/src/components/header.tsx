@@ -41,6 +41,12 @@ export async function Header() {
                   Manage Roles
                 </Link>
               )}
+              <Link href="/points" className="hover:text-blue-600">
+                Points
+              </Link>
+              <Link href="/scanner" className="hover:text-blue-600">
+                Scanner
+              </Link>
             </div>
           )}
         </div>
