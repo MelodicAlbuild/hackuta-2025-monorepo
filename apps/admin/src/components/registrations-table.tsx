@@ -170,11 +170,11 @@ export function RegistrationsTable({
                     variant="outline"
                     size="sm"
                     onClick={() => handleInvite(reg)}
-                    // disabled={
-                    //   isInviting === reg.id ||
-                    //   (reg.status != "pending" && reg.status != undefined)
-                    // }
-                    disabled={true}
+                    disabled={
+                      isInviting === reg.id ||
+                      (reg.status != "pending" && reg.status != undefined)
+                    }
+                    //disabled={true}
                   >
                     {isInviting === reg.id && (
                       <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />

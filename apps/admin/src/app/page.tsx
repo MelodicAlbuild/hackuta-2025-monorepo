@@ -1,9 +1,10 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { createSupabaseServerClient } from "@repo/supabase/server";
 import { Users } from "lucide-react";
+import { cookies } from "next/headers";
 
 export default async function AdminDashboard() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(cookies);
 
   const {
     data: { user },

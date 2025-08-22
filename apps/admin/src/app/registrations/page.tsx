@@ -7,9 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cookies } from "next/headers";
 
 export default async function RegistrationsPage() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(cookies);
 
   const { data: registrations, error } = await supabase
     .from("interest-form")

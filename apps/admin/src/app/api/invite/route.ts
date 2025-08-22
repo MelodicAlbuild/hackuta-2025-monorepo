@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient, createSupabaseAdminClient } from '@repo/supabase/server'
+import { cookies } from "next/headers"
 
 export async function POST(request: Request) {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseServerClient(cookies)
 
     // 1. Check if the current user is authenticated
     const { data: { user } } = await supabase.auth.getUser()

@@ -2,9 +2,10 @@
 
 import { createSupabaseServerClient } from '@repo/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { cookies } from "next/headers"
 
 export async function updateUser(formData: { fullName: string }) {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseServerClient(cookies)
 
     // The `updateUser` method allows updating user_metadata
     const { data, error } = await supabase.auth.updateUser({
@@ -21,7 +22,7 @@ export async function updateUser(formData: { fullName: string }) {
 }
 
 export async function updatePassword(formData: { password: string }) {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseServerClient(cookies)
 
     const { data, error } = await supabase.auth.updateUser({
         password: formData.password,

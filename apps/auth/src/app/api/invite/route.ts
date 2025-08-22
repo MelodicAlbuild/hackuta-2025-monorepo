@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient, createSupabaseAdminClient } from '@repo/supabase/server'
+import { cookies } from 'next/headers'
 
 export async function POST(request: Request) {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseServerClient(cookies)
+
+    if (request.headers.has("legacy")) {
+        supabase.auth.setSession({
+            access_token: request.headers.get("access")!,
+            refresh_token: request.headers.get("refresh")!
+        })
+    }
 
     // 1. Check if the current user is authenticated
     const { data: { user } } = await supabase.auth.getUser()
@@ -23,7 +31,11 @@ export async function POST(request: Request) {
 
     // 4. Use the Admin client to send the invite
     const supabaseAdmin = createSupabaseAdminClient()
-    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email)
+    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+        data: {
+            role: 'user'
+        }
+    })
 
     if (error) {
         console.error('Supabase invite error:', error)

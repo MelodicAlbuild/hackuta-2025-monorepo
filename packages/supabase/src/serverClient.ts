@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies'
 
-export async function createSupabaseServerClient() {
+export async function createSupabaseServerClient(cookies: () => Promise<ReadonlyRequestCookies>) {
     const cookieStore = await cookies()
 
     return createServerClient(
@@ -27,7 +27,7 @@ export async function createSupabaseServerClient() {
                 },
             },
             cookieOptions: {
-                domain: ".hackuta.org",
+                domain: process.env.NODE_ENV === 'production' ? ".hackuta.org" : "localhost",
                 secure: process.env.NODE_ENV === 'production',
                 path: "/",
                 sameSite: "lax"

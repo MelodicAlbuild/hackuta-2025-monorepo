@@ -6,7 +6,7 @@ export function createSupabaseBrowserClient() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookieOptions: {
-                domain: ".hackuta.org",
+                domain: process.env.NODE_ENV === 'production' ? ".hackuta.org" : "localhost",
                 secure: process.env.NODE_ENV === 'production',
                 path: "/",
                 sameSite: "lax"
