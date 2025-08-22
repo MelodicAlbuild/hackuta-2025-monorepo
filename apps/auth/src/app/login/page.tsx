@@ -1,34 +1,18 @@
-// apps/auth/src/app/login/page.tsx
 import { LoginForm } from "@/components/login-form";
 import Link from "next/link";
 
 export default function LoginPage() {
   return (
-    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      {/* Left side - Branding/Image */}
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-        <div
-          className="absolute inset-0 bg-cover"
-          style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80)",
-          }}
-        />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          {/* Your Logo or App Name Here */}
-          HackUTA 2025
-        </div>
-      </div>
-
-      {/* Right side - Login Form */}
-      <div className="lg:p-8">
+    // The main container now uses flexbox to center content
+    <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
+      <div className="flex items-center justify-center p-6 lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Welcome back
+              Welcome Back
             </h1>
             <p className="text-sm text-muted-foreground">
-              Enter your credentials to access your account
+              Sign in to access HackUTA portals
             </p>
           </div>
           <LoginForm />
@@ -45,6 +29,18 @@ export default function LoginPage() {
             .
           </p>
         </div>
+      </div>
+      {/* This branding column is hidden on mobile and appears on large screens */}
+      <div className="hidden bg-muted lg:block">
+        <div
+          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          style={{
+            backgroundImage:
+              "url(https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
       </div>
     </div>
   );
