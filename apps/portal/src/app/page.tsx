@@ -6,8 +6,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { cookies } from "next/headers";
 import { QrCodeModal } from "@/components/qr-code-modal";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { cookies } from "next/headers";
 
 export default async function PortalPage() {
   const supabase = await createSupabaseServerClient(cookies);
@@ -15,42 +17,46 @@ export default async function PortalPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return <></>;
-  }
-
-  // Fetch the user's profile and points in one query
   const { data: profile } = await supabase
     .from("profiles")
-    .select(
-      `
-      *,
-      points ( score )
-    `
-    )
+    .select("*, points ( score )")
     .eq("id", user!.id)
     .single();
 
   const userPoints = profile?.points[0]?.score ?? 0;
+  const accountSettingsUrl = `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/dashboard`;
 
   return (
     <div className="p-4 sm:p-8 space-y-8">
-      <header className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Your HackUTA Portal
-          </h1>
-          <p className="text-gray-600 mt-1">Welcome, {user?.email}!</p>
-        </div>
-        <QrCodeModal />
+      <header>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          Welcome back, {user?.email}!
+        </h1>
+        <p className="text-gray-600 mt-1">
+          This is your central hub for the HackUTA hackathon.
+        </p>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {/* QR Code Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Event Pass</CardTitle>
+            <CardDescription>
+              Use this QR code for check-in and interactions.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <QrCodeModal />
+          </CardContent>
+        </Card>
+
+        {/* Points Card */}
         <Card>
           <CardHeader>
             <CardTitle>Your Points</CardTitle>
             <CardDescription>
-              Points are earned by participating in events.
+              Earn points by participating in events.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -58,15 +64,16 @@ export default async function PortalPage() {
           </CardContent>
         </Card>
 
+        {/* Account Settings Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Account Status</CardTitle>
-            <CardDescription>
-              Your current role in the HackUTA ecosystem.
-            </CardDescription>
+            <CardTitle>Account Settings</CardTitle>
+            <CardDescription>Manage your profile and password.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold capitalize">{profile?.role}</p>
+            <Button asChild>
+              <Link href="/settings">Go to Settings</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

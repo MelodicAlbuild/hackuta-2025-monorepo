@@ -12,7 +12,7 @@ export async function GET(request: Request) {
         const supabase = await createSupabaseServerClient(cookies)
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-            return NextResponse.redirect(`${origin}${next}`)
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_PORTAL_APP_URL}${next}`)
         }
     }
 
