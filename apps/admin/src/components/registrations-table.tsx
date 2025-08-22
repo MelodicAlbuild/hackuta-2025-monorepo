@@ -61,19 +61,22 @@ function DetailItem({ label, value }: { label: string; value: any }) {
   let displayValue: React.ReactNode = value;
 
   if (label === "Resume") {
-    const updatedValue = displayValue!
-      .toString()
-      .substring(displayValue!.toString().indexOf("/") + 1);
+    if (displayValue && displayValue.toString() != "") {
+      const updatedValue = displayValue!
+        .toString()
+        .substring(displayValue!.toString().indexOf("/") + 1);
 
-    console.log(updatedValue);
-    displayValue = (
-      <a
-        onClick={() => downloadResume(updatedValue)}
-        className="text-blue-500 hover:text-blue-700 hover:underline"
-      >
-        Download Resume
-      </a>
-    );
+      displayValue = (
+        <a
+          onClick={() => downloadResume(updatedValue)}
+          className="text-blue-500 hover:text-blue-700 hover:underline"
+        >
+          Download Resume
+        </a>
+      );
+    } else {
+      displayValue = <span className="text-gray-400">No Resume Uploaded</span>;
+    }
 
     return (
       <div className="flex flex-col py-2 border-b border-gray-100">
