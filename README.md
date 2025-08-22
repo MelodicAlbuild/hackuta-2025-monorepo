@@ -28,9 +28,9 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 ## The Todo List:
 
-- QR Code Management `@repo/qr`?
+- ~~QR Code Management `@repo/qr`?~~
 - Better User Management
-- User Dashboard
+- User Dashboard - **WIP (`portal`)**
 - Organizer Tools
 - Schedule Manager
 - Announcements/Messages? `@repo/amqp`?
