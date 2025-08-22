@@ -7,10 +7,9 @@ import { cookies } from "next/headers"
 function isValidRedirectUrl(url: string | null): boolean {
     if (!url) return false
     // Ensure the redirect is to a known, safe domain (your own)
-    const allowedOrigin = process.env.NEXT_PUBLIC_AUTH_APP_URL || ''
-    const viewerOrigin = process.env.NEXT_PUBLIC_VIEWER_APP_URL || '' // Add viewer app URL to .env
+    const regex = /^(?:[a-zA-Z0-9-]+\.)*hackuta\.org$/;
 
-    return url.startsWith(allowedOrigin) || url.startsWith(viewerOrigin);
+    return regex.test(url) || url.startsWith('http://localhost');
 }
 
 export async function signIn(formData: FormData) {

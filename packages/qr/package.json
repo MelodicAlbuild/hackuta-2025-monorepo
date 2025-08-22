@@ -1,5 +1,5 @@
 {
-  "name": "@repo/supabase",
+  "name": "@repo/qr",
   "version": "1.0.0",
   "description": "",
   "private": true,
@@ -16,14 +16,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.43.4"
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "eslint": "^9.33.0",
-    "typescript": "^5.4.5",
-    "next": "15.5.0",
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@types/qrcode": "^1.5.5",
+    "eslint": "^9.33.0",
+    "typescript": "^5.4.5"
   }
 }

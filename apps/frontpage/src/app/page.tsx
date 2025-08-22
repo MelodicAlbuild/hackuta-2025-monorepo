@@ -6,9 +6,13 @@ import { Menu, X } from "lucide-react";
 import Schedule from "@/components/schedule";
 import Faq from "@/components/faq";
 import InterestForm from "@/components/interest-form";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const authAppLoginUrl = `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login?redirect_to=${window.location.href}profile`;
 
   return (
     <div className="scrollbar-hide bg-gradient-to-b from-black via-blue-950 to-blue-900 min-h-screen">
@@ -43,6 +47,9 @@ export default function Home() {
                 {item.name}
               </a>
             ))}
+            <Button variant="outline" asChild>
+              <Link href={authAppLoginUrl}>Login</Link>
+            </Button>
           </div>
 
           {/* Mobile Navigation */}
@@ -78,6 +85,9 @@ export default function Home() {
                 {item.name}
               </a>
             ))}
+            <Button variant="outline" asChild>
+              <Link href={authAppLoginUrl}>Login</Link>
+            </Button>
           </div>
         </div>
 
