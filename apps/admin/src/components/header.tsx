@@ -67,6 +67,9 @@ export async function Header() {
                 <DropdownMenuItem asChild>
                   <Link href="/scanner">Scanner</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/users">User Management</Link>
+                </DropdownMenuItem>
 
                 {/* --- NEW: Conditional Super Admin Section --- */}
                 {userRole === "super-admin" && (
