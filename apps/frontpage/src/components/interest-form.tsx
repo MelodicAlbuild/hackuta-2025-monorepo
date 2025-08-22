@@ -68,6 +68,7 @@ import { iso31661 } from "iso-3166";
 import { createSupabaseBrowserClient } from "@repo/supabase/client";
 import Link from "next/link";
 import { useRef } from "react";
+import { Label } from "./ui/label";
 
 const FormSchema = z.object({
   // General Information
@@ -87,6 +88,7 @@ const FormSchema = z.object({
     error: "Country of residence is required",
   }),
   linkedInUrl: z.string().url("Invalid LinkedIn URL").optional(),
+  resume: z.string().optional(),
   // Optional Demographic Information
   dietaryRestrictions: z.string().optional(),
   underRepresentedGroup: z.string().optional(),
@@ -138,6 +140,20 @@ export default function InterestForm() {
         }
       });
   }
+
+  async function uploadResume(file: File) {
+    const { data, error } = await supabase.storage
+      .from("interest-form-resumes")
+      .upload(`public/${form.getValues("email")}-${file.name}`, file);
+    if (error) {
+      console.error("Error uploading resume:", error);
+      toast.error("Failed to upload resume. Please try again.");
+    } else {
+      toast.success("Resume uploaded successfully!");
+      form.setValue("resume", data.fullPath);
+    }
+  }
+
   return (
     <Dialog>
       <DialogTrigger
@@ -423,6 +439,20 @@ export default function InterestForm() {
                   </FormItem>
                 )}
               />
+              <br />
+              <div className="grid w-full max-w-sm items-center gap-2">
+                <Label htmlFor="resume">Resume (Optional)</Label>
+                <Input
+                  id="resume"
+                  type="file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      uploadResume(file);
+                    }
+                  }}
+                />
+              </div>
             </DialogHeader>
 
             <Dialog>
