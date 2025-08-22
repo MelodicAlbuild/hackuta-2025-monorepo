@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { inviteUser } from "./actions";
 import { Icons } from "@/components/icons";
+import { createSupabaseBrowserClient } from "@repo/supabase/client";
 
 // The type definition remains the same
 type Registration = {
@@ -34,10 +35,55 @@ function formatLabel(key: string) {
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
 
+async function downloadResume(url: string) {
+  const supabase = createSupabaseBrowserClient();
+  const article = await supabase.storage
+    .from("interest-form-resumes")
+    .download(url);
+
+  if (article.error) {
+    console.error("Error downloading resume:", article.error);
+    return;
+  }
+
+  const blobUrl = URL.createObjectURL(article.data!);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = url.split("/")[1] || "resume.pdf";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 // Helper component to display each piece of information
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function DetailItem({ label, value }: { label: string; value: any }) {
   let displayValue: React.ReactNode = value;
+
+  if (label === "Resume") {
+    const updatedValue = displayValue!
+      .toString()
+      .substring(displayValue!.toString().indexOf("/") + 1);
+
+    console.log(updatedValue);
+    displayValue = (
+      <a
+        onClick={() => downloadResume(updatedValue)}
+        className="text-blue-500 hover:text-blue-700 hover:underline"
+      >
+        Download Resume
+      </a>
+    );
+
+    return (
+      <div className="flex flex-col py-2 border-b border-gray-100">
+        <dt className="text-sm font-medium text-gray-500">{label}</dt>
+        <dd className="mt-1 text-sm text-gray-900 break-words">
+          {displayValue}
+        </dd>
+      </div>
+    );
+  }
 
   if (typeof value === "boolean") {
     displayValue = (
@@ -114,6 +160,7 @@ export function RegistrationsTable({
       "levelOfStudy",
       "majorFieldOfStudy",
       "completedEducation",
+      "resume",
     ],
     "Event Specifics": ["tShirtSize", "dietaryRestrictions"],
     Agreements: ["codeOfConduct", "mlhDataHandling", "mlhPromotion"],
