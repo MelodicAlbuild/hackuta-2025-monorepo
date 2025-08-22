@@ -7,6 +7,9 @@ export async function middleware(request: NextRequest) {
 
     if (!session) {
         const authAppLoginUrl = new URL('/login', process.env.NEXT_PUBLIC_AUTH_APP_URL!)
+        if (authAppLoginUrl.searchParams.has('redirect_to')) {
+            return
+        }
         authAppLoginUrl.searchParams.set('redirect_to', request.url)
         return NextResponse.redirect(authAppLoginUrl)
     }
