@@ -30,7 +30,13 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { deleteUser } from "../actions";
 
-export function UsersTable({ users, currentUserRole }) {
+export function UsersTable({
+  users,
+  currentUserRole,
+}: {
+  users: Array<{ id: string; email: string; role: string; created_at: string }>;
+  currentUserRole: string;
+}) {
   const [isPending, setIsPending] = useState(false);
 
   const handleDelete = async (userId: string) => {
