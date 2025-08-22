@@ -30,10 +30,10 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 - ~~QR Code Management `@repo/qr`?~~
 - Better User Management
-- User Dashboard - **WIP (`portal`)**
+~~- User Dashboard `portal`~~
 - Organizer Tools
 - Schedule Manager
-- Announcements/Messages? `@repo/amqp`?
+- ~~Announcements/Messages? `@repo/amqp`?~~
 - Updates to the Auth Platform
 - Submission Management?
 - Anything else? Ask Dominic/Muhammad/Kevin
