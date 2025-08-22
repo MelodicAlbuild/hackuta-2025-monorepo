@@ -55,9 +55,11 @@ export default function Home() {
                 {item.name}
               </a>
             ))}
-            <Button variant="outline" asChild>
-              <Link href={authAppLoginUrl}>Login</Link>
-            </Button>
+            {process.env.NEXT_PUBLIC_ENABLE_AUTH && (
+              <Button variant="outline" asChild>
+                <Link href={authAppLoginUrl}>Login</Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -93,9 +95,11 @@ export default function Home() {
                 {item.name}
               </a>
             ))}
-            <Button variant="outline" asChild>
-              <Link href={authAppLoginUrl}>Login</Link>
-            </Button>
+            {process.env.NEXT_PUBLIC_ENABLE_AUTH && (
+              <Button variant="outline" asChild>
+                <Link href={authAppLoginUrl}>Login</Link>
+              </Button>
+            )}
           </div>
         </div>
 
