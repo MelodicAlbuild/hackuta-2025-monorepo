@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@repo/supabase/server";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { cookies } from "next/headers";
 
@@ -9,6 +18,7 @@ export async function Header() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   let userRole = "user";
   if (user) {
     const { data: profile } = await supabase
@@ -27,37 +37,59 @@ export async function Header() {
           <Link href="/" className="text-xl font-bold text-gray-900">
             HackUTA Admin
           </Link>
-          {/* Navigation links only show if the user is logged in */}
-          {user && (
-            <div className="hidden md:flex items-center gap-4 text-sm font-medium text-gray-600">
-              <Link href="/" className="hover:text-blue-600">
-                Dashboard
-              </Link>
-              <Link href="/registrations" className="hover:text-blue-600">
-                Registrations
-              </Link>
-              {userRole === "super-admin" && (
-                <Link href="/manage-roles" className="hover:text-blue-600">
-                  Manage Roles
-                </Link>
-              )}
-              <Link href="/points" className="hover:text-blue-600">
-                Points
-              </Link>
-              <Link href="/scanner" className="hover:text-blue-600">
-                Scanner
-              </Link>
-            </div>
-          )}
         </div>
 
-        {/* The sign-out form only shows if the user is logged in */}
         {user && (
-          <form action={signOut}>
-            <Button variant="outline" type="submit">
-              Sign Out
-            </Button>
-          </form>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 hidden sm:block">
+              {user.email}
+            </span>
+
+            {/* --- NEW: Navigation Dropdown Menu --- */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/registrations">Registrations</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/points">Points</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/scanner">Scanner</Link>
+                </DropdownMenuItem>
+
+                {/* --- NEW: Conditional Super Admin Section --- */}
+                {userRole === "super-admin" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Super Admin</DropdownMenuLabel>
+                    <DropdownMenuItem asChild>
+                      <Link href="/manage-roles">Manage Roles</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/notifications">Send Notifications</Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <form action={signOut}>
+              <Button variant="ghost" type="submit">
+                Sign Out
+              </Button>
+            </form>
+          </div>
         )}
       </nav>
     </header>
