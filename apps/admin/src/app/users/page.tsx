@@ -11,6 +11,11 @@ import {
 } from "@/components/ui/card";
 import { UsersTable } from "./_components/users-table";
 import { cookies } from "next/headers";
+import { User } from "@supabase/supabase-js";
+
+export interface UserWithRole extends User {
+  role: string;
+}
 
 export default async function UserManagementPage() {
   const supabase = await createSupabaseServerClient(cookies);

@@ -29,12 +29,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { deleteUser } from "../actions";
+import { UserWithRole } from "../page";
 
 export function UsersTable({
   users,
   currentUserRole,
 }: {
-  users: Array<{ id: string; email: string; role: string; created_at: string }>;
+  users: UserWithRole[];
   currentUserRole: string;
 }) {
   const [isPending, setIsPending] = useState(false);
