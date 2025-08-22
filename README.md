@@ -34,6 +34,6 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 - Organizer Tools
 - Schedule Manager
 - ~~Announcements/Messages? `@repo/amqp`?~~
-- Updates to the Auth Platform
+- ~~Updates to the Auth Platform~~
 - Submission Management?
 - Anything else? Ask Dominic/Muhammad/Kevin
