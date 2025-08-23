@@ -62,9 +62,6 @@ export async function Header() {
                   <Link href="/registrations">Registrations</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/points">Points</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/scanner">Scanner</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -81,6 +78,9 @@ export async function Header() {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/notifications">Send Notifications</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/points">Manage Points</Link>
                     </DropdownMenuItem>
                   </>
                 )}
