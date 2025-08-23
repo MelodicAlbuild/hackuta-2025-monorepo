@@ -24,7 +24,7 @@ export default async function PortalPage() {
     .eq("id", user!.id)
     .single();
 
-  const userPoints = profile?.points[0]?.score ?? 0;
+  const userPoints = profile?.points?.score ?? 0;
   const accountSettingsUrl = `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/dashboard`;
 
   return (
