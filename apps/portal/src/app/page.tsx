@@ -10,6 +10,7 @@ import { QrCodeModal } from "@/components/qr-code-modal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cookies } from "next/headers";
+import { PointsCard } from "@/components/points-cards";
 
 export default async function PortalPage() {
   const supabase = await createSupabaseServerClient(cookies);
@@ -52,17 +53,7 @@ export default async function PortalPage() {
         </Card>
 
         {/* Points Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Points</CardTitle>
-            <CardDescription>
-              Earn points by participating in events.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-5xl font-bold">{userPoints}</p>
-          </CardContent>
-        </Card>
+        <PointsCard initialPoints={userPoints} />
 
         {/* Account Settings Card */}
         <Card>
