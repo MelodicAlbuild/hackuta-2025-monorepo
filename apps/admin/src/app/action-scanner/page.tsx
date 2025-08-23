@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,11 +9,13 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
 import { applyPointsAction } from "./actions";
+import { Button } from "@/components/ui/button";
 
 type ActionState = "idle" | "loading" | "success" | "failure";
 type ActionType = "add" | "remove";
@@ -57,6 +59,7 @@ export default function ActionScannerPage() {
   // State for the scanning feedback
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [isConfigLocked, setIsConfigLocked] = useState(false);
 
   // Main handler for when a QR code is successfully decoded
   const handleScan = async (scannedToken: string) => {
@@ -106,6 +109,43 @@ export default function ActionScannerPage() {
       setFeedbackMessage("");
     }, 2500);
   };
+
+  const ScannerView = memo(function ScannerView({
+    onScan,
+    actionState,
+    feedbackMessage,
+  }: {
+    onScan: (result: string) => void;
+    actionState: ActionState;
+    feedbackMessage: string;
+  }) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Scanner</CardTitle>
+          <CardDescription>
+            The action configured on the left will be applied to each user you
+            scan.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="relative w-full max-w-sm mx-auto overflow-hidden border rounded-lg">
+            <ActionOverlay state={actionState} message={feedbackMessage} />
+            <Scanner
+              constraints={{ facingMode: "environment" }}
+              sound={false}
+              onScan={(detectedBarcodes) => {
+                if (detectedBarcodes.length > 0) {
+                  const scannedText = detectedBarcodes[0].rawValue;
+                  onScan(scannedText);
+                }
+              }}
+            />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  });
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
@@ -182,33 +222,27 @@ export default function ActionScannerPage() {
             </div>
           )}
         </CardContent>
+        <CardFooter>
+          {isConfigLocked ? (
+            <Button variant="outline" onClick={() => setIsConfigLocked(false)}>
+              Change Action
+            </Button>
+          ) : (
+            <Button onClick={() => setIsConfigLocked(true)}>
+              Lock in Action & Start Scanning
+            </Button>
+          )}
+        </CardFooter>
       </Card>
 
       {/* --- COLUMN 2: SCANNER --- */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Scanner</CardTitle>
-          <CardDescription>
-            The action configured on the left will be applied to each user you
-            scan.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="relative w-full max-w-sm mx-auto overflow-hidden border rounded-lg">
-            <ActionOverlay state={actionState} message={feedbackMessage} />
-            <Scanner
-              constraints={{ facingMode: "environment" }}
-              sound={false}
-              onScan={(detectedBarcodes) => {
-                if (detectedBarcodes.length > 0) {
-                  const scannedText = detectedBarcodes[0].rawValue;
-                  handleScan(scannedText);
-                }
-              }}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {isConfigLocked && (
+        <ScannerView
+          onScan={handleScan}
+          actionState={actionState}
+          feedbackMessage={feedbackMessage}
+        />
+      )}
     </div>
   );
 }
