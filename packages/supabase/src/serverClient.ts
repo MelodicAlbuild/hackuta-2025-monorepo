@@ -31,6 +31,12 @@ export async function createSupabaseServerClient(cookies: () => Promise<Readonly
                 secure: process.env.NODE_ENV === 'production',
                 path: "/",
                 sameSite: "lax"
+            },
+            auth: {
+                storageKey: 'sb-auth-token',
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true,
             }
         }
     )

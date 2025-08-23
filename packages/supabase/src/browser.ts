@@ -10,6 +10,12 @@ export function createSupabaseBrowserClient() {
                 secure: process.env.NODE_ENV === 'production',
                 path: "/",
                 sameSite: "lax"
+            },
+            auth: {
+                storageKey: 'sb-auth-token',
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true,
             }
         }
     )

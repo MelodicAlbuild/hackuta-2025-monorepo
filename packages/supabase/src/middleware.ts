@@ -26,6 +26,12 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
                     })
                 },
             },
+            auth: {
+                storageKey: 'sb-auth-token',
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true,
+            }
         }
     )
 

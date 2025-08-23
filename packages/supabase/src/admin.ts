@@ -11,9 +11,10 @@ export const createSupabaseAdminClient = () => {
         process.env.SUPABASE_SERVICE_ROLE_KEY,
         {
             auth: {
+                storageKey: 'sb-auth-token',
                 autoRefreshToken: false,
                 persistSession: false,
-            },
+            }
         }
     )
 }
