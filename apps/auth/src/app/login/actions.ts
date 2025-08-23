@@ -31,7 +31,7 @@ export async function signIn(formData: FormData) {
         return redirect(redirectTo!)
     }
 
-    redirect('/dashboard')
+    redirect(`${process.env.NEXT_PUBLIC_PORTAL_APP_URL}/`)
 }
 
 export async function signUp(formData: FormData) {
