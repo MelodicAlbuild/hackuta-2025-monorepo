@@ -81,6 +81,7 @@ export default function UserScannerPage() {
               onScan={(result) => {
                 if (result) handleScan(result[0].rawValue);
               }}
+              sound={false}
               constraints={{ facingMode: "environment" }}
             />
           </div>
