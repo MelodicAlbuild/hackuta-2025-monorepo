@@ -85,6 +85,9 @@ export async function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/points">Manage Points</Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/vendor-codes">Manage Vendor Codes</Link>
+                    </DropdownMenuItem>
                   </>
                 )}
               </DropdownMenuContent>

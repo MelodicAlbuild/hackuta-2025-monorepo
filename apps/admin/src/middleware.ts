@@ -31,7 +31,9 @@ export async function middleware(request: NextRequest) {
         .select('role')
         .single()
 
-    if (request.nextUrl.pathname.startsWith('/manage-roles') || request.nextUrl.pathname.startsWith("/notifications") || request.nextUrl.pathname.startsWith("/points")) {
+    const superAdminOnlyRoutes = ['/manage-roles', '/notifications', '/points', '/vendor-codes'];
+
+    if (superAdminOnlyRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
         if (profile?.role !== 'super-admin') {
             const unauthorizedUrl = new URL('/unauthorized', request.url)
             return NextResponse.redirect(unauthorizedUrl)

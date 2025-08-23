@@ -48,6 +48,12 @@ export async function Header() {
                 Admin Portal
               </Link>
             )}
+            <Link
+              href="/scan"
+              className="hover:text-blue-600 font-semibold text-green-600"
+            >
+              Scan Code
+            </Link>
           </div>
         </div>
 
