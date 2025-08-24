@@ -67,7 +67,7 @@ export function InviteUserDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Invite New User</Button>
+        <Button className="mr-2">Invite New User</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

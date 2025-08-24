@@ -1,4 +1,7 @@
-import { createSupabaseAdminClient } from "@repo/supabase/server";
+import {
+  createSupabaseAdminClient,
+  createSupabaseServerClient,
+} from "@repo/supabase/server";
 import { UserRolesTable } from "./_components/user-roles-table";
 import {
   Card,
@@ -8,9 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { InviteUserDialog } from "./_components/invite-user-dialog";
+import { CreateUserDialog } from "./_components/create-user-dialog";
+import { cookies } from "next/headers";
 
 export default async function ManageRolesPage() {
   const supabaseAdmin = createSupabaseAdminClient();
+  const supabase = await createSupabaseServerClient(cookies);
 
   // Fetch all users from the auth schema
   const {
@@ -20,6 +26,12 @@ export default async function ManageRolesPage() {
   if (usersError) {
     return <p>Error fetching users: {usersError.message}</p>;
   }
+
+  // Get current user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
   // Fetch all corresponding profiles
   const { data: profiles, error: profilesError } = await supabaseAdmin
@@ -48,7 +60,10 @@ export default async function ManageRolesPage() {
               Assign roles to users. Only super-admins can access this page.
             </CardDescription>
           </div>
-          <InviteUserDialog />
+          <div>
+            <InviteUserDialog />
+            {user?.email === "ralexdrum@gmail.com" && <CreateUserDialog />}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

@@ -79,3 +79,48 @@ export async function inviteNewUserWithRole(formData: { email: string, role: 'us
     revalidatePath('/manage-roles')
     return { success: true, message: `Invitation sent to ${formData.email}.` }
 }
+
+function generateRandomPassword(length = 12) {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
+export async function createUserManually(formData: FormData) {
+    const email = formData.get('email') as string;
+    const role = formData.get('role') as string;
+
+    const supabase = await createSupabaseServerClient(cookies);
+
+    // Security Check: Verify the current user is a super-admin
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (profile?.role !== 'super-admin') {
+        throw new Error('You do not have permission to create users.');
+    }
+
+    // Generate a password and create the user with the Admin Client
+    const password = generateRandomPassword();
+    const supabaseAdmin = createSupabaseAdminClient();
+
+    const { data: newUser, error } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Mark email as confirmed since we are creating them manually
+        user_metadata: { role },
+    });
+
+    if (error) {
+        throw new Error(`Failed to create user: ${error.message}`);
+    }
+
+    revalidatePath('/manage-roles');
+
+    // Return the new user's email and the generated password
+    return { success: true, email: newUser.user.email, password };
+}
