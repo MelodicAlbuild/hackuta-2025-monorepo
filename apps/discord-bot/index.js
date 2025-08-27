@@ -9,6 +9,9 @@ const {
 } = require("discord.js");
 const { createClient } = require("@supabase/supabase-js");
 
+// Local Running of the Discord Bot is DISABLED
+const disabled = true;
+
 // --- Clients ---
 const discordClient = new Client({ intents: [GatewayIntentBits.Guilds] });
 const supabase = createClient(
@@ -151,4 +154,6 @@ discordClient.on("interactionCreate", async (interaction) => {
   }
 });
 
-discordClient.login(process.env.DISCORD_TOKEN);
+if (!disabled) {
+  discordClient.login(process.env.DISCORD_TOKEN);
+}
