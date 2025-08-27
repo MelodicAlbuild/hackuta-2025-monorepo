@@ -1,136 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
 import Schedule from '@/components/schedule';
 import Faq from '@/components/faq';
 import InterestForm from '@/components/interest-form';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import Navbar from '@/components/navbar';
 
 export default function Home() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const [authAppLoginUrl, setAuthAppLoginUrl] = useState('');
-  const [showLoginButton, setShowLoginButton] = useState(false);
-
-  useEffect(() => {
-    if (window) {
-      setAuthAppLoginUrl(
-        `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login?redirect_to=${window.location.href}profile`,
-      );
-    }
-
-    const handleFeatureFlags = async () => {
-      const response = await fetch(
-        '/api/feature-flags?flag=show_signin_button',
-      );
-      const data = await response.json();
-      setShowLoginButton(data === 'true');
-    };
-
-    handleFeatureFlags();
-  }, []);
-
   return (
     <div className="scrollbar-hide bg-gradient-to-b from-black via-blue-950 to-blue-900 min-h-screen">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 w-full z-[100] bg-gradient-to-r from-black via-blue-950 to-black px-[15px] md:px-[5px] text-center fancy-shadow md:h-16">
-        <div className="flex items-center justify-between px-20 md:px-5 h-full">
-          <div className="flex items-center">
-            <Image
-              src="/Logo.svg"
-              alt="Main Logo"
-              width={30}
-              height={34}
-              priority
-            />
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex xl:space-x-24 lg:space-x-10 md:space-x-5 justify-center w-full">
-            {[
-              { name: 'Home', href: '#' },
-              { name: 'When & Where', href: '#d-time' },
-              { name: 'Apply', href: '#apply' },
-              { name: 'Sponsors', href: '#sponsors' },
-              { name: 'Schedule', href: '#schedule' },
-              { name: 'FAQ', href: '#faq' },
-            ].map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-white font-franklinGothic lg:text-2xl md:text-lg font-normal hover:text-purple-300 transition shrink"
-              >
-                {item.name}
-              </a>
-            ))}
-            {showLoginButton && (
-              <Button variant="outline" asChild>
-                <Link href={authAppLoginUrl}>Login</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Mobile Navigation */}
-          <button
-            className="md:hidden text-white focus:outline-none"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle Menu"
-          >
-            {isOpen ? <X size={32} /> : <Menu size={32} />}
-          </button>
-
-          <div
-            className={`absolute top-full left-0 w-full bg-purple-950 bg-opacity-80 backdrop-blur-md flex flex-col items-center space-y-4 py-4 transition-all ${
-              isOpen
-                ? 'opacity-100 scale-100'
-                : 'opacity-0 scale-95 pointer-events-none'
-            }`}
-          >
-            {[
-              { name: 'Home', href: '#' },
-              { name: 'When & Where', href: '#d-time' },
-              { name: 'Apply', href: '#apply' },
-              { name: 'Sponsors', href: '#founders-arena' },
-              { name: 'Schedule', href: '#schedule' },
-              { name: 'FAQ', href: '#faq' },
-            ].map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="font-franklinGothic text-white text-xl font-normal hover:text-purple-300 transition"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.name}
-              </a>
-            ))}
-            {showLoginButton && (
-              <Button variant="outline" asChild>
-                <Link href={authAppLoginUrl}>Login</Link>
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* MLH Trust Badge */}
-        <a
-          id="mlh-trust-badge"
-          href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=black"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed z-[10000] right-2 top-[0px] w-[60px] sm:w-[80px] md:w-[90px]"
-        >
-          <Image
-            width={90}
-            height={157}
-            src="https://s3.amazonaws.com/logged-assets/trust-badge/2026/mlh-trust-badge-2026-black.svg"
-            alt="Major League Hacking 2026 Hackathon Season"
-            className="w-full h-auto"
-          />
-        </a>
-      </nav>
+      <Navbar />
+      {/* MLH Trust Badge */}
+      <a
+        id="mlh-trust-badge"
+        href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=black"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed z-[10000] right-2 top-[0px] w-[60px] sm:w-[80px] md:w-[90px]"
+      >
+        <Image
+          width={90}
+          height={157}
+          src="https://s3.amazonaws.com/logged-assets/trust-badge/2026/mlh-trust-badge-2026-black.svg"
+          alt="Major League Hacking 2026 Hackathon Season"
+          className="w-full h-auto"
+        />
+      </a>
 
       {/* Scrollable Content Wrapper */}
       <div className="relative w-full min-h-[130vh] md:min-h-[170vh] flex justify-center items-start" />
