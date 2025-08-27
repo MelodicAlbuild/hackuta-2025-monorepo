@@ -1,33 +1,33 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { Menu, X } from "lucide-react";
-import Schedule from "@/components/schedule";
-import Faq from "@/components/faq";
-import InterestForm from "@/components/interest-form";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Menu, X } from 'lucide-react';
+import Schedule from '@/components/schedule';
+import Faq from '@/components/faq';
+import InterestForm from '@/components/interest-form';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [authAppLoginUrl, setAuthAppLoginUrl] = useState("");
+  const [authAppLoginUrl, setAuthAppLoginUrl] = useState('');
   const [showLoginButton, setShowLoginButton] = useState(false);
 
   useEffect(() => {
     if (window) {
       setAuthAppLoginUrl(
-        `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login?redirect_to=${window.location.href}profile`
+        `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login?redirect_to=${window.location.href}profile`,
       );
     }
 
     const handleFeatureFlags = async () => {
       const response = await fetch(
-        "/api/feature-flags?flag=show_signin_button"
+        '/api/feature-flags?flag=show_signin_button',
       );
       const data = await response.json();
-      setShowLoginButton(data === "true");
+      setShowLoginButton(data === 'true');
     };
 
     handleFeatureFlags();
@@ -51,12 +51,12 @@ export default function Home() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex xl:space-x-24 lg:space-x-10 md:space-x-5 justify-center w-full">
             {[
-              { name: "Home", href: "#" },
-              { name: "When & Where", href: "#d-time" },
-              { name: "Apply", href: "#apply" },
-              { name: "Sponsors", href: "#sponsors" },
-              { name: "Schedule", href: "#schedule" },
-              { name: "FAQ", href: "#faq" },
+              { name: 'Home', href: '#' },
+              { name: 'When & Where', href: '#d-time' },
+              { name: 'Apply', href: '#apply' },
+              { name: 'Sponsors', href: '#sponsors' },
+              { name: 'Schedule', href: '#schedule' },
+              { name: 'FAQ', href: '#faq' },
             ].map((item) => (
               <a
                 key={item.name}
@@ -85,17 +85,17 @@ export default function Home() {
           <div
             className={`absolute top-full left-0 w-full bg-purple-950 bg-opacity-80 backdrop-blur-md flex flex-col items-center space-y-4 py-4 transition-all ${
               isOpen
-                ? "opacity-100 scale-100"
-                : "opacity-0 scale-95 pointer-events-none"
+                ? 'opacity-100 scale-100'
+                : 'opacity-0 scale-95 pointer-events-none'
             }`}
           >
             {[
-              { name: "Home", href: "#" },
-              { name: "When & Where", href: "#d-time" },
-              { name: "Apply", href: "#apply" },
-              { name: "Sponsors", href: "#founders-arena" },
-              { name: "Schedule", href: "#schedule" },
-              { name: "FAQ", href: "#faq" },
+              { name: 'Home', href: '#' },
+              { name: 'When & Where', href: '#d-time' },
+              { name: 'Apply', href: '#apply' },
+              { name: 'Sponsors', href: '#founders-arena' },
+              { name: 'Schedule', href: '#schedule' },
+              { name: 'FAQ', href: '#faq' },
             ].map((item) => (
               <a
                 key={item.name}
@@ -242,7 +242,7 @@ export default function Home() {
           </h2>
           <p className="text-lg sm:text-2xl mt-4 font-normal text-center max-w-[600px]">
             Mouser Electronics is a worldwide leading authorized distributor of
-            semiconductors and electronic components for over 700 industry
+            semiconductors and electronic components for over 1,200 industry
             leading manufacturers.
           </p>
 
@@ -284,6 +284,24 @@ export default function Home() {
             MLH is an engaged and passionate maker community, consisting of the
             next generation of technology leaders and entrepreneurs.
           </p>
+
+          <div className="mt-16" />
+
+          <a
+            href="https://mail.mlh.io/e/c/eyJlIjoxNTI0ODIsImVtYWlsX2lkIjoiZXhhbXBsZSIsImhyZWYiOiJodHRwczovL21saC5saW5rL01MSC1QdXJlQnV0dG9ucy1oYWNrYXRob25zP2Fqc191aWQ9MDE5NjNjZjEtNmZlNy00NmU1LThiOWItOWYzYjQ1ZTQ5YTQxXHUwMDI2dXRtX2NhbXBhaWduPU1lbWJlcitFdmVudCstK1B1cmUrQnV0dG9ucytJbnRyb1x1MDAyNnV0bV9jb250ZW50PVB1cmUrQnV0dG9ucytJbnRyb1x1MDAyNnV0bV9tZWRpdW09RW1haWxcdTAwMjZ1dG1fc291cmNlPUN1c3RvbWVyLmlvIiwidCI6MTc0NDgwNzUxMX0/465b97fffd84c977c1b3f1e4dc23b3c937dce616e1a19b195fbefe37581efec1"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src="/PureButtonsLogo.png"
+              alt="PureButtons Logo"
+              width={300}
+              height={100}
+            />
+            <h2 className="text-3xl sm:text-5xl font-bold text-center max-w-[600px]">
+              PURE BUTTONS
+            </h2>
+          </a>
         </section>
 
         <section id="schedule" className="scroll-mt-16 pt-10 mx-auto p-[50px]">
