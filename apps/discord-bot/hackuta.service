@@ -1,0 +1,14 @@
+[Unit]
+Description=Discord Bot for HackUTA
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/hackuta-bot
+EnvironmentFile=/home/ubuntu/hackuta-bot/.env
+ExecStart=/home/ubuntu/.local/share/pnpm/pnpm start
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
