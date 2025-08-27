@@ -8,7 +8,8 @@ This repo is the core of HackUTA comprising of all the packages and sites that r
 2. Install pnpm [pnpm Install Docs](https://pnpm.io/installation)
 3. Run `pnpm install` from the **ROOT** of the project
 4. Collect the needed `.env.local` from someone who has it, ask in the tech chat
-5. Begin Development!
+5. Read the [README](./supabase/README.md) in the `supabase` folder to configure the remote supabase db. *(Only one person ever needs to do this, don't do it if someone else has)*
+6. Begin Development!
 
 ## What's inside?
 
