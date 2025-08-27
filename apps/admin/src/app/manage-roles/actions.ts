@@ -105,22 +105,38 @@ export async function createUserManually(formData: FormData) {
     }
 
     // Generate a password and create the user with the Admin Client
-    const password = generateRandomPassword();
     const supabaseAdmin = createSupabaseAdminClient();
+
+    // ** NEW: Read the feature flag **
+    const { data: flag } = await supabaseAdmin
+        .from('feature_flags')
+        .select('value')
+        .eq('name', 'invite_method')
+        .single();
+
+    const inviteMethod = flag?.value || 'email'; // Default to email if flag not found
+    const password = generateRandomPassword();
 
     const { data: newUser, error } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
-        email_confirm: true, // Mark email as confirmed since we are creating them manually
+        email_confirm: true,
         user_metadata: { role },
     });
 
-    if (error) {
-        throw new Error(`Failed to create user: ${error.message}`);
+    if (error) throw new Error(`Failed to create user: ${error.message}`);
+
+    if (inviteMethod === 'discord') {
+        // ** NEW: Save password to the database for the bot to fetch **
+        await supabaseAdmin
+            .from('temporary_passwords')
+            .insert({ user_id: newUser.user.id, temp_password: password });
+
+        revalidatePath('/manage-roles');
+        return { success: true, message: `User ${email} created. They can now get their password from the Discord bot.` };
+    } else {
+        // ** OLD: Return the password directly to the admin **
+        revalidatePath('/manage-roles');
+        return { success: true, email: newUser.user.email, password };
     }
-
-    revalidatePath('/manage-roles');
-
-    // Return the new user's email and the generated password
-    return { success: true, email: newUser.user.email, password };
 }

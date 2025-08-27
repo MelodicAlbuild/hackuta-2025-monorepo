@@ -13,6 +13,7 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
 
   const [authAppLoginUrl, setAuthAppLoginUrl] = useState("");
+  const [showLoginButton, setShowLoginButton] = useState(false);
 
   useEffect(() => {
     if (window) {
@@ -20,6 +21,16 @@ export default function Home() {
         `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login?redirect_to=${window.location.href}profile`
       );
     }
+
+    const handleFeatureFlags = async () => {
+      const response = await fetch(
+        "/api/feature-flags?flag=show_signin_button"
+      );
+      const data = await response.json();
+      setShowLoginButton(data === "true");
+    };
+
+    handleFeatureFlags();
   }, []);
 
   return (
@@ -55,7 +66,7 @@ export default function Home() {
                 {item.name}
               </a>
             ))}
-            {process.env.NEXT_PUBLIC_ENABLE_AUTH && (
+            {showLoginButton && (
               <Button variant="outline" asChild>
                 <Link href={authAppLoginUrl}>Login</Link>
               </Button>
@@ -95,7 +106,7 @@ export default function Home() {
                 {item.name}
               </a>
             ))}
-            {process.env.NEXT_PUBLIC_ENABLE_AUTH && (
+            {showLoginButton && (
               <Button variant="outline" asChild>
                 <Link href={authAppLoginUrl}>Login</Link>
               </Button>
