@@ -34,7 +34,7 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/). *Except 
 
 - ~~QR Code Management `@repo/qr`?~~
 - Better User Management - **WIP (v1)**
-~~- User Dashboard `portal`~~
+- ~~User Dashboard `portal`~~
 - Organizer Tools - **WIP (v1ish)**
 - Schedule Manager
 - ~~Announcements/Messages? `@repo/amqp`?~~
