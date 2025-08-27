@@ -62,7 +62,10 @@ export default async function ManageRolesPage() {
           </div>
           <div>
             <InviteUserDialog />
-            {user?.email === "ralexdrum@gmail.com" && <CreateUserDialog />}
+            {(user?.email === "ralexdrum@gmail.com" ||
+              user?.email === "dominic.m.lamanna@gmail.com") && (
+              <CreateUserDialog />
+            )}
           </div>
         </div>
       </CardHeader>

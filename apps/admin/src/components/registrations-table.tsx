@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { inviteUser } from "./actions";
+import { inviteUser } from "../app/registrations/actions";
 import { Icons } from "@/components/icons";
 import { createSupabaseBrowserClient } from "@repo/supabase/client";
 

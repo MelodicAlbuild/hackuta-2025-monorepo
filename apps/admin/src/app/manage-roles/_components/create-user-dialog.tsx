@@ -124,6 +124,18 @@ export function CreateUserDialog() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Invite Method</Label>
+              <Select name="inviteMethod" defaultValue="email">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an invite method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="email">Show Password</SelectItem>
+                  <SelectItem value="discord">Discord</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             {error && <p className="text-sm text-red-500">{error}</p>}
             <DialogFooter>
               <DialogClose asChild>
