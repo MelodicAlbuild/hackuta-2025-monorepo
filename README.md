@@ -26,7 +26,7 @@ This Repository includes the following packages/apps:
 - `@repo/tailwind-config`: `tailwind` configurations. **CURRENTLY UNUSED, NEED TO FIX THIS** *`packages/tailwind-config`*
 - `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo *`packages/typescript-config`*
 - `@repo/supabase`: the core of the database management using supabase *`packages/supabase`*
-- `@repo/qr`: a uniform library for qr based connections and content scanning in a single package
+- `@repo/qr`: a uniform library for qr based connections and content scanning in a single package *`packages/qr`*
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
