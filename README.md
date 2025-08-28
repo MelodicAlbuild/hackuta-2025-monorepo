@@ -40,4 +40,5 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/). *Except 
 - ~~Announcements/Messages? `@repo/amqp`?~~
 - ~~Updates to the Auth Platform~~
 - ~~Submission Management?~~
+- Remove Supabase Realtime, It destroys DB Resources. _(80k calls at 328.23 seconds)_
 - Anything else? Ask Dominic/Muhammad/Kevin
