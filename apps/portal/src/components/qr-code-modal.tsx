@@ -1,21 +1,32 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Icons } from "@/components/icons";
-import Image from "next/image";
-import { useState } from "react";
+} from '@/components/ui/dialog';
+import { Icons } from '@/components/icons';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export function QrCodeModal() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userGroup, setUserGroup] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserGroup = async () => {
+      const response = await fetch('/api/user-group');
+      const data = await response.json();
+      setUserGroup(data.group);
+    };
+    fetchUserGroup();
+  }, []);
 
   return (
     <Dialog>
@@ -48,15 +59,24 @@ export function QrCodeModal() {
               width={300}
               height={300}
               unoptimized
-              className={`transition-opacity duration-300 ${isLoading || error ? "opacity-0" : "opacity-100"}`}
+              className={`transition-opacity duration-300 ${isLoading || error ? 'opacity-0' : 'opacity-100'}`}
               onLoad={() => setIsLoading(false)}
               onError={() => {
                 setIsLoading(false);
-                setError("Could not load QR code.");
+                setError('Could not load QR code.');
               }}
             />
           </div>
         </div>
+        {userGroup && (
+          <DialogFooter>
+            <div className="flex text-center font-franklinGothic">
+              <p className="font-franklinGothic text-gray-600">
+                Group: <span className="font-bold text-black">{userGroup}</span>
+              </p>
+            </div>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
