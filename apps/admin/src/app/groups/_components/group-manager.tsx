@@ -33,7 +33,17 @@ import { Icons } from '@/components/icons';
 
 type RowStatus = 'idle' | 'loading' | 'success' | 'failure';
 
-export function GroupManager({ users }) {
+type UserWithGroup = {
+  id: string;
+  email?: string;
+  group: string | null;
+};
+
+type GroupManagerProps = {
+  users: UserWithGroup[];
+};
+
+export function GroupManager({ users }: GroupManagerProps) {
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(
     new Set(),
   );
@@ -80,7 +90,11 @@ export function GroupManager({ users }) {
 
   const handleSelectUser = (userId: string, checked: boolean) => {
     const newSet = new Set(selectedUserIds);
-    checked ? newSet.add(userId) : newSet.delete(userId);
+    if (checked) {
+      newSet.add(userId);
+    } else {
+      newSet.delete(userId);
+    }
     setSelectedUserIds(newSet);
   };
 
@@ -161,7 +175,7 @@ export function GroupManager({ users }) {
                 <TableCell>{user.group || 'N/A'}</TableCell>
                 <TableCell className="w-[150px]">
                   <Select
-                    defaultValue={user.group}
+                    defaultValue={user.group ? user.group : ''}
                     onValueChange={(value) =>
                       setPendingChanges((prev) => ({
                         ...prev,
