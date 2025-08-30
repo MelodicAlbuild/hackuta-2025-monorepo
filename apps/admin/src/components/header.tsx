@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { createSupabaseServerClient } from "@repo/supabase/server";
-import { Button } from "@/components/ui/button";
+import Link from 'next/link';
+import { createSupabaseServerClient } from '@repo/supabase/server';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,10 +8,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
-import { signOut } from "@/app/auth/actions";
-import { cookies } from "next/headers";
+} from '@/components/ui/dropdown-menu';
+import { Menu } from 'lucide-react';
+import { signOut } from '@/app/auth/actions';
+import { cookies } from 'next/headers';
 
 export async function Header() {
   const supabase = await createSupabaseServerClient(cookies);
@@ -19,11 +19,11 @@ export async function Header() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let userRole = "user";
+  let userRole = 'user';
   if (user) {
     const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
+      .from('profiles')
+      .select('role')
       .single();
     if (profile) {
       userRole = profile.role;
@@ -62,17 +62,14 @@ export async function Header() {
                   <Link href="/registrations">Registrations</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/scanner">Scanner</Link>
+                  <Link href="/action-scanner">Scanner</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/users">User Management</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/action-scanner">Action Scanner</Link>
-                </DropdownMenuItem>
 
                 {/* --- NEW: Conditional Super Admin Section --- */}
-                {userRole === "super-admin" && (
+                {userRole === 'super-admin' && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuLabel>Super Admin</DropdownMenuLabel>
@@ -84,6 +81,9 @@ export async function Header() {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/points">Manage Points</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/scanner">Admin Scanner</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/vendor-codes">Manage Vendor Codes</Link>
