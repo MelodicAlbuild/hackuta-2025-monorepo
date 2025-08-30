@@ -32,6 +32,7 @@ export async function middleware(request: NextRequest) {
         .single()
 
     const superAdminOnlyRoutes = ['/manage-roles', '/notifications', '/points', '/scanner', '/vendor-codes'];
+    const volunteerRoutes = ['/', '/action-scanner']
 
     if (superAdminOnlyRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
         if (profile?.role !== 'super-admin') {
@@ -40,8 +41,14 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    const allowedRoles = ['admin', 'super-admin'];
+    const allowedRoles = ['volunteer', 'admin', 'super-admin'];
     if (!profile || !allowedRoles.includes(profile.role)) {
+        const unauthorizedUrl = new URL('/unauthorized', request.url)
+        return NextResponse.redirect(unauthorizedUrl)
+    }
+
+    // Lock Volunteers to specific routes ONLY
+    if (profile?.role === 'volunteer' && !volunteerRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
         const unauthorizedUrl = new URL('/unauthorized', request.url)
         return NextResponse.redirect(unauthorizedUrl)
     }

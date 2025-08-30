@@ -4,7 +4,7 @@ import { createSupabaseServerClient, createSupabaseAdminClient } from '@repo/sup
 import { revalidatePath } from 'next/cache'
 import { cookies } from "next/headers"
 
-export async function updateUserRole(targetUserId: string, newRole: 'user' | 'admin' | 'super-admin') {
+export async function updateUserRole(targetUserId: string, newRole: 'user' | 'volunteer' | 'admin' | 'super-admin') {
     const supabase = await createSupabaseServerClient(cookies)
 
     // Security Check 1: Verify the current user is a super-admin
@@ -44,7 +44,7 @@ export async function updateUserRole(targetUserId: string, newRole: 'user' | 'ad
     return { success: true, message: `Role updated to ${newRole}.` }
 }
 
-export async function inviteNewUserWithRole(formData: { email: string, role: 'user' | 'admin' | 'super-admin' }) {
+export async function inviteNewUserWithRole(formData: { email: string, role: 'user' | 'volunteer' | 'admin' | 'super-admin' }) {
     const supabase = await createSupabaseServerClient(cookies)
 
     // Security Check: Verify the current user is a super-admin

@@ -59,14 +59,20 @@ export async function Header() {
                   <Link href="/">Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/registrations">Registrations</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/action-scanner">Scanner</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/users">User Management</Link>
-                </DropdownMenuItem>
+
+                {/* --- Conditional Admin/Super Admin Routes --- */}
+                {userRole === 'admin' || userRole === 'super-admin' ? (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/registrations">Registrations</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/users">User Management</Link>
+                    </DropdownMenuItem>
+                  </>
+                ) : null}
 
                 {/* --- NEW: Conditional Super Admin Section --- */}
                 {userRole === 'super-admin' && (

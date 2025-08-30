@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { updateUserRole } from "../actions";
+import { useState } from 'react';
+import { updateUserRole } from '../actions';
 import {
   Table,
   TableBody,
@@ -9,15 +9,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 type UserWithRole = {
   id: string;
@@ -40,19 +40,19 @@ export function UserRolesTable({ users }: { users: UserWithRole[] }) {
     if (!newRole) return;
 
     setIsLoading((prev) => ({ ...prev, [userId]: true }));
-    setMessages((prev) => ({ ...prev, [userId]: "" }));
+    setMessages((prev) => ({ ...prev, [userId]: '' }));
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await updateUserRole(userId, newRole as any);
       setMessages((prev) => ({
         ...prev,
-        [userId]: result.message || "Success!",
+        [userId]: result.message || 'Success!',
       }));
     } catch (error) {
       setMessages((prev) => ({
         ...prev,
-        [userId]: error instanceof Error ? error.message : "An error occurred.",
+        [userId]: error instanceof Error ? error.message : 'An error occurred.',
       }));
     } finally {
       setIsLoading((prev) => ({ ...prev, [userId]: false }));
@@ -74,8 +74,8 @@ export function UserRolesTable({ users }: { users: UserWithRole[] }) {
           <TableRow key={user.id}>
             <TableCell>{user.email}</TableCell>
             <TableCell className="capitalize">
-              {user.role.includes("-")
-                ? user.role.split("-").join(" ")
+              {user.role.includes('-')
+                ? user.role.split('-').join(' ')
                 : user.role}
             </TableCell>
             <TableCell>
@@ -88,6 +88,7 @@ export function UserRolesTable({ users }: { users: UserWithRole[] }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="volunteer">Volunteer</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="super-admin">Super Admin</SelectItem>
                 </SelectContent>
@@ -103,7 +104,7 @@ export function UserRolesTable({ users }: { users: UserWithRole[] }) {
                   isLoading[user.id]
                 }
               >
-                {isLoading[user.id] ? "Updating..." : "Update Role"}
+                {isLoading[user.id] ? 'Updating...' : 'Update Role'}
               </Button>
             </TableCell>
           </TableRow>

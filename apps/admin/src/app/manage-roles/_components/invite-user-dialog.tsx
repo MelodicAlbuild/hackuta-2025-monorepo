@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useState } from "react";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useState } from 'react';
 
 import {
   Dialog,
@@ -14,8 +14,8 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -23,44 +23,44 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { inviteNewUserWithRole } from "../actions";
+} from '@/components/ui/select';
+import { inviteNewUserWithRole } from '../actions';
 
 const inviteSchema = z.object({
-  email: z.email({ message: "Please enter a valid email address." }),
-  role: z.enum(["user", "admin", "super-admin"], {
-    message: "Please select a valid role.",
+  email: z.email({ message: 'Please enter a valid email address.' }),
+  role: z.enum(['user', 'admin', 'super-admin'], {
+    message: 'Please select a valid role.',
   }),
 });
 
 export function InviteUserDialog() {
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   const form = useForm<z.infer<typeof inviteSchema>>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: "", role: "user" },
+    defaultValues: { email: '', role: 'user' },
   });
 
   async function onSubmit(values: z.infer<typeof inviteSchema>) {
     try {
       const result = await inviteNewUserWithRole(values);
-      setMessage(result.message || "Success!");
+      setMessage(result.message || 'Success!');
       setTimeout(() => {
         setOpen(false); // Close dialog on success
         form.reset();
-        setMessage("");
+        setMessage('');
       }, 2000);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "An error occurred.");
+      setMessage(error instanceof Error ? error.message : 'An error occurred.');
     }
   }
 
@@ -108,6 +108,7 @@ export function InviteUserDialog() {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="volunteer">Volunteer</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="super-admin">Super Admin</SelectItem>
                     </SelectContent>
@@ -122,7 +123,7 @@ export function InviteUserDialog() {
                 <Button variant="ghost">Cancel</Button>
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Sending..." : "Send Invite"}
+                {form.formState.isSubmitting ? 'Sending...' : 'Send Invite'}
               </Button>
             </DialogFooter>
           </form>

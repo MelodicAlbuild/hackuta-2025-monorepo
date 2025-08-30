@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,18 +10,18 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { createUserManually } from "../actions";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/select';
+import { createUserManually } from '../actions';
+import { Label } from '@/components/ui/label';
 
 type NewUserCredentials = {
   email: string;
@@ -30,20 +30,20 @@ type NewUserCredentials = {
 
 export function CreateUserDialog() {
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newUser, setNewUser] = useState<NewUserCredentials | null>(null);
 
   const handleAction = async (formData: FormData) => {
     setIsSubmitting(true);
-    setError("");
+    setError('');
     try {
       const result = await createUserManually(formData);
       if (result.success) {
         setNewUser({ email: result.email!, password: result.password });
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "An error occurred.");
+      setError(e instanceof Error ? e.message : 'An error occurred.');
     } finally {
       setIsSubmitting(false);
     }
@@ -51,7 +51,7 @@ export function CreateUserDialog() {
 
   const resetAndClose = () => {
     setNewUser(null);
-    setError("");
+    setError('');
     setOpen(false);
   };
 
@@ -72,12 +72,12 @@ export function CreateUserDialog() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {newUser ? "User Created Successfully" : "Create a New User"}
+            {newUser ? 'User Created Successfully' : 'Create a New User'}
           </DialogTitle>
           <DialogDescription>
             {newUser
-              ? "Copy the password and send it to the user securely. This password will not be shown again."
-              : "A random password will be generated. No invitation email will be sent."}
+              ? 'Copy the password and send it to the user securely. This password will not be shown again.'
+              : 'A random password will be generated. No invitation email will be sent.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,6 +119,7 @@ export function CreateUserDialog() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="volunteer">Volunteer</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="super-admin">Super Admin</SelectItem>
                 </SelectContent>
@@ -144,7 +145,7 @@ export function CreateUserDialog() {
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create User"}
+                {isSubmitting ? 'Creating...' : 'Create User'}
               </Button>
             </DialogFooter>
           </form>
