@@ -199,7 +199,10 @@ export default function Home() {
           </a>
         </section>
 
-        <section id="schedule" className="scroll-mt-16 pt-10 mx-auto p-[50px]">
+        <section
+          id="schedule"
+          className="scroll-mt-16 pt-10 mx-auto p-[50px] w-full"
+        >
           <h2 className="text-3xl sm:text-5xl font-bold">HackUTA Schedule</h2>
           <div className="flex justify-center mt-4">
             <Schedule />
