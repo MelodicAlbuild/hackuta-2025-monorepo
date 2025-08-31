@@ -1,16 +1,17 @@
-import { createSupabaseServerClient } from "@repo/supabase/server";
+import { createSupabaseServerClient } from '@repo/supabase/server';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { QrCodeModal } from "@/components/qr-code-modal";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { cookies } from "next/headers";
-import { PointsCard } from "@/components/points-cards";
+} from '@/components/ui/card';
+import { QrCodeModal } from '@/components/qr-code-modal';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { cookies } from 'next/headers';
+import { PointsCard } from '@/components/points-cards';
+import { LiveSchedulePreview } from '@/components/live-schedule-preview';
 
 export default async function PortalPage() {
   const supabase = await createSupabaseServerClient(cookies);
@@ -19,9 +20,9 @@ export default async function PortalPage() {
   } = await supabase.auth.getUser();
 
   const { data: profile } = await supabase
-    .from("profiles")
-    .select("*, points ( score )")
-    .eq("id", user!.id)
+    .from('profiles')
+    .select('*, points ( score )')
+    .eq('id', user!.id)
     .single();
 
   const userPoints = profile?.points?.score ?? 0;
@@ -67,6 +68,10 @@ export default async function PortalPage() {
             </Button>
           </CardContent>
         </Card>
+
+        <div className="col-span-2 lg:col-span-3">
+          <LiveSchedulePreview />
+        </div>
       </div>
     </div>
   );
