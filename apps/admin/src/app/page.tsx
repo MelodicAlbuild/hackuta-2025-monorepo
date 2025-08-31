@@ -1,3 +1,4 @@
+import { LiveSchedulePreview } from '@/components/live-schedule-preview';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { createSupabaseServerClient } from '@repo/supabase/server';
 import { Users } from 'lucide-react';
@@ -64,7 +65,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* ** NEW: Grid for statistics cards ** */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
         {userRole !== 'volunteer' && (
           <>
             {/* Total Submissions Card */}
@@ -84,6 +85,9 @@ export default async function AdminDashboard() {
             </Card>
           </>
         )}
+        <div className="col-span-2">
+          <LiveSchedulePreview />
+        </div>
       </div>
     </div>
   );

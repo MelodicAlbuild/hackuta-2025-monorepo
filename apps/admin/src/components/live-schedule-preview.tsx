@@ -31,7 +31,9 @@ type ProcessedEvent = ScheduleEvent & {
 const pixelsPerHour = 100; // Each hour is 100px tall
 
 // --- Main Component ---
-export function LiveSchedulePreview() {
+export function LiveSchedulePreview({
+  showNow = true,
+}: { showNow?: boolean } = {}) {
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const supabase = createSupabaseBrowserClient();
@@ -88,6 +90,7 @@ export function LiveSchedulePreview() {
           key={day}
           day={day}
           events={dayEvents as ProcessedEvent[]}
+          showNowBar={showNow}
         />
       ))}
     </div>
@@ -98,9 +101,11 @@ export function LiveSchedulePreview() {
 function DayTimeline({
   day,
   events,
+  showNowBar = true,
 }: {
   day: string;
   events: ProcessedEvent[];
+  showNowBar?: boolean;
 }) {
   // Determine the first hour to display and number of hours to cover
   const earliestStartMs = Math.min(...events.map((e) => e.start.getTime()));
@@ -118,6 +123,33 @@ function DayTimeline({
     { length: hoursCount },
     (_, i) => (startHour + i) % 24,
   );
+
+  // Live-updating current time bar (America/Chicago)
+  const displayTZ = 'America/Chicago';
+  const [now, setNow] = useState<Date>(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const nowDayLabel = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    timeZone: displayTZ,
+  });
+  const isToday = nowDayLabel === day;
+  const nowZoned = zonedDate(now, displayTZ);
+  const windowEnd = new Date(baseStart.getTime() + hoursCount * 60 * 60 * 1000);
+  const inWindow =
+    showNowBar && isToday && nowZoned >= baseStart && nowZoned <= windowEnd;
+  const nowTop = inWindow
+    ? differenceInMinutes(nowZoned, baseStart) * (pixelsPerHour / 60)
+    : 0;
+  const nowLabel = now.toLocaleTimeString([], {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: displayTZ,
+  });
 
   return (
     <div>
@@ -151,6 +183,20 @@ function DayTimeline({
               className="border-t border-gray-200"
             />
           ))}
+          {/* Current time bar */}
+          {inWindow && (
+            <div
+              className="absolute inset-x-0 z-10 pointer-events-none"
+              style={{ top: `${nowTop}px` }}
+            >
+              <div className="relative">
+                <div className="border-t-2 border-red-500/60" />
+                <div className="absolute -top-3 right-0 bg-red-500/80 text-white/95 text-[10px] px-1.5 py-0.5 rounded">
+                  Now {nowLabel}
+                </div>
+              </div>
+            </div>
+          )}
           {/* Render Events */}
           {events.map((event) => (
             <EventCard key={event.id} event={event} />
