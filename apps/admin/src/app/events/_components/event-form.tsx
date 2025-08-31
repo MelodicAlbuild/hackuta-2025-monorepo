@@ -47,6 +47,12 @@ export function EventForm({ event, onComplete }: EventFormProps) {
       }}
       className="space-y-4 pt-4"
     >
+      {/* Pass client timezone to the server action so we can convert properly */}
+      <input
+        type="hidden"
+        name="tz"
+        value={Intl.DateTimeFormat().resolvedOptions().timeZone}
+      />
       {event && <input type="hidden" name="id" value={event.id} />}
 
       <div className="space-y-2">

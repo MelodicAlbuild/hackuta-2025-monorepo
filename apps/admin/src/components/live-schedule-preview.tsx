@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { createSupabaseBrowserClient } from '@repo/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
+import { startOfDay, differenceInMinutes } from 'date-fns';
 
-// 1. Define the exact shape of a schedule event
+// --- Type Definitions ---
 type ScheduleEvent = {
   id: number;
   title: string;
@@ -15,70 +15,22 @@ type ScheduleEvent = {
   end_time: string | null;
   location: string | null;
   category: string;
-  created_by: string | null;
-  created_at: string;
 };
 
-// 2. Helper to format time with explicit types
-const formatTime = (dateStr: string): string => {
-  return new Date(dateStr).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+// A "processed" event includes layout properties
+type ProcessedEvent = ScheduleEvent & {
+  top: number;
+  height: number;
+  left: number;
+  width: number;
+  start: Date;
+  end: Date;
 };
 
-// 3. Fully-typed component for a single event card
-function EventCard({ event }: { event: ScheduleEvent }) {
-  const categoryColors: Record<string, string> = {
-    workshop: 'bg-indigo-500',
-    food: 'bg-orange-500',
-    keynote: 'bg-rose-500',
-    social: 'bg-teal-500',
-    general: 'bg-blue-500',
-  };
+// --- Constants ---
+const pixelsPerHour = 100; // Each hour is 100px tall
 
-  const bgColor = categoryColors[event.category] || 'bg-gray-500';
-
-  return (
-    <div className="flex items-start gap-4">
-      <div className="flex flex-col items-center flex-shrink-0">
-        <div className="w-20 text-right font-semibold text-gray-800">
-          {formatTime(event.start_time)}
-        </div>
-        {event.end_time && (
-          <div className="text-xs text-gray-500">
-            til {formatTime(event.end_time)}
-          </div>
-        )}
-      </div>
-      <div className="relative w-full pl-4 border-l-2 border-gray-200">
-        <div
-          className={`absolute -left-[9px] top-1 h-4 w-4 rounded-full ${bgColor} border-2 border-white`}
-        ></div>
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle>{event.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {event.description && (
-              <p className="text-gray-600 mb-4 whitespace-pre-wrap">
-                {event.description}
-              </p>
-            )}
-            {event.location && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <MapPin className="h-4 w-4" />
-                <span>{event.location}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
+// --- Main Component ---
 export function LiveSchedulePreview() {
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -86,33 +38,40 @@ export function LiveSchedulePreview() {
 
   useEffect(() => {
     const fetchEvents = async (): Promise<void> => {
-      // Don't set loading to true here to avoid flicker on real-time updates
       const { data } = await supabase
         .from('events')
         .select('*')
         .order('start_time');
       setEvents(data || []);
-      setIsLoading(false); // Only set loading to false after the initial fetch
+      setIsLoading(false);
     };
-
     fetchEvents();
-
-    const channel = supabase
-      .channel('events-channel-admin')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'events' },
-        (_payload) => {
-          // When any change happens, just re-fetch the whole list to ensure order
-          fetchEvents();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [supabase]);
+
+  // Group events by day and process their layout
+  const displayTZ = 'America/Chicago';
+  const eventsByDay = useMemo(() => {
+    const grouped = events.reduce(
+      (acc: Record<string, ScheduleEvent[]>, event) => {
+        const day = new Date(event.start_time).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          timeZone: displayTZ,
+        });
+        if (!acc[day]) acc[day] = [];
+        acc[day].push(event);
+        return acc;
+      },
+      {},
+    );
+
+    // Run the layout algorithm on each day's events
+    Object.keys(grouped).forEach((day) => {
+      grouped[day] = processDayLayout(grouped[day]) as ScheduleEvent[];
+    });
+    return grouped;
+  }, [events]);
 
   if (isLoading) {
     return (
@@ -122,43 +81,243 @@ export function LiveSchedulePreview() {
     );
   }
 
-  // Group events by day
-  const eventsByDay = events.reduce(
-    (acc: Record<string, ScheduleEvent[]>, event: ScheduleEvent) => {
-      const day = new Date(event.start_time).toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-      });
-      if (!acc[day]) {
-        acc[day] = [];
-      }
-      acc[day].push(event);
-      return acc;
-    },
-    {},
+  return (
+    <div className="p-4 space-y-12">
+      {Object.entries(eventsByDay).map(([day, dayEvents]) => (
+        <DayTimeline
+          key={day}
+          day={day}
+          events={dayEvents as ProcessedEvent[]}
+        />
+      ))}
+    </div>
+  );
+}
+
+// --- Day Timeline Component ---
+function DayTimeline({
+  day,
+  events,
+}: {
+  day: string;
+  events: ProcessedEvent[];
+}) {
+  // Determine the first hour to display and number of hours to cover
+  const earliestStartMs = Math.min(...events.map((e) => e.start.getTime()));
+  const latestEndMs = Math.max(...events.map((e) => e.end.getTime()));
+  const earliest = new Date(earliestStartMs);
+  const baseStart = new Date(
+    startOfDay(earliest).setHours(earliest.getHours(), 0, 0, 0),
+  );
+  const hoursCount = Math.max(
+    1,
+    Math.ceil(differenceInMinutes(new Date(latestEndMs), baseStart) / 60) + 1,
+  );
+  const startHour = earliest.getHours();
+  const hours = Array.from(
+    { length: hoursCount },
+    (_, i) => (startHour + i) % 24,
   );
 
   return (
-    <div className="p-4 space-y-8">
-      {Object.keys(eventsByDay).length > 0 ? (
-        Object.entries(eventsByDay).map(([day, dayEvents]) => (
-          <div key={day}>
-            <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
-              {day}
-            </h2>
-            <div className="space-y-6">
-              {dayEvents.map((event: ScheduleEvent) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+    <div>
+      <h2 className="text-2xl font-bold text-center my-6 sticky top-0 backdrop-blur-sm z-20 py-2">
+        {day}
+      </h2>
+      <div className="flex">
+        {/* Time Gutter */}
+        <div className="w-20 text-right pr-4 text-sm text-gray-500 flex-shrink-0">
+          {hours.map((hour) => (
+            <div
+              key={hour}
+              style={{ height: `${pixelsPerHour}px` }}
+              className="relative -top-3"
+            >
+              <span className="font-semibold">
+                {hour % 12 === 0 ? 12 : hour % 12}
+              </span>
+              <span className="text-xs">{hour < 12 ? ' AM' : ' PM'}</span>
             </div>
-          </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-500 py-12">
-          No events scheduled yet.
-        </p>
-      )}
+          ))}
+        </div>
+
+        {/* Event Container */}
+        <div className="flex-1 bg-gray-50 rounded-lg relative border-l border-gray-200">
+          {/* Hour Lines */}
+          {hours.map((hour) => (
+            <div
+              key={hour}
+              style={{ height: `${pixelsPerHour}px` }}
+              className="border-t border-gray-200"
+            />
+          ))}
+          {/* Render Events */}
+          {events.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
+      </div>
     </div>
   );
+}
+
+// --- Event Card Component ---
+function EventCard({ event }: { event: ProcessedEvent }) {
+  const categoryStyles: Record<string, string> = {
+    workshop: 'bg-indigo-100 border-indigo-500 text-indigo-800',
+    food: 'bg-orange-100 border-orange-500 text-orange-800',
+    keynote: 'bg-rose-100 border-rose-500 text-rose-800',
+    social: 'bg-teal-100 border-teal-500 text-teal-800',
+    general: 'bg-blue-100 border-blue-500 text-blue-800',
+  };
+  const style = categoryStyles[event.category] || categoryStyles.general;
+
+  return (
+    <Card
+      className={`absolute p-2 rounded-lg text-xs overflow-hidden border-l-4 ${style}`}
+      style={{
+        top: `${event.top}px`,
+        height: `${event.height}px`,
+        left: `${event.left}%`,
+        width: `${event.width}%`,
+      }}
+    >
+      <CardContent className="p-1 translate-y-[-10px]">
+        <p className="font-bold">{event.title}</p>
+        <div className="flex justify-between items-center">
+          <p className="text-xs">
+            {new Date(event.start_time).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZone: 'America/Chicago',
+            })}
+          </p>
+          {event.location && (
+            <p className="text-muted-foreground mt-1 truncate">
+              {event.location}
+            </p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// --- The Layout Algorithm ---
+function processDayLayout(dayEvents: ScheduleEvent[]): ProcessedEvent[] {
+  const processedEvents: ProcessedEvent[] = dayEvents
+    .map((e) => ({
+      ...e,
+      // Convert the stored UTC time into America/Chicago wall time Date objects
+      start: zonedDate(new Date(e.start_time), 'America/Chicago'),
+      end: zonedDate(
+        new Date(
+          e.end_time ||
+            new Date(new Date(e.start_time).getTime() + 60 * 60 * 1000),
+        ),
+        'America/Chicago',
+      ), // Default 1 hour
+      top: 0,
+      height: 0,
+      left: 0,
+      width: 0,
+    }))
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+  // Choose the day's schedule start hour from the earliest event
+  const dayScheduleStartHour = processedEvents.length
+    ? Math.floor(processedEvents[0].start.getHours())
+    : 8; // fallback
+
+  const columns: ProcessedEvent[][] = [];
+  let lastEventEnd: Date | null = null;
+
+  processedEvents.forEach((event) => {
+    // If this event starts after the last cluster ended, pack the previous cluster and start a new one.
+    if (lastEventEnd !== null && event.start >= lastEventEnd) {
+      packColumns(columns, dayScheduleStartHour);
+      columns.length = 0; // Reset columns for the new cluster
+      lastEventEnd = null;
+    }
+
+    // Find a column for the event
+    let placed = false;
+    for (const col of columns) {
+      if (col[col.length - 1].end <= event.start) {
+        col.push(event);
+        placed = true;
+        break;
+      }
+    }
+
+    // If no column was found, create a new one
+    if (!placed) {
+      columns.push([event]);
+    }
+
+    // Update the end time of the current cluster
+    if (lastEventEnd === null || event.end > lastEventEnd) {
+      lastEventEnd = event.end;
+    }
+  });
+
+  // Pack the last cluster of events
+  if (columns.length > 0) {
+    packColumns(columns, dayScheduleStartHour);
+  }
+
+  return processedEvents;
+}
+
+function packColumns(
+  columns: ProcessedEvent[][],
+  dayScheduleStartHour: number,
+) {
+  const numColumns = columns.length;
+  const colWidth = 100 / numColumns;
+  const gap = 1; // 1% gap between cards
+
+  columns.forEach((col, colIndex) => {
+    col.forEach((event) => {
+      const dayStart = startOfDay(event.start);
+      const scheduleStart = new Date(
+        dayStart.setHours(dayScheduleStartHour, 0, 0, 0),
+      );
+
+      event.top =
+        differenceInMinutes(event.start, scheduleStart) * (pixelsPerHour / 60);
+      event.height = Math.max(
+        30,
+        differenceInMinutes(event.end, event.start) * (pixelsPerHour / 60),
+      ); // Min height for a 30-min event
+
+      event.left = colIndex * colWidth;
+      event.width = colWidth - gap;
+    });
+  });
+}
+
+// Convert a UTC Date into a Date that represents the same wall-clock time in a given IANA timezone.
+// Note: This returns a Date object whose fields (getHours, etc.) reflect the zone's local time, but
+// the internal epoch stays UTC. It's sufficient for layout math and formatting in this component.
+function zonedDate(date: Date, timeZone: string): Date {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+  const parts = dtf.formatToParts(date);
+  const map = Object.fromEntries(parts.map((p) => [p.type, p.value]));
+  const y = parseInt(map.year, 10);
+  const m = parseInt(map.month, 10) - 1;
+  const d = parseInt(map.day, 10);
+  const hh = parseInt(map.hour, 10);
+  const mm = parseInt(map.minute, 10);
+  const ss = parseInt(map.second, 10);
+  return new Date(y, m, d, hh, mm, ss, 0);
 }
