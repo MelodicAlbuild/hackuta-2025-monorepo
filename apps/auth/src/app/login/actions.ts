@@ -5,33 +5,39 @@ import { createSupabaseServerClient } from '@repo/supabase/server'
 import { cookies } from "next/headers"
 
 function isValidRedirectUrl(url: string | null): boolean {
-    if (!url) return false
-    // Ensure the redirect is to a known, safe domain (your own)
-    const regex = /^(?:[a-zA-Z0-9-]+\.)*hackuta\.org$/;
-
+    if (!url) return false;
+    // Allow relative URLs (starting with /)
+    if (url.startsWith('/')) return true;
+    // Allow full URLs to hackuta.org subdomains or localhost
+    const regex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)*hackuta\.org(\/|$)/;
     return regex.test(url) || url.startsWith('http://localhost');
 }
 
 export async function signIn(formData: FormData) {
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const redirectTo = formData.get('redirect_to') as string | null
-    const supabase = await createSupabaseServerClient(cookies)
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const redirectTo = formData.get('redirect_to') as string | null;
+    const supabase = await createSupabaseServerClient(cookies);
 
     const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-    })
+    });
 
     if (error) {
-        return redirect('/login?message=Could not authenticate user')
+        console.error('SignIn error:', error.message);
+        return redirect('/login?message=Could not authenticate user');
     }
 
+    console.log('SignIn success. redirectTo:', redirectTo);
     if (isValidRedirectUrl(redirectTo)) {
-        return redirect(redirectTo!)
+        console.log('Redirecting to:', redirectTo);
+        return redirect(redirectTo!);
+    } else {
+        console.warn('Invalid redirectTo, redirecting to portal:', redirectTo);
     }
 
-    redirect(`${process.env.NEXT_PUBLIC_PORTAL_APP_URL}/`)
+    redirect(`${process.env.NEXT_PUBLIC_PORTAL_APP_URL}/`);
 }
 
 export async function signUp(formData: FormData) {
