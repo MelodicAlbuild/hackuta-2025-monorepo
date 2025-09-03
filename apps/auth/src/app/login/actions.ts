@@ -29,9 +29,7 @@ export async function signIn(formData: FormData) {
         return redirect('/login?message=Could not authenticate user');
     }
 
-    console.log('SignIn success. redirectTo:', redirectTo);
     if (isValidRedirectUrl(redirectTo)) {
-        console.log('Redirecting to:', redirectTo);
         return redirect(redirectTo!);
     } else {
         console.warn('Invalid redirectTo, redirecting to portal:', redirectTo);
