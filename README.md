@@ -36,9 +36,11 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/). *Except 
 - Better User Management - **WIP (v1)**
 - ~~User Dashboard `portal`~~
 - Organizer Tools - **WIP (v1ish)**
-- Schedule Manager
+- Schedule Manager - **WIP (v1)**
 - ~~Announcements/Messages? `@repo/amqp`?~~
 - ~~Updates to the Auth Platform~~
 - ~~Submission Management?~~
 - Remove Supabase Realtime, It destroys DB Resources. _(80k calls at 328.23 seconds)_
+- Update Action Scanner to be more user friendly
+- Volunteer Role and Actions - This Kinda Exists, will need intense updates and testing.
 - Anything else? Ask Dominic/Muhammad/Kevin
