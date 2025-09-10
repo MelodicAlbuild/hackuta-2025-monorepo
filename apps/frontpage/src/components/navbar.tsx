@@ -2,14 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Link, Menu, X } from 'lucide-react';
-import { Button } from './ui/button';
+import { Menu, X } from 'lucide-react';
 
-export default function Navbar() {
+interface NavbarProps {
+  onMobileMenuToggle?: (isOpen: boolean) => void;
+}
+
+export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showLoginButton, setShowLoginButton] = useState(false);
-  const [authAppLoginUrl, setAuthAppLoginUrl] = useState('');
+
+  const toggleMobileMenu = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    onMobileMenuToggle?.(newState);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,40 +24,32 @@ export default function Navbar() {
       setIsScrolled(scrollTop > 50);
     };
 
-    const handleFeatureFlags = async () => {
-      const response = await fetch(
-        '/api/feature-flags?flag=show_signin_button',
-      );
-      const data = await response.json();
-      setShowLoginButton(data === 'true');
-    };
-
-    handleFeatureFlags();
-
-    if (window) {
-      setAuthAppLoginUrl(
-        `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login?redirect_to=${window.location.href}profile`,
-      );
-      window.addEventListener('scroll', handleScroll);
-    }
-
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const mobileMenuItems = [
+    { name: 'When & Where', href: '#d-time' },
+    { name: 'Schedule', href: '#schedule' },
+    { name: 'FAQ', href: '#faq' },
+    { name: 'Sponsors', href: '#sponsors' },
+    { name: 'Apply', href: '#apply' },
+  ];
+
   return (
     <nav
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] px-[15px] md:px-[5px] text-center fancy-shadow md:h-12 transition-all duration-1000 ease-in-out border ${
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] text-center fancy-shadow transition-all duration-1000 ease-in-out border ${
         isScrolled
-          ? 'w-[600px] bg-black/80 backdrop-blur-md rounded-full mx-4 shadow-2xl border-black/50'
-          : 'w-full bg-black border-transparent'
+          ? 'w-[calc(100%-2rem)] md:w-[65%] lg:w-[65%] bg-black/80 backdrop-blur-md rounded-full shadow-2xl border-black/50 h-14 px-4 md:px-6 md:h-12'
+          : 'w-[calc(100%-2rem)] md:w-[95%] lg:w-[95%] bg-black/90 backdrop-blur-sm rounded-2xl md:rounded-full border-black/30 md:border-black/40 h-16 px-6 md:px-8'
       }`}
       style={{
         boxShadow: isScrolled
-          ? '0 0 20px rgba(11, 10, 100, 0.8), 0 0 40px rgba(11, 10, 100, 0.6), 0 0 80px rgba(11, 10, 100, 0.4), 0 0 120px rgba(11, 10, 100, 0.2)'
-          : 'none',
+          ? '0 0 12px rgba(147, 51, 234, 0.28), 0 0 24px rgba(147, 51, 234, 0.18)'
+          : '0 4px 14px rgba(0, 0, 0, 0.20), 0 0 16px rgba(147, 51, 234, 0.12)',
       }}
     >
-      <div className="flex items-center justify-between px-20 md:px-5 h-full">
+      <div className="flex items-center justify-between h-full pl-3 pr-3 md:pl-4 md:pr-4">
         <div className="flex items-center">
           <a href="#" className="flex items-center hover:opacity-80 transition">
             <Image
@@ -68,9 +67,9 @@ export default function Navbar() {
         <div className="hidden md:flex xl:space-x-8 lg:space-x-6 md:space-x-4 justify-center w-full ml-8">
           {[
             { name: 'When & Where', href: '#d-time' },
-            { name: 'Sponsors', href: '#sponsors' },
             { name: 'Schedule', href: '#schedule' },
             { name: 'FAQ', href: '#faq' },
+            { name: 'Sponsors', href: '#sponsors' },
             { name: 'Apply', href: '#apply' },
           ].map((item) => (
             <a
@@ -81,50 +80,55 @@ export default function Navbar() {
               {item.name}
             </a>
           ))}
-          {showLoginButton && (
-            <Button variant="outline" asChild>
-              <Link href={authAppLoginUrl}>Login</Link>
-            </Button>
-          )}
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Hamburger Menu */}
         <button
-          className="md:hidden text-white focus:outline-none"
-          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden text-white focus:outline-none z-[110] relative transition-transform duration-300 hover:scale-110"
+          onClick={toggleMobileMenu}
           aria-label="Toggle Menu"
         >
-          {isOpen ? <X size={32} /> : <Menu size={32} />}
+          <div className="w-8 h-8 flex items-center justify-center">
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </div>
         </button>
 
+        {/* Mobile Dropdown Menu */}
         <div
-          className={`absolute top-full left-0 w-full bg-purple-950 bg-opacity-80 backdrop-blur-md flex flex-col items-center space-y-4 py-4 transition-all ${
+          className={`md:hidden absolute top-full left-1/2 transform -translate-x-1/2 w-[calc(100%-1rem)] mt-2 bg-black/90 backdrop-blur-md rounded-2xl border border-purple-500/20 flex flex-col items-center space-y-3 py-6 transition-all duration-300 z-[105] ${
             isOpen
-              ? 'opacity-100 scale-100'
-              : 'opacity-0 scale-95 pointer-events-none'
+              ? 'opacity-100 scale-100 translate-y-0'
+              : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
           }`}
+          style={{
+            boxShadow: isOpen
+              ? '0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(147, 51, 234, 0.3)'
+              : 'none',
+          }}
         >
-          {[
-            { name: 'When & Where', href: '#d-time' },
-            { name: 'Apply', href: '#apply' },
-            { name: 'Sponsors', href: '#founders-arena' },
-            { name: 'Schedule', href: '#schedule' },
-            { name: 'FAQ', href: '#faq' },
-          ].map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="font-franklinGothic text-white text-xl font-normal hover:text-purple-300 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              {item.name}
-            </a>
-          ))}
-          {showLoginButton && (
-            <Button variant="outline" asChild>
-              <Link href={authAppLoginUrl}>Login</Link>
-            </Button>
-          )}
+          {mobileMenuItems.map((item, index) => {
+            const isApply = item.name === 'Apply';
+            return (
+              <a
+                key={item.name}
+                href={item.href}
+                className={`font-franklinGothic text-white text-lg font-normal transition-all duration-200 hover:scale-105 rounded-lg ${
+                  isApply
+                    ? 'bg-transparent text-white border border-purple-400/80 ring-0 shadow-[0_0_18px_rgba(147,51,234,0.35),0_0_28px_rgba(147,51,234,0.2)] hover:shadow-[0_0_24px_rgba(147,51,234,0.45),0_0_36px_rgba(147,51,234,0.28)] animate-pulse w-[90%] px-8 py-3 text-center'
+                    : 'hover:text-purple-300 hover:bg-purple-500/10 px-6 py-2'
+                } ${isOpen ? `animate-fadeInUp` : ''}`}
+                style={{
+                  animationDelay: isOpen ? `${index * 50}ms` : '0ms',
+                }}
+                onClick={() => {
+                  setIsOpen(false);
+                  onMobileMenuToggle?.(false);
+                }}
+              >
+                {item.name}
+              </a>
+            );
+          })}
         </div>
       </div>
     </nav>
