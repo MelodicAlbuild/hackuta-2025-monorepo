@@ -17,11 +17,11 @@ This Repository includes the following packages/apps:
 
 ### Apps and Packages
 
-- `apps/admin`: a [Next.js](https://nextjs.org/) app designed for use by the organizers and super-admins of the organization
-- `apps/auth`: another [Next.js](https://nextjs.org/) app that handles any and all authentication to the supabase project
+- `apps/admin`: a [Next.js](https://nextjs.org/) app designed for use by the organizers and super-admins of the organization [Web Link](https://admin.hackuta.org)
+- `apps/auth`: another [Next.js](https://nextjs.org/) app that handles any and all authentication to the supabase project [Web Link](https://auth.hackuta.org)
 - `apps/discord-bot`: a [Discord.js](https://discord.js.org/) app that allows discord users to claim their temporary passwords if needed
 - `apps/frontpage`: another [Next.js](https://nextjs.org/) app that presents the frontpage of [HackUTA](https://hackuta.org)
-- `apps/portal`: another [Next.js](https://nextjs.org/) app that presents a uniform portal interface to the hackers
+- `apps/portal`: another [Next.js](https://nextjs.org/) app that presents a uniform portal interface to the hackers [Web Link](https://portal.hackuta.org)
 - `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`) *`packages/eslint-config`*
 - `@repo/tailwind-config`: `tailwind` configurations. **CURRENTLY UNUSED, NEED TO FIX THIS** *`packages/tailwind-config`*
 - `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo *`packages/typescript-config`*
@@ -36,9 +36,11 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/). *Except 
 - Better User Management - **WIP (v1)**
 - ~~User Dashboard `portal`~~
 - Organizer Tools - **WIP (v1ish)**
-- Schedule Manager
+- Schedule Manager - **WIP (v1)**
 - ~~Announcements/Messages? `@repo/amqp`?~~
 - ~~Updates to the Auth Platform~~
 - ~~Submission Management?~~
 - Remove Supabase Realtime, It destroys DB Resources. _(80k calls at 328.23 seconds)_
+- Update Action Scanner to be more user friendly
+- Volunteer Role and Actions - This Kinda Exists, will need intense updates and testing.
 - Anything else? Ask Dominic/Muhammad/Kevin
