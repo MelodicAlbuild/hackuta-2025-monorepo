@@ -10,7 +10,9 @@ export default function WhenWhere() {
     >
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col items-center text-center gap-2">
-          <h2 className="text-3xl sm:text-5xl font-bold text-white">About</h2>
+          <h2 className="text-3xl sm:text-5xl font-bold text-white">
+            Event Details
+          </h2>
           <p className="mt-2 text-gray-300 font-franklinGothic">
             Everything you need to plan your visit.
           </p>
