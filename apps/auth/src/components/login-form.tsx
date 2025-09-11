@@ -91,7 +91,7 @@ export function LoginForm() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-transparent border border-purple-400/80 text-white font-franklinGothic text-lg py-3 rounded-lg transition-all duration-300 hover:bg-purple-500/10 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/25"
+              className="w-full bg-transparent border border-purple-400/80 text-white font-franklinGothic text-lg p-3 rounded-lg transition-all duration-300 text-sm hover:bg-purple-500/10 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/25"
             >
               {isSubmitting && (
                 <Icons.spinner className="mr-2 h-5 w-5 animate-spin" />
