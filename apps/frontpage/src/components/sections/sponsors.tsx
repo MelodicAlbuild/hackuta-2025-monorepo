@@ -16,7 +16,7 @@ export default function Sponsors() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Mouser Electronics */}
           <div className="group bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20">
             <div className="flex flex-col items-center text-center h-full">
@@ -80,6 +80,28 @@ export default function Sponsors() {
               <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
                 The official student hackathon league. An engaged and passionate
                 maker community of the next generation of technology leaders.
+              </p>
+            </div>
+          </div>
+
+          {/* Pure Button */}
+          <div className="group bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 lg:col-start-2">
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="mb-6">
+                <Image
+                  src="/PureButtonsLogo.png"
+                  alt="Pure Button"
+                  className="w-full max-w-[180px] h-auto transition-transform duration-300 group-hover:scale-110"
+                  width={300}
+                  height={100}
+                />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 font-franklinGothic">
+                PURE BUTTON
+              </h3>
+              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
+                Innovative button solutions and electronic components for modern
+                technology applications and hardware development projects.
               </p>
             </div>
           </div>
