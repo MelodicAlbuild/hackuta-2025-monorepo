@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Instagram, Linkedin, Mail, Twitter, Github } from 'lucide-react';
+import { Instagram, Linkedin, Mail, Github } from 'lucide-react';
 
 export default function Footer() {
   const year = new Date().getFullYear();
