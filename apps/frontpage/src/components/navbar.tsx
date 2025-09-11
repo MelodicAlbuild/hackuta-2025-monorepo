@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 
@@ -11,6 +11,8 @@ interface NavbarProps {
 export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const lastIsScrolled = useRef<boolean>(false);
+  const tickingRef = useRef<boolean>(false);
 
   const toggleMobileMenu = () => {
     const newState = !isOpen;
@@ -19,13 +21,21 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 50);
+    const onScroll = () => {
+      if (tickingRef.current) return;
+      tickingRef.current = true;
+      requestAnimationFrame(() => {
+        const next = window.scrollY > 50;
+        if (next !== lastIsScrolled.current) {
+          lastIsScrolled.current = next;
+          setIsScrolled(next);
+        }
+        tickingRef.current = false;
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll as EventListener);
   }, []);
 
   const mobileMenuItems = [
@@ -38,10 +48,10 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
 
   return (
     <nav
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] text-center fancy-shadow transition-all duration-1000 ease-in-out border ${
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] text-center fancy-shadow transition-[background-color,border-color,border-radius,box-shadow,opacity,transform,width,height,padding] duration-500 ease-out border ${
         isScrolled
-          ? 'w-[calc(100%-2rem)] md:w-[65%] lg:w-[65%] bg-black/80 backdrop-blur-md rounded-full shadow-2xl border-black/50 h-14 px-4 md:px-6 md:h-12'
-          : 'w-[calc(100%-2rem)] md:w-[95%] lg:w-[95%] bg-black/90 backdrop-blur-sm rounded-2xl md:rounded-full border-black/30 md:border-black/40 h-16 px-6 md:px-8'
+          ? 'w-[calc(100%-2rem)] md:w-[65%] lg:w-[65%] bg-black/80 rounded-full shadow-2xl border-black/50 h-14 px-4 md:px-6 md:h-12'
+          : 'w-[calc(100%-2rem)] md:w-[95%] lg:w-[95%] bg-black/90 rounded-2xl md:rounded-full border-black/30 md:border-black/40 h-16 px-6 md:px-8'
       }`}
       style={{
         boxShadow: isScrolled
@@ -95,7 +105,7 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
 
         {/* Mobile Dropdown Menu */}
         <div
-          className={`md:hidden absolute top-full left-1/2 transform -translate-x-1/2 w-[calc(100%-1rem)] mt-2 bg-black/90 backdrop-blur-md rounded-2xl border border-purple-500/20 flex flex-col items-center space-y-3 py-6 transition-all duration-300 z-[105] ${
+          className={`md:hidden absolute top-full left-1/2 transform -translate-x-1/2 w-[calc(100%-1rem)] mt-2 bg-black/90 rounded-2xl border border-purple-500/20 flex flex-col items-center space-y-3 py-6 transition-all duration-300 z-[105] ${
             isOpen
               ? 'opacity-100 scale-100 translate-y-0'
               : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'

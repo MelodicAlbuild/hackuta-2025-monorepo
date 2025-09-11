@@ -33,8 +33,6 @@ export default function Reveal({
   index = 0,
   enableParallax = true,
   translateFromPx = 36,
-  maxBlurPx = 10,
-  blurSpeedMultiplier = 2.2,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -110,22 +108,17 @@ export default function Reveal({
 
   const effectiveProgress = enableParallax ? progress : isVisible ? 1 : 0;
   const translateYPx = (1 - effectiveProgress) * translateFromPx;
-  const blurProgress = Math.min(
-    1,
-    effectiveProgress * Math.max(0.1, blurSpeedMultiplier),
-  );
-  const blurPx = (1 - blurProgress) * maxBlurPx;
+  // Blur effect disabled for performance across browsers
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out will-change-transform will-change-opacity ${
+      className={`transition-all duration-700 ease-out will-change-[transform,opacity] ${
         isVisible ? visibleClassName : hiddenClassName
       }`}
       style={{
         transitionDelay,
         transform: `translate3d(0, ${translateYPx.toFixed(2)}px, 0)`,
-        filter: `blur(${blurPx.toFixed(2)}px)`,
         opacity: effectiveProgress,
       }}
     >
