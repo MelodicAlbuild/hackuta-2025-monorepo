@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Schedule from '@/components/sections/schedule';
 import Faq from '@/components/sections/faq';
 import Navbar from '@/components/navbar';
@@ -18,6 +18,18 @@ export default function Home() {
   const handleMobileMenuToggle = (isOpen: boolean) => {
     setIsMobileMenuOpen(isOpen);
   };
+
+  useEffect(() => {
+    // Prevent auto-scroll on page load by clearing hash and scrolling to top
+    if (typeof window !== 'undefined') {
+      // Remove any hash from URL on initial load
+      if (window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+      // Ensure page starts at top
+      window.scrollTo(0, 0);
+    }
+  }, []);
 
   return (
     <div className="scrollbar-hide bg-gradient-to-b from-black via-blue-950 to-blue-950 min-h-screen">

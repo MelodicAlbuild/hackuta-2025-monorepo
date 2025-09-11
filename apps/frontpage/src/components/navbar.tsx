@@ -36,14 +36,17 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll as EventListener);
+    return () =>
+      window.removeEventListener('scroll', onScroll as EventListener);
   }, []);
 
   // Fetch feature flag to control Sign In visibility
   useEffect(() => {
     const handleFeatureFlags = async () => {
       try {
-        const response = await fetch('/api/feature-flags?flag=show_signin_button');
+        const response = await fetch(
+          '/api/feature-flags?flag=show_signin_button',
+        );
         const data = await response.json();
         setShowLoginButton(data === 'true');
       } catch {
@@ -54,7 +57,7 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
   }, []);
 
   const mobileMenuItems = [
-    { name: 'When & Where', href: '#d-time' },
+    { name: 'About', href: '#about' },
     { name: 'Schedule', href: '#schedule' },
     { name: 'FAQ', href: '#faq' },
     { name: 'Sponsors', href: '#sponsors' },
@@ -91,7 +94,7 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
         {/* Desktop Navigation */}
         <div className="hidden md:flex xl:space-x-8 lg:space-x-6 md:space-x-4 justify-center w-full ml-8">
           {[
-            { name: 'When & Where', href: '#d-time' },
+            { name: 'About', href: '#about' },
             { name: 'Schedule', href: '#schedule' },
             { name: 'FAQ', href: '#faq' },
             { name: 'Sponsors', href: '#sponsors' },
@@ -143,11 +146,16 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
               : 'none',
           }}
         >
-          {(
-            showLoginButton
-              ? [...mobileMenuItems, { name: 'Sign In', href: `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login` }]
-              : mobileMenuItems
-            ).map((item, index) => {
+          {(showLoginButton
+            ? [
+                ...mobileMenuItems,
+                {
+                  name: 'Sign In',
+                  href: `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login`,
+                },
+              ]
+            : mobileMenuItems
+          ).map((item, index) => {
             const isApply = item.name === 'Apply';
             return (
               <a

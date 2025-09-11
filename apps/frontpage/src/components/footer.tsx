@@ -8,7 +8,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   const navLinks = [
-    { label: 'When & Where', href: '#d-time' },
+    { label: 'About', href: '#about' },
     { label: 'Schedule', href: '#schedule' },
     { label: 'FAQ', href: '#faq' },
     { label: 'Sponsors', href: '#sponsors' },
