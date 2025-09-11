@@ -13,7 +13,7 @@ export default function WhenWhere() {
           </h2>
           <p className="text-lg sm:text-xl text-gray-300 font-franklinGothic max-w-2xl mx-auto mb-8">
             Mark your calendars! Here's everything you need to know about the
-            event details.
+            event.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">

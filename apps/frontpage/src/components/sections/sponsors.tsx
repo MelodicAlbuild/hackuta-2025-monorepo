@@ -22,9 +22,9 @@ export default function Sponsors() {
             <div className="flex flex-col items-center text-center h-full">
               <div className="mb-6">
                 <Image
-                  src="/MouserElectronics.svg"
+                  src="/mouserWhite.png"
                   alt="Mouser Electronics"
-                  className="w-full max-w-[200px] h-auto transition-transform duration-300 group-hover:scale-110"
+                  className="w-full max-w-[400px] h-auto transition-transform duration-300 group-hover:scale-110"
                   width={500}
                   height={300}
                 />
@@ -80,6 +80,33 @@ export default function Sponsors() {
               <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
                 The official student hackathon league. An engaged and passionate
                 maker community of the next generation of technology leaders.
+              </p>
+            </div>
+          </div>
+          {/* Pure Buttons */}
+          <div className="group bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20">
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="mb-6">
+                <a
+                  href="https://mlh.link/MLH-PureButtons-hackathons"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                <Image
+                  src="/PureButtonsLogo.png"
+                  alt="PureButtons"
+                  className="w-full max-w-[180px] h-auto transition-transform duration-300 group-hover:scale-110"
+                  width={300}
+                  height={100}
+                />
+                </a>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 font-franklinGothic">
+                PURE BUTTONS
+              </h3>
+              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
+                Pure Buttons manufactures high quality promotional products like custom buttons, 
+                fridge magnets, and custom stickers.
               </p>
             </div>
           </div>
