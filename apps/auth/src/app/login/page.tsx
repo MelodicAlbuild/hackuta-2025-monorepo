@@ -1,46 +1,74 @@
-import { LoginForm } from "@/components/login-form";
-import Link from "next/link";
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { LoginForm } from '@/components/login-form';
 
 export default function LoginPage() {
   return (
-    // The main container now uses flexbox to center content
-    <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
-      <div className="flex items-center justify-center p-6 lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Welcome Back
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Sign in to access HackUTA portals
+    <div className="scrollbar-hide bg-gradient-to-b from-black to-blue-950 max-h-screen overflow-hidden relative">
+      {/* HackUTA Logo at Top */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-[20]">
+        <Link href="/" className="hover:opacity-80 transition-opacity">
+          <Image
+            src="/Logo.svg"
+            alt="HackUTA Logo"
+            width={100}
+            height={100}
+            className="drop-shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+          />
+        </Link>
+      </div>
+
+      {/* Main Content - Centered Form */}
+      <div className="font-franklinCondensed text-white text-center w-[100vw] mx-auto px-6 sm:px-10 p-[20px] relative z-[10] pb-[500px]">
+        <div className="flex items-center justify-center min-h-[100vh]">
+          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
+            <div className="bg-black/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 space-y-6">
+              <div className="flex flex-col space-y-2 text-center">
+                <h1 className="text-3xl font-franklinGothic font-bold tracking-tight text-white">
+                  Welcome Back
+                </h1>
+                <p className="text-lg text-gray-300 font-franklinGothic">
+                  Sign in to access HackUTA portals
+                </p>
+              </div>
+              <LoginForm />
+            </div>
+            <p className="px-8 text-center text-xs text-gray-300 font-franklinGothic">
+              By clicking continue, you agree to the{' '}
+              <Link
+                href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4 hover:text-purple-300 transition-colors"
+              >
+                MLH Code of Conduct
+              </Link>
+              .
             </p>
           </div>
-          <LoginForm />
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            By clicking continue, you agree to the{" "}
-            <Link
-              href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-4 hover:text-primary"
-            >
-              MLH Code of Conduct
-            </Link>
-            .
-          </p>
         </div>
       </div>
-      {/* This branding column is hidden on mobile and appears on large screens */}
-      <div className="hidden bg-muted lg:block">
-        <div
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-          style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
+
+      {/* Buildings + Glow */}
+      <div className="absolute w-full bottom-0 sm:bottom-auto sm:top-[75%] left-0 z-0">
+        <div className="relative w-full">
+          <Image
+            src="/BuildingGlow.svg"
+            alt="Building Glow"
+            className="w-full h-auto opacity-80"
+            width={1438}
+            height={730}
+          />
+          <Image
+            src="/Buildings.svg"
+            alt="Buildings"
+            className="absolute top-0 left-0 w-full h-auto"
+            width={1440}
+            height={761}
+          />
+        </div>
       </div>
     </div>
   );

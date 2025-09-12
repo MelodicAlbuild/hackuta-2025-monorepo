@@ -1,25 +1,30 @@
 'use client';
 
 import Image from 'next/image';
+import GlitchLogo from '@/components/GlitchLogo';
 
 export default function Hero() {
   return (
     <div className="relative w-full min-h-[130vh] md:min-h-[170vh] flex justify-center items-start">
       {/* Logo Container with glow */}
-      <div className="absolute w-full top-[5%] sm:top-[20%] md:top-[10%] lg:top-[12%] left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
-        <Image
+      <div className="absolute w-full top-[12%] sm:top-[2%] md:top-[1%] lg:top-[1.5%] left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
+        <GlitchLogo
           src="/Logo.svg"
           alt="Main Logo"
-          className="absolute bottom-[-400px] sm:bottom-[-400px] md:bottom-[-400px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50 drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
           width={402}
           height={439}
+          durationMs={1000}
+          wrapperClassName="absolute bottom-[-80px] sm:bottom-[-90px] md:bottom-[-100px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
+          imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
         />
-        <Image
+        <GlitchLogo
           src="/hackutalogo.svg"
           alt="HackUTA Logo"
-          className="absolute bottom-[-460px] sm:bottom-[-460px] md:bottom-[-510px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50 drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
           width={418}
           height={113}
+          durationMs={1000}
+          wrapperClassName="absolute bottom-[-80px] sm:bottom-[-90px] md:bottom-[-100px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
+          imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
         />
       </div>
 

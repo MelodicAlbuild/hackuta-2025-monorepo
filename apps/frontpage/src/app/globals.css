@@ -193,3 +193,79 @@ nav a {
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.4),
     0 0 30px rgba(147, 51, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
+
+/* ---------------- Glitch Effect ---------------- */
+/* Wrapper holds three stacked images (base + 2 overlays). */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-base {
+  position: relative;
+  z-index: 3;
+}
+
+.glitch-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 4;
+  opacity: 0;
+  /* Run once on mount; total length controlled via CSS var */
+  animation-duration: var(--glitch-duration, 900ms);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards; /* keep end state */
+}
+
+/* Two slightly different animations to create layered glitch */
+.glitch-layer-a {
+  mix-blend-mode: screen;
+  filter: saturate(160%) hue-rotate(325deg);
+  animation-name: glitch-scan-a, glitch-fadeout;
+  animation-timing-function: steps(18, end), ease-out;
+  animation-delay: 0ms, calc(var(--glitch-duration, 900ms) - 200ms);
+}
+
+.glitch-layer-b {
+  mix-blend-mode: screen;
+  filter: saturate(160%) hue-rotate(210deg);
+  animation-name: glitch-scan-b, glitch-fadeout;
+  animation-timing-function: steps(18, end), ease-out;
+  animation-delay: 50ms, calc(var(--glitch-duration, 900ms) - 200ms);
+}
+
+@keyframes glitch-fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Vertical scanline-y slice jumps */
+@keyframes glitch-scan-a {
+  0%   { opacity: 1; transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+  10%  { transform: translate(-2px, -1px); clip-path: inset(12% 0 70% 0); }
+  20%  { transform: translate(2px, 1px); clip-path: inset(60% 0 25% 0); }
+  30%  { transform: translate(-3px, 2px); clip-path: inset(20% 0 65% 0); }
+  40%  { transform: translate(3px, -2px); clip-path: inset(75% 0 10% 0); }
+  50%  { transform: translate(-1px, 3px); clip-path: inset(35% 0 55% 0); }
+  60%  { transform: translate(2px, -3px); clip-path: inset(5% 0 80% 0); }
+  70%  { transform: translate(-2px, 1px); clip-path: inset(50% 0 35% 0); }
+  80%  { transform: translate(3px, -1px); clip-path: inset(15% 0 70% 0); }
+  90%  { transform: translate(-1px, 2px); clip-path: inset(70% 0 15% 0); }
+  100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+}
+
+@keyframes glitch-scan-b {
+  0%   { opacity: 1; transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+  12%  { transform: translate(2px, 2px) skewX(0.5deg); clip-path: inset(8% 0 75% 0); }
+  24%  { transform: translate(-2px, -1px) skewX(-0.5deg); clip-path: inset(65% 0 20% 0); }
+  36%  { transform: translate(3px, -1px) skewX(0.8deg); clip-path: inset(28% 0 58% 0); }
+  48%  { transform: translate(-3px, 2px) skewX(-0.8deg); clip-path: inset(78% 0 8% 0); }
+  60%  { transform: translate(1px, -3px) skewX(0.4deg); clip-path: inset(40% 0 45% 0); }
+  72%  { transform: translate(-1px, 3px) skewX(-0.4deg); clip-path: inset(12% 0 75% 0); }
+  84%  { transform: translate(2px, -2px) skewX(0.6deg); clip-path: inset(58% 0 30% 0); }
+  96%  { transform: translate(-2px, 1px) skewX(-0.6deg); clip-path: inset(20% 0 60% 0); }
+  100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+}
