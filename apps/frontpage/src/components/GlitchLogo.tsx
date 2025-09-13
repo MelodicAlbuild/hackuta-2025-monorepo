@@ -11,10 +11,12 @@ type GlitchLogoProps = {
   wrapperClassName?: string;
   imgClassName?: string;
   durationMs?: number; // how long the glitch runs
+  startDelayMs?: number; // delay before glitch starts
 };
 
 interface GlitchStyle extends React.CSSProperties {
   ['--glitch-duration']?: string;
+  ['--glitch-start-delay']?: string;
 }
 
 export default function GlitchLogo({
@@ -25,13 +27,18 @@ export default function GlitchLogo({
   wrapperClassName = '',
   imgClassName = '',
   durationMs = 900,
+  startDelayMs = 0,
 }: GlitchLogoProps) {
   const duration = `${durationMs}ms`;
+  const startDelay = `${startDelayMs}ms`;
 
   return (
     <div
       className={`glitch ${wrapperClassName}`}
-      style={{ ['--glitch-duration']: duration } as GlitchStyle}
+      style={{
+        ['--glitch-duration']: duration,
+        ['--glitch-start-delay']: startDelay,
+      } as GlitchStyle}
     >
       {/* Base image */}
       <img

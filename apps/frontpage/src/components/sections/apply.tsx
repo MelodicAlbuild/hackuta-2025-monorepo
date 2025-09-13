@@ -23,7 +23,7 @@ export default function Apply() {
                 href="https://discord.gg/2bVsYS3SgS"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/30 shadow-lg hover:shadow-2xl hover:shadow-purple-500/30"
+                className="cursor-target font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/30 shadow-lg hover:shadow-2xl hover:shadow-purple-500/30"
               >
                 <span className="relative z-10">JOIN DISCORD</span>
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
@@ -32,7 +32,7 @@ export default function Apply() {
                 href="https://docs.google.com/forms/d/e/1FAIpQLSfb5P_NzBWblFOWQEA1yo6C2PIOy3wuH79TO4opo4A3yz4dmw/viewform"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/30 shadow-lg hover:shadow-2xl hover:shadow-purple-500/30"
+                className="cursor-target font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/30 shadow-lg hover:shadow-2xl hover:shadow-purple-500/30"
               >
                 <span className="relative z-10">BE A JUDGE</span>
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>

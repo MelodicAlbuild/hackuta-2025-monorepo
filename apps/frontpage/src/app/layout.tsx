@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
+import TargetCursor from '@/components/TargetCursor';
 import './globals.css';
 
 const geistSans = Geist({
@@ -32,6 +33,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased scrollbar-hide overflow-x-hidden bg-black`}
       >
+        <TargetCursor
+          targetSelector=".cursor-target, button, a, [role='button'], input, textarea, select"
+          spinDuration={3}
+          hideDefaultCursor={true}
+        />
         {children}
         <Toaster position="bottom-right" />
       </body>
