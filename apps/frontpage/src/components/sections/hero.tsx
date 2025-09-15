@@ -14,6 +14,7 @@ export default function Hero() {
           width={402}
           height={439}
           durationMs={1000}
+          startDelayMs={700}
           wrapperClassName="absolute bottom-[-80px] sm:bottom-[-90px] md:bottom-[-100px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
           imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
         />
@@ -23,6 +24,7 @@ export default function Hero() {
           width={418}
           height={113}
           durationMs={1000}
+          startDelayMs={700}
           wrapperClassName="absolute bottom-[-80px] sm:bottom-[-90px] md:bottom-[-100px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
           imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
         />

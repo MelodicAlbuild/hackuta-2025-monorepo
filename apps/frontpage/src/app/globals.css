@@ -226,7 +226,8 @@ nav a {
   filter: saturate(160%) hue-rotate(325deg);
   animation-name: glitch-scan-a, glitch-fadeout;
   animation-timing-function: steps(18, end), ease-out;
-  animation-delay: 0ms, calc(var(--glitch-duration, 900ms) - 200ms);
+  /* First animation delayed by optional start delay; fadeout aligned to total */
+  animation-delay: var(--glitch-start-delay, 0ms), calc(var(--glitch-start-delay, 0ms) + var(--glitch-duration, 900ms) - 200ms);
 }
 
 .glitch-layer-b {
@@ -234,7 +235,8 @@ nav a {
   filter: saturate(160%) hue-rotate(210deg);
   animation-name: glitch-scan-b, glitch-fadeout;
   animation-timing-function: steps(18, end), ease-out;
-  animation-delay: 50ms, calc(var(--glitch-duration, 900ms) - 200ms);
+  /* Offset by 50ms after the optional start delay; fadeout aligned to total */
+  animation-delay: calc(var(--glitch-start-delay, 0ms) + 50ms), calc(var(--glitch-start-delay, 0ms) + var(--glitch-duration, 900ms) - 200ms);
 }
 
 @keyframes glitch-fadeout {
