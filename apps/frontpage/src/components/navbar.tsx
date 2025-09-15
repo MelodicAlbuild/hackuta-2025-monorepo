@@ -103,7 +103,7 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
             <a
               key={item.name}
               href={item.href}
-              className="text-white font-franklinGothic lg:text-lg md:text-base font-normal hover:text-purple-300 transition shrink"
+              className="cursor-target text-white font-franklinGothic lg:text-lg md:text-base font-normal hover:text-purple-300 transition shrink"
             >
               {item.name}
             </a>
@@ -115,7 +115,7 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
           <div className="hidden md:flex items-center ml-4">
             <a
               href={`${process.env.NEXT_PUBLIC_AUTH_APP_URL}/login`}
-              className="text-white font-franklinGothic md:text-base font-normal border border-purple-400/80 rounded-full px-4 py-2 hover:shadow-[0_0_18px_rgba(147,51,234,0.35),0_0_28px_rgba(147,51,234,0.2)] transition"
+              className="cursor-target text-white font-franklinGothic md:text-base font-normal border border-purple-400/80 rounded-full px-4 py-2 hover:shadow-[0_0_18px_rgba(147,51,234,0.35),0_0_28px_rgba(147,51,234,0.2)] transition"
             >
               Sign In
             </a>
@@ -124,7 +124,7 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
 
         {/* Mobile Hamburger Menu */}
         <button
-          className="md:hidden text-white focus:outline-none z-[110] relative transition-transform duration-300 hover:scale-110"
+          className="cursor-target md:hidden text-white focus:outline-none z-[110] relative transition-transform duration-300 hover:scale-110"
           onClick={toggleMobileMenu}
           aria-label="Toggle Menu"
         >
@@ -161,7 +161,7 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
               <a
                 key={item.name}
                 href={item.href}
-                className={`font-franklinGothic text-white text-lg font-normal transition-all duration-200 hover:scale-105 rounded-lg ${
+                className={`cursor-target font-franklinGothic text-white text-lg font-normal transition-all duration-200 hover:scale-105 rounded-lg ${
                   isApply
                     ? 'bg-transparent text-white border border-purple-400/80 ring-0 shadow-[0_0_18px_rgba(147,51,234,0.35),0_0_28px_rgba(147,51,234,0.2)] hover:shadow-[0_0_24px_rgba(147,51,234,0.45),0_0_36px_rgba(147,51,234,0.28)] animate-pulse w-[90%] px-8 py-3 text-center'
                     : item.name === 'Sign In'

@@ -113,7 +113,7 @@ export default function Reveal({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out will-change-[transform,opacity] ${
+      className={`transition-all duration-200 ease-out will-change-[transform,opacity] ${
         isVisible ? visibleClassName : hiddenClassName
       }`}
       style={{
