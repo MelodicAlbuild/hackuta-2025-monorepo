@@ -79,7 +79,7 @@ const FormSchema = z.object({
     .max(3, 'Age must be a valid number'),
   phoneNumber: z
     .string()
-    .regex(/^\d{11}$/, 'Phone number must be 10 digits plus country code'),
+    .regex(/^\d{9,13}$/, 'Phone number must be 9 to 13 digits'),
   email: z.string().email('Invalid email address'),
   school: z.string().optional(),
   levelOfStudy: z.string({ error: 'Level of study is required' }),
