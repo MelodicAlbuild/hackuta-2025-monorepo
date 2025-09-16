@@ -28,7 +28,7 @@ export default function Sponsors() {
                   className="block transition-transform duration-300 group-hover:scale-110"
                 >
                   <Image
-                    src="/MouserElectronics.svg"
+                    src="/mouserWhite.png"
                     alt="Mouser Electronics"
                     className="w-full max-w-[200px] h-auto"
                     width={500}
