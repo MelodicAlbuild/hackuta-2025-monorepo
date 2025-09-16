@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React from 'react';
+import useWindowSize from '@/hooks/useWindowSize';
 
 type GlitchLogoProps = {
   src: string;
@@ -29,43 +30,51 @@ export default function GlitchLogo({
   durationMs = 900,
   startDelayMs = 0,
 }: GlitchLogoProps) {
+  const { width: viewportWidth } = useWindowSize();
+  const isMobile = viewportWidth > 0 && viewportWidth < 768;
   const duration = `${durationMs}ms`;
   const startDelay = `${startDelayMs}ms`;
-
-  return (
-    <div
-      className={`glitch ${wrapperClassName}`}
-      style={{
+  const wrapperClasses = `${isMobile ? '' : 'glitch'} ${wrapperClassName}`.trim();
+  const baseImgClasses = `${isMobile ? '' : 'glitch-base'} block w-full h-auto ${imgClassName}`.trim();
+  const style = isMobile
+    ? undefined
+    : ({
         ['--glitch-duration']: duration,
         ['--glitch-start-delay']: startDelay,
-      } as GlitchStyle}
-    >
+      } as GlitchStyle);
+
+  return (
+    <div className={wrapperClasses} style={style}>
       {/* Base image */}
       <img
         src={src}
         alt={alt}
         width={width}
         height={height}
-        className={`glitch-base block w-full h-auto ${imgClassName}`}
+        className={baseImgClasses}
         decoding="async"
         loading="eager"
       />
 
       {/* Overlay layers for glitch effect */}
-      <img
-        src={src}
-        alt=""
-        aria-hidden="true"
-        className="glitch-layer glitch-layer-a pointer-events-none"
-        decoding="async"
-      />
-      <img
-        src={src}
-        alt=""
-        aria-hidden="true"
-        className="glitch-layer glitch-layer-b pointer-events-none"
-        decoding="async"
-      />
+      {!isMobile && (
+        <>
+          <img
+            src={src}
+            alt=""
+            aria-hidden="true"
+            className="glitch-layer glitch-layer-a pointer-events-none"
+            decoding="async"
+          />
+          <img
+            src={src}
+            alt=""
+            aria-hidden="true"
+            className="glitch-layer glitch-layer-b pointer-events-none"
+            decoding="async"
+          />
+        </>
+      )}
     </div>
   );
 }
