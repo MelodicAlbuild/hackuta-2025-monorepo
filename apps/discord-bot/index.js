@@ -166,12 +166,12 @@ discordClient.on('interactionCreate', async (interaction) => {
     const email = interaction.options.getString('email').toLowerCase();
 
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+      .from('interest-form')
       .select('id')
-      .eq('email', email)
-      .single();
+      .eq('email', email);
 
-    if (profileError || !profile) {
+    if (profileError || !profile || profile.length < 1) {
+      console.error(profileError);
       return interaction.reply({
         content:
           'This email is not registered. You can register at https://hackuta.org/',
