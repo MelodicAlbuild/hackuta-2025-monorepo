@@ -28,7 +28,7 @@ export default function Apply() {
                 <span className="relative z-10">JOIN DISCORD</span>
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
               </a>
-              <a
+              {/* <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSfb5P_NzBWblFOWQEA1yo6C2PIOy3wuH79TO4opo4A3yz4dmw/viewform"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -36,7 +36,7 @@ export default function Apply() {
               >
                 <span className="relative z-10">BE A JUDGE</span>
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
-              </a>
+              </a> */}
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSe9xRh8ZIAIZCoa5O-4lk3fbgdJ51szu__p5Huj9dCLQcdbzg/viewform"
                 target="_blank"

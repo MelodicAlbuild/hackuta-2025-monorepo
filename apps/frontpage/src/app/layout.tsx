@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>HackDay 2025</title>
+        <title>HackUTA 2025</title>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body
