@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import useWindowSize from '@/hooks/useWindowSize';
 
 type RevealProps = {
   children: ReactNode;
@@ -38,6 +39,8 @@ export default function Reveal({
   const [isVisible, setIsVisible] = useState(false);
   const [progress, setProgress] = useState(0); // 0..1 how revealed it is
   const tickingRef = useRef(false);
+  const { width } = useWindowSize();
+  const disableEffects = width > 0 && width < 768;
 
   useEffect(() => {
     const element = ref.current;
@@ -47,6 +50,11 @@ export default function Reveal({
       typeof window !== 'undefined' &&
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (disableEffects || prefersReducedMotion) {
+      setIsVisible(true);
+      setProgress(1);
+    }
 
     let didCancel = false;
 
@@ -74,52 +82,67 @@ export default function Reveal({
       });
     };
 
+    const parallaxActive = enableParallax && !prefersReducedMotion && !disableEffects;
+
     // Initial compute
-    if (enableParallax && !prefersReducedMotion) {
+    if (parallaxActive) {
       setProgress(computeProgress());
       window.addEventListener('scroll', updateOnScroll, { passive: true });
       window.addEventListener('resize', updateOnScroll);
+    } else if (!disableEffects && !prefersReducedMotion) {
+      setProgress(1);
     }
 
     // IntersectionObserver to ensure visibility class toggles at least once
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !didCancel) {
-            setIsVisible(true);
-          }
-        });
-      },
-      { root: null, rootMargin, threshold: 0.15 },
-    );
-    observer.observe(element);
+    const observer = !disableEffects
+      ? new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && !didCancel) {
+                setIsVisible(true);
+              }
+            });
+          },
+          { root: null, rootMargin, threshold: 0.15 },
+        )
+      : null;
+    if (observer) observer.observe(element);
 
     return () => {
       didCancel = true;
-      observer.disconnect();
-      if (enableParallax && !prefersReducedMotion) {
+      observer?.disconnect();
+      if (parallaxActive) {
         window.removeEventListener('scroll', updateOnScroll as EventListener);
         window.removeEventListener('resize', updateOnScroll as EventListener);
       }
     };
-  }, [rootMargin, enableParallax, isVisible]);
+  }, [rootMargin, enableParallax, disableEffects, isVisible]);
 
   const transitionDelay = `${Math.max(0, index) * delayMs}ms`;
 
-  const effectiveProgress = enableParallax ? progress : isVisible ? 1 : 0;
+  const parallaxEnabled = enableParallax && !disableEffects;
+  const effectiveProgress = parallaxEnabled ? progress : isVisible ? 1 : 0;
   const translateYPx = (1 - effectiveProgress) * translateFromPx;
   // Blur effect disabled for performance across browsers
+
+  const baseClassName = disableEffects
+    ? visibleClassName
+    : isVisible
+      ? visibleClassName
+      : hiddenClassName;
+  const transitionClasses = disableEffects
+    ? ''
+    : 'transition-all duration-200 ease-out will-change-[transform,opacity]';
+  const className = `${transitionClasses} ${baseClassName}`.trim();
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-200 ease-out will-change-[transform,opacity] ${
-        isVisible ? visibleClassName : hiddenClassName
-      }`}
+      className={className}
       style={{
-        transitionDelay,
+        transitionDelay: disableEffects ? undefined : transitionDelay,
         transform: `translate3d(0, ${translateYPx.toFixed(2)}px, 0)`,
-        opacity: effectiveProgress,
+        opacity: disableEffects ? 1 : effectiveProgress,
       }}
     >
       {children}

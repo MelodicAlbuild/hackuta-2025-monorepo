@@ -30,8 +30,16 @@ export default function Footer() {
     { name: 'Email', href: 'mailto:contact@hackuta.org', Icon: Mail },
   ];
 
+  const peerHackathons = [
+    { label: 'HackUTD', href: 'https://hackutd.co' },
+    { label: 'TAMUhack', href: 'https://tamuhack.com' },
+    { label: 'RowdyHacks', href: 'https://rowdyhacks.org' },
+    { label: 'HackTX', href: 'https://hacktx.com' },
+    { label: 'HackUNT', href: 'https://unthackathon.com' },
+  ];
+
   return (
-    <footer className="w-full border-t border-purple-500/20 bg-black/80 text-white">
+    <footer className="w-full border-t border-red-500/20 bg-black/80 text-white">
       <div className="mx-auto max-w-6xl px-6 sm:px-8">
         {/* Top section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 py-12">
@@ -66,9 +74,9 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={name}
-                  className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-purple-400/30 bg-black/40 hover:bg-purple-500/10 hover:border-purple-400/60 transition shadow-[0_0_10px_rgba(147,51,234,0.15)]"
+                  className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-500/30 bg-black/40 hover:bg-red-500/10 hover:border-red-500/60 transition shadow-[0_0_10px_rgba(239,68,68,0.2)]"
                 >
-                  <Icon className="h-4 w-4 text-gray-200 group-hover:text-purple-200" />
+                  <Icon className="h-4 w-4 text-gray-200 group-hover:text-red-200" />
                 </a>
               ))}
             </div>
@@ -76,7 +84,7 @@ export default function Footer() {
 
           {/* Explore */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-200/90">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-red-200/90">
               Explore
             </h3>
             <ul className="mt-4 space-y-2">
@@ -84,7 +92,7 @@ export default function Footer() {
                 <li key={item.label}>
                   <a
                     href={item.href}
-                    className="text-gray-300 hover:text-purple-300 transition font-franklinGothic"
+                    className="text-gray-300 hover:text-red-300 transition font-franklinGothic"
                   >
                     {item.label}
                   </a>
@@ -95,7 +103,7 @@ export default function Footer() {
 
           {/* Event Info */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-200/90">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-red-200/90">
               Event
             </h3>
             <ul className="mt-4 space-y-2 text-gray-300 font-franklinGothic">
@@ -106,26 +114,30 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Peer Hackathons */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-200/90">
-              Contact
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-red-200/90">
+              Other Hackathons
             </h3>
             <ul className="mt-4 space-y-2 text-gray-300 font-franklinGothic">
-              <li>
-                <a
-                  href="mailto:contact@hackuta.org"
-                  className="hover:text-purple-300 transition"
-                >
-                  contact@hackuta.org
-                </a>
-              </li>
+              {peerHackathons.map((hackathon) => (
+                <li key={hackathon.label}>
+                  <a
+                    href={hackathon.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-red-300 transition"
+                  >
+                    {hackathon.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-purple-500/20 py-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-red-500/20 py-6">
           <p className="text-xs sm:text-sm text-gray-400 font-franklinGothic">
             © {year} HackUTA. All rights reserved.
           </p>
@@ -134,7 +146,7 @@ export default function Footer() {
               href="http://mlh.io/code-of-conduct"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-purple-300 transition"
+              className="text-gray-400 hover:text-red-300 transition"
             >
               Code of Conduct
             </a>

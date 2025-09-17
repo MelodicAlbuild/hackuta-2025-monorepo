@@ -7,7 +7,7 @@ export default function Hero() {
   return (
     <div className="relative w-full min-h-[130vh] md:min-h-[170vh] flex justify-center items-start">
       {/* Logo Container with glow */}
-      <div className="absolute w-full top-[12%] sm:top-[2%] md:top-[1%] lg:top-[1.5%] left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
+      <div className="absolute w-full top-[18%] sm:top-[2%] md:top-[1%] lg:top-[9%] left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
         <GlitchLogo
           src="/Logo.svg"
           alt="Main Logo"
@@ -15,8 +15,8 @@ export default function Hero() {
           height={439}
           durationMs={1000}
           startDelayMs={700}
-          wrapperClassName="absolute bottom-[-80px] sm:bottom-[-90px] md:bottom-[-100px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
-          imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
+          wrapperClassName="relative w-[60%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
+          imgClassName="drop-shadow-[0_0_30px_rgba(239,68,68,0.45)]"
         />
         <GlitchLogo
           src="/hackutalogo.svg"
@@ -25,8 +25,8 @@ export default function Hero() {
           height={113}
           durationMs={1000}
           startDelayMs={700}
-          wrapperClassName="absolute bottom-[-80px] sm:bottom-[-90px] md:bottom-[-100px] w-[50%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
-          imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
+          wrapperClassName="relative w-[60%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
+          imgClassName="drop-shadow-[0_0_30px_rgba(239,68,68,0.45)]"
         />
       </div>
 

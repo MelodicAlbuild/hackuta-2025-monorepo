@@ -1,27 +1,85 @@
 [
-    {
-        "id": 1,
-        "label": "How do I contact an organizer?",
-        "content": "Through our Discord! Join using the button above!"
-    },
-    {
-        "id": 2,
-        "label": "How many people can be on a team?",
-        "content": "HackUTA Teams consist of four members per team. You can either apply with a team, or apply without a team and get matched with one for the event."
-    },
-    {
-        "id": 3,
-        "label": "How long do we have to work on our projects?",
-        "content": "Hacking begins October 4th at 12:00 PM and ends October 5th at 12:00 PM. You will have 24 hours to work on your project."
-    },
-    {
-        "id": 4,
-        "label": "Will there be food?",
-        "content": "We will provide lunch, dinner, breakfast, and a final lunch, times will be available on the schedule above."
-    },
-    {
-        "id": 5,
-        "label": "Where is the event?",
-        "content": "The event is being held at the SWSH and SEIR at UTA!"
-    }
+  {
+    "id": 1,
+    "label": "Who can apply to HackUTA 2025?",
+    "content": "HackUTA is open to all college, university, and trade-school students who will be 18 or older by October 4, 2025. Recent graduates from December 2024 or later and high school seniors who are 18+ are welcome as well. Bring a government-issued ID or student ID for check-in."
+  },
+  {
+    "id": 2,
+    "label": "Do I need to be a UTA student or live in Texas?",
+    "content": "Nope! We love hosting students from across the state and beyond. HackUTA 2025 is fully in person at UTA's Social Work & Smart Hospital (SWSH) and Science & Engineering Innovation & Research (SEIR) buildings, so just make it to Arlington for check-in."
+  },
+  {
+    "id": 3,
+    "label": "How much does it cost to attend?",
+    "content": "HackUTA is completely free thanks to our sponsors. We cover four meals, snacks, caffeine, workspace, and swag throughout the weekend, while you handle your own travel."
+  },
+  {
+    "id": 4,
+    "label": "What if I've never been to a hackathon?",
+    "content": "No experience required. We run onboarding sessions, beginner-friendly workshops, and have mentors and MLH coaches on site to help you scope ideas, learn new tools, and ship something you're proud of."
+  },
+  {
+    "id": 5,
+    "label": "How do teams work?",
+    "content": [
+      {
+        "type": "text",
+        "value": "Teams can have up to four hackers. You can list your teammates on the application or arrive solo. We host a team formation mixer and share a "
+      },
+      {
+        "type": "link",
+        "label": "Discord channel",
+        "href": "https://discord.gg/2bVsYS3SgS"
+      },
+      {
+        "type": "text",
+        "value": " to help you find collaborators before hacking starts."
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "label": "What should I bring?",
+    "content": "Pack your laptop, chargers, and any hardware you plan to hack on. A valid student ID, government ID, toiletries, medications, and something comfy to nap with, like a hoodie, pillow, or sleeping bag and a deodorant, will make the 24 hours much easier."
+  },
+  {
+    "id": 7,
+    "label": "Can I start on my project early?",
+    "content": "You can brainstorm and explore public resources ahead of time, but all code, design assets, and build work must be created during the official hacking window from noon Oct 4 to noon Oct 5. Using open source libraries or templates is fine as long as you start fresh and give credit."
+  },
+  {
+    "id": 8,
+    "label": "How does judging and prizes work?",
+    "content": "We host an expo-style demo fair where judges visit each team. Expect a short pitch of three to four minutes and Q&A covering your problem, solution, and tech. Projects are evaluated on creativity, impact, technical execution, and presentation, with overall winners plus sponsor challenges announced at closing."
+  },
+  {
+    "id": 9,
+    "label": "Is travel or lodging provided?",
+    "content": "We are not able to offer travel reimbursements or hotel rooms for 2025. We keep quiet rooms open overnight in SWSH and SEIR for resting, so bring anything you need to be comfortable."
+  },
+  {
+    "id": 10,
+    "label": "How do I contact organizers or request accommodations?",
+    "content": [
+      {
+        "type": "text",
+        "value": "Join the HackUTA "
+      },
+      {
+        "type": "link",
+        "label": "Discord",
+        "href": "https://discord.gg/2bVsYS3SgS"
+      },
+      {
+        "type": "text",
+        "value": " for the fastest responses. You can also email contact@hackuta.org for questions, accessibility needs, or dietary concerns, and the team will be happy to help."
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "label": "How do guests register for parking?",
+    "content": "Visit http://www.uta.edu/mavpark, choose Purchase Event Permit → Student Organization Event → HackUTA 2025, enter voucher code Hack25, pick the (EVT-COMP) Fac/Staff Surface Lots permit, set your event date, add your vehicle details, and confirm."
+  }
 ]

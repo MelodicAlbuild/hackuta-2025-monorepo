@@ -38,7 +38,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="scrollbar-hide bg-gradient-to-b from-black via-blue-950 to-blue-950 min-h-screen">
+    <div className="scrollbar-hide bg-gradient-to-b from-black to-gray-950 min-h-screen">
       <Navbar onMobileMenuToggle={handleMobileMenuToggle} />
 
       <MLHBadge isMobileMenuOpen={isMobileMenuOpen} />
@@ -50,21 +50,21 @@ export default function Home() {
       </Reveal>
 
       {/* Main Content */}
-      <div className="font-franklinCondensed text-white text-center w-[100vw] mx-auto px-6 sm:px-10 p-[20px] mt-[-60px] sm:mt-[-40px] md:mt-0 relative z-[10]">
+      <div className="font-franklinCondensed text-white text-center w-[100vw] mx-auto px-6 sm:px-10 p-[20px] mt-[60px] sm:mt-[80px] md:mt-80px lg:mt-100px relative z-[10]">
+        <Reveal>
+          <Apply />
+        </Reveal>
+
+        <div className="mt-[-10px]" />
         <Reveal>
           <WhenWhere />
         </Reveal>
 
         {/* Circular Gallery after Event Details */}
         <Reveal>
-          <div className="mt-8 h-[360px] sm:h-[420px] md:h-[480px]">
-            <CircularGallery bend={1} scrollEase={0.05} />
+          <div className="mt-3 h-[360px] sm:h-[420px] md:h-[480px] -mx-[20px]">
+            <CircularGallery bend={1} scrollEase={0.02} />
           </div>
-        </Reveal>
-
-        <div className="mt-8" />
-        <Reveal>
-          <Apply />
         </Reveal>
 
         <section id="schedule" className="py-8">

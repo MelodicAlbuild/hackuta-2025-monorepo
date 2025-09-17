@@ -1,12 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import faqJson from '../../../faq.json';
+
+type FaqContentSegment =
+  | {
+      type: 'text';
+      value: string;
+    }
+  | {
+      type: 'link';
+      label: string;
+      href: string;
+    };
 
 interface FaqItem {
   id: number;
   label: string;
-  content: string;
+  content: string | FaqContentSegment[];
 }
 
 export default function Faq() {
@@ -31,11 +42,11 @@ export default function Faq() {
         {faqJson.map((faq: FaqItem) => (
           <div
             key={faq.id}
-            className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl overflow-hidden transition-all duration-300 hover:border-purple-400/50 faq-glow"
+            className="bg-gradient-to-r from-red-900/20 to-blue-900/20 backdrop-blur-sm border border-red-500/30 rounded-2xl overflow-hidden transition-all duration-300 hover:border-red-500/50 faq-glow"
           >
             <button
               onClick={() => toggleItem(faq.id)}
-              className="w-full px-6 py-5 text-left focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all duration-200"
+              className="w-full px-6 py-5 text-left focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all duration-200"
               aria-expanded={openItem === faq.id}
               aria-controls={`faq-content-${faq.id}`}
             >
@@ -49,7 +60,7 @@ export default function Faq() {
                   }`}
                 >
                   <svg
-                    className="w-6 h-6 text-purple-300 group-hover:text-purple-200"
+                    className="w-6 h-6 text-red-300 group-hover:text-red-200"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -75,9 +86,31 @@ export default function Faq() {
               } overflow-hidden`}
             >
               <div className="px-6 pb-6">
-                <div className="w-full h-px bg-gradient-to-r from-purple-500/30 to-blue-500/30 mb-4"></div>
+                <div className="w-full h-px bg-gradient-to-r from-red-500/30 to-blue-500/30 mb-4"></div>
                 <p className="text-gray-200 text-base sm:text-lg leading-relaxed font-franklinGothic">
-                  {faq.content}
+                  {typeof faq.content === 'string'
+                    ? faq.content
+                    : faq.content.map((segment, index) => {
+                        if (segment.type === 'link') {
+                          return (
+                            <a
+                              key={`${segment.type}-${index}`}
+                              href={segment.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-red-300 underline underline-offset-4 hover:text-red-200 transition"
+                            >
+                              {segment.label}
+                            </a>
+                          );
+                        }
+
+                        return (
+                          <Fragment key={`${segment.type}-${index}`}>
+                            {segment.value}
+                          </Fragment>
+                        );
+                      })}
                 </p>
               </div>
             </div>

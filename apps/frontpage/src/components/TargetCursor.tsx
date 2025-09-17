@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useCallback, useMemo } from 'react';
+import useWindowSize from '@/hooks/useWindowSize';
 import { gsap } from 'gsap';
 
 export interface TargetCursorProps {
@@ -26,6 +27,8 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
     }),
     [],
   );
+  const { width: viewportWidth } = useWindowSize();
+  const isMobile = viewportWidth > 0 && viewportWidth < 768;
 
   const moveCursor = useCallback((x: number, y: number) => {
     if (!cursorRef.current) return;
@@ -39,6 +42,7 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
   useEffect(() => {
     if (!cursorRef.current) return;
+    if (isMobile) return;
 
     const originalCursor = document.body.style.cursor;
     if (hideDefaultCursor) {
@@ -328,9 +332,10 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
       spinTl.current?.kill();
       document.body.style.cursor = originalCursor;
     };
-  }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor]);
+  }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor, isMobile]);
 
   useEffect(() => {
+    if (isMobile) return;
     if (!cursorRef.current || !spinTl.current) return;
 
     if (spinTl.current.isActive()) {
@@ -343,7 +348,11 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
           ease: 'none',
         });
     }
-  }, [spinDuration]);
+  }, [spinDuration, isMobile]);
+
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <div
