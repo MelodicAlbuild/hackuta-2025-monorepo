@@ -27,7 +27,10 @@ export default async function RegistrationsPage() {
   }
 
   const filteredRegistrations = registrations
-    .filter((reg) => reg.age >= 18)
+    .filter(
+      (reg) =>
+        reg.age >= 18 && reg.firstName + ' ' + reg.lastName !== 'Alex Drum',
+    )
     .sort((a, b) => {
       return (
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
