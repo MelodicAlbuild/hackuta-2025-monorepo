@@ -1,21 +1,21 @@
-import { createSupabaseServerClient } from "@repo/supabase/server";
-import { RegistrationsTable } from "@/components/registrations-table";
+import { createSupabaseServerClient } from '@repo/supabase/server';
+import { RegistrationsTable } from '@/components/registrations-table';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { cookies } from "next/headers";
+} from '@/components/ui/card';
+import { cookies } from 'next/headers';
 
 export default async function RegistrationsPage() {
   const supabase = await createSupabaseServerClient(cookies);
 
   const { data: registrations, error } = await supabase
-    .from("interest-form")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .from('interest-form')
+    .select('*')
+    .order('created_at', { ascending: false });
 
   if (error) {
     return (
@@ -25,6 +25,14 @@ export default async function RegistrationsPage() {
       </p>
     );
   }
+
+  const filteredRegistrations = registrations
+    .filter((reg) => reg.age >= 18)
+    .sort((a, b) => {
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    });
 
   return (
     <Card>
@@ -36,7 +44,7 @@ export default async function RegistrationsPage() {
       </CardHeader>
       <CardContent>
         <div className="overflow-y-auto h-md">
-          <RegistrationsTable registrations={registrations || []} />
+          <RegistrationsTable registrations={filteredRegistrations || []} />
         </div>
       </CardContent>
     </Card>
