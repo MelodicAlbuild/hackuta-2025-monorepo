@@ -4,9 +4,9 @@ import { cookies } from 'next/headers'
 
 export async function GET() {
     const supabase = await createSupabaseServerClient(cookies)
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (!user || userError) {
         return new Response('Unauthorized', { status: 401 })
     }
 
