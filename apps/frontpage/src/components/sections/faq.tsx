@@ -3,22 +3,19 @@
 import { Fragment, useState } from 'react';
 import faqJson from '../../../faq.json';
 
-type FaqContentSegment =
-  | {
-      type: 'text';
-      value: string;
-    }
-  | {
-      type: 'link';
-      label: string;
-      href: string;
-    };
-
-interface FaqItem {
+// Type for the actual JSON data structure
+type FaqJsonItem = {
   id: number;
   label: string;
-  content: string | FaqContentSegment[];
-}
+  content:
+    | string
+    | Array<{
+        type: string;
+        value?: string;
+        label?: string;
+        href?: string;
+      }>;
+};
 
 export default function Faq() {
   const [openItem, setOpenItem] = useState<number | null>(null);
@@ -39,7 +36,7 @@ export default function Faq() {
         </p>
       </div>
       <div className="space-y-4">
-        {faqJson.map((faq: FaqItem) => (
+        {faqJson.map((faq: FaqJsonItem) => (
           <div
             key={faq.id}
             className="bg-gradient-to-r from-red-900/20 to-blue-900/20 backdrop-blur-sm border border-red-500/30 rounded-2xl overflow-hidden transition-all duration-300 hover:border-red-500/50 faq-glow"
@@ -91,7 +88,11 @@ export default function Faq() {
                   {typeof faq.content === 'string'
                     ? faq.content
                     : faq.content.map((segment, index) => {
-                        if (segment.type === 'link') {
+                        if (
+                          segment.type === 'link' &&
+                          segment.href &&
+                          segment.label
+                        ) {
                           return (
                             <a
                               key={`${segment.type}-${index}`}
