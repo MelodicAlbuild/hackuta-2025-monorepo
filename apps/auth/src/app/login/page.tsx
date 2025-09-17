@@ -6,7 +6,7 @@ import { LoginForm } from '@/components/login-form';
 
 export default function LoginPage() {
   return (
-    <div className="scrollbar-hide bg-gradient-to-b from-black to-blue-950 max-h-screen overflow-hidden relative">
+    <div className="scrollbar-hide bg-gradient-to-b from-black to-gray-950 max-h-screen overflow-hidden relative">
       {/* HackUTA Logo at Top */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-[20]">
         <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -35,13 +35,13 @@ export default function LoginPage() {
               </div>
               <LoginForm />
             </div>
-            <p className="px-8 text-center text-xs text-gray-300 font-franklinGothic">
+            <p className="px-6 text-center text-xs text-gray-300 font-franklinGothic">
               By clicking continue, you agree to the{' '}
               <Link
                 href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline underline-offset-4 hover:text-purple-300 transition-colors"
+                className="underline underline-offset-4 decoration-red-400/70 hover:text-red-300 transition-colors"
               >
                 MLH Code of Conduct
               </Link>
@@ -52,7 +52,7 @@ export default function LoginPage() {
       </div>
 
       {/* Buildings + Glow */}
-      <div className="absolute w-full bottom-0 sm:bottom-auto sm:top-[75%] left-0 z-0">
+      <div className="absolute w-full bottom-0 sm:bottom-auto sm:top-[82%] left-0 z-0">
         <div className="relative w-full">
           <Image
             src="/BuildingGlow.svg"

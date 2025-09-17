@@ -140,9 +140,8 @@ export default function InterestForm() {
   }
   return (
     <Dialog>
-      <DialogTrigger className="cursor-target font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/30 shadow-lg hover:shadow-2xl hover:shadow-purple-500/30">
+      <DialogTrigger className="cursor-target font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-gradient-to-r from-red-900/20 to-blue-900/20 backdrop-blur-sm border border-red-500/30 hover:border-red-500/50 faq-glow shadow-[0_0_18px_rgba(239,68,68,0.4),0_0_28px_rgba(239,68,68,0.24)] hover:shadow-[0_0_24px_rgba(239,68,68,0.5),0_0_36px_rgba(239,68,68,0.32)]">
         <span className="relative z-10">REGISTER NOW</span>
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
       </DialogTrigger>
       <DialogContent className="max-h-[75%] overflow-y-scroll">
         <Form {...form}>

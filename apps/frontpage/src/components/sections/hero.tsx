@@ -16,7 +16,7 @@ export default function Hero() {
           durationMs={1000}
           startDelayMs={700}
           wrapperClassName="relative w-[60%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
-          imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
+          imgClassName="drop-shadow-[0_0_30px_rgba(239,68,68,0.45)]"
         />
         <GlitchLogo
           src="/hackutalogo.svg"
@@ -26,7 +26,7 @@ export default function Hero() {
           durationMs={1000}
           startDelayMs={700}
           wrapperClassName="relative w-[60%] sm:w-[60%] max-w-[250px] sm:max-w-[300px] md:max-w-[400px] h-auto z-50"
-          imgClassName="drop-shadow-[0_0_30px_rgba(61,58,255,0.41)]"
+          imgClassName="drop-shadow-[0_0_30px_rgba(239,68,68,0.45)]"
         />
       </div>
 

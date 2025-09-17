@@ -76,7 +76,7 @@ const Map = ({ src, embedded }: MapProps) => {
         Venue & Parking
       </div>
       <div className="flex justify-center w-full px-4">
-        <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 backdrop-blur-sm border border-purple-500/40 rounded-3xl p-6 sm:p-8 transition-all duration-500 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 flex flex-col items-center justify-center gap-5 w-full max-w-4xl">
+        <div className="bg-gradient-to-br from-red-900/30 to-blue-900/30 backdrop-blur-sm border border-red-500/40 rounded-3xl p-6 sm:p-8 transition-all duration-500 hover:border-red-500/60 hover:shadow-2xl hover:shadow-red-500/20 flex flex-col items-center justify-center gap-5 w-full max-w-4xl">
           <div className="w-full flex justify-center">{iframe}</div>
           {legend}
         </div>

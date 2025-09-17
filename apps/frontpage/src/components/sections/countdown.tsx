@@ -93,8 +93,12 @@ export default function Countdown() {
 
 function TimeNumber({ value }: { value: string }) {
   return (
-    <div className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-black/20 px-4 sm:px-5 py-3 sm:py-4 shadow-lg shadow-purple-900/20">
-      <span className="font-franklinCondensed text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_0_20px_rgba(93,86,252,0.25)]">
+    <div className="relative inline-flex items-center justify-center overflow-hidden rounded-2xl border border-white/20 px-4 sm:px-5 py-3 sm:py-4 shadow-lg shadow-red-500/30 backdrop-blur-md">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 rounded-2xl bg-gradient-to-br from-gray-600/60 via-transparent to-red-500/60 opacity-40"
+      />
+      <span className="relative z-10 font-franklinCondensed text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_0_20px_rgba(220,38,38,0.25)]">
         {value}
       </span>
     </div>

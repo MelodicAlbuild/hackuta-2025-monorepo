@@ -2,6 +2,58 @@
 
 import Image from 'next/image';
 
+const sponsors = [
+  {
+    name: 'Mouser Electronics',
+    href: 'https://www.mouser.com/',
+    logo: '/mouserWhite.png',
+    width: 300,
+    height: 140,
+  },
+  {
+    name: "The Founder's Arena",
+    href: 'https://www.thefoundersarena.com/',
+    logo: '/FoundersArena.svg',
+    width: 240,
+    height: 120,
+  },
+  {
+    name: 'Major League Hacking',
+    href: 'https://mlh.io/',
+    logo: '/mlh-logo-color.png',
+    width: 260,
+    height: 120,
+  },
+  {
+    name: 'Pure Buttons',
+    href: 'https://mail.mlh.io/e/c/eyJlIjoxNTI0ODIsImVtYWlsX2lkIjoiZXhhbXBsZSIsImhyZWYiOiJodHRwczovL21saC5saW5rL01MSC1QdXJlQnV0dG9ucy1oYWNrYXRob25zP2Fqc191aWQ9MDE5NjNjZjEtNmZlNy00NmU1LThiOWItOWYzYjQ1ZTQ5YTQxXHUwMDI2dXRtX2NhbXBhaWduPU1lbWJlcitFdmVudCstK1B1cmUrQnV0dG9ucytJbnRyb1x1MDAyNnV0bV9jb250ZW50PVB1cmUrQnV0dG9ucytJbnRyb1x1MDAyNnV0bV9tZWRpdW09RW1haWxcdTAwMjZ1dG1fc291cmNlPUN1c3RvbWVyLmlvIiwidCI6MTc0NDgwNzUxMX0/465b97fffd84c977c1b3f1e4dc23b3c937dce616e1a19b195fbefe37581efec1',
+    logo: '/PureButtonsLogo.png',
+    width: 260,
+    height: 120,
+  },
+  {
+    name: 'IEEE',
+    href: 'https://www.ieee.org/',
+    logo: '/ieee_logo.svg',
+    width: 240,
+    height: 100,
+  },
+  {
+    name: 'Red Bull',
+    href: 'https://www.redbull.com/',
+    logo: '/redbull.png',
+    width: 200,
+    height: 120,
+  },
+  {
+    name: 'CSE Department',
+    href: 'https://www.uta.edu/academics/schools-colleges/engineering/academics/departments/computer-science-engineering',
+    logo: '/cselogo.png',
+    width: 200,
+    height: 120,
+  },
+];
+
 export default function Sponsors() {
   return (
     <section id="sponsors" className="py-24">
@@ -16,122 +68,47 @@ export default function Sponsors() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Mouser Electronics */}
-          <div className="group bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20">
-            <div className="flex flex-col items-center text-center h-full">
-              <div className="mb-6">
-                <a
-                  href="https://www.mouser.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block transition-transform duration-300 group-hover:scale-110"
-                >
-                  <Image
-                    src="/mouserWhite.png"
-                    alt="Mouser Electronics"
-                    className="w-full max-w-[200px] h-auto"
-                    width={500}
-                    height={300}
-                  />
-                </a>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 font-franklinGothic">
-                MOUSER ELECTRONICS
-              </h3>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
-                Worldwide leading authorized distributor of semiconductors and
-                electronic components for over 700 industry leading
-                manufacturers.
-              </p>
-            </div>
+        <div className="relative overflow-hidden rounded-3xl border border-red-500/30 bg-black/40 px-6 py-12 sm:px-10 sm:py-14">
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-blue-500/20" />
+          <span className="pointer-events-none absolute -top-24 right-12 h-72 w-72 rounded-full bg-red-500/20 blur-3xl" />
+          <span className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+          <div className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {sponsors.map(({ name, href, logo, width, height }) => (
+              <a
+                key={name}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex h-32 items-center justify-center overflow-hidden rounded-2xl border border-red-500/30 px-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-red-500/50 faq-glow hover:shadow-[0_25px_50px_-12px_rgba(248,113,113,0.05)]"
+              >
+                <span
+                  className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{
+                    background:
+                      'radial-gradient(circle at top, rgba(248,113,113,0.25), transparent 60%)',
+                  }}
+                />
+                <Image
+                  src={logo}
+                  alt={name}
+                  width={width}
+                  height={height}
+                  className="relative z-10 w-auto max-h-16 sm:max-h-20 object-contain drop-shadow-[0_0_35px_rgba(255,255,255,0.10)]"
+                />
+                <span className="sr-only">{name}</span>
+              </a>
+            ))}
           </div>
-
-          {/* The Founder's Arena */}
-          <div className="group bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20">
-            <div className="flex flex-col items-center text-center h-full">
-              <div className="mb-6">
-                <a
-                  href="https://www.thefoundersarena.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block transition-transform duration-300 group-hover:scale-110"
-                >
-                  <Image
-                    src="/FoundersArena.svg"
-                    alt="The Founder's Arena"
-                    className="w-full max-w-[180px] h-auto"
-                    width={250}
-                    height={75}
-                  />
-                </a>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 font-franklinGothic">
-                THE FOUNDER'S ARENA
-              </h3>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
-                A unique "go-to-market" Accelerator for WealthTech companies
-                looking to scale across the global market with expert guidance.
-              </p>
-            </div>
-          </div>
-
-          {/* Major League Hacking */}
-          <div className="group bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20">
-            <div className="flex flex-col items-center text-center h-full">
-              <div className="mb-6">
-                <a
-                  href="https://mlh.io/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block transition-transform duration-300 group-hover:scale-110"
-                >
-                  <Image
-                    src="/mlh-logo-color.png"
-                    alt="Major League Hacking"
-                    className="w-full max-w-[180px] h-auto"
-                    width={300}
-                    height={100}
-                  />
-                </a>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 font-franklinGothic">
-                MAJOR LEAGUE HACKING
-              </h3>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
-                The official student hackathon league. An engaged and passionate
-                maker community of the next generation of technology leaders.
-              </p>
-            </div>
-          </div>
-
-          {/* Pure Button */}
-          <div className="group bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-3xl p-8 transition-all duration-500 hover:scale-105 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 lg:col-start-2">
-            <div className="flex flex-col items-center text-center h-full">
-              <div className="mb-6">
-                <a
-                  href="https://mail.mlh.io/e/c/eyJlIjoxNTI0ODIsImVtYWlsX2lkIjoiZXhhbXBsZSIsImhyZWYiOiJodHRwczovL21saC5saW5rL01MSC1QdXJlQnV0dG9ucy1oYWNrYXRob25zP2Fqc191aWQ9MDE5NjNjZjEtNmZlNy00NmU1LThiOWItOWYzYjQ1ZTQ5YTQxXHUwMDI2dXRtX2NhbXBhaWduPU1lbWJlcitFdmVudCstK1B1cmUrQnV0dG9ucytJbnRyb1x1MDAyNnV0bV9jb250ZW50PVB1cmUrQnV0dG9ucytJbnRyb1x1MDAyNnV0bV9tZWRpdW09RW1haWxcdTAwMjZ1dG1fc291cmNlPUN1c3RvbWVyLmlvIiwidCI6MTc0NDgwNzUxMX0/465b97fffd84c977c1b3f1e4dc23b3c937dce616e1a19b195fbefe37581efec1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block transition-transform duration-300 group-hover:scale-110"
-                >
-                  <Image
-                    src="/PureButtonsLogo.png"
-                    alt="Pure Button"
-                    className="w-full max-w-[180px] h-auto"
-                    width={300}
-                    height={100}
-                  />
-                </a>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 font-franklinGothic">
-                PURE BUTTON
-              </h3>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-franklinGothic flex-grow">
-                Pure Buttons manufactures high quality promotional products like
-                custom buttons, fridge magnets, and custom stickers.
-              </p>
-            </div>
+          <div className="relative mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-300/80">
+            <span className="uppercase tracking-[0.35em] text-red-200">
+              Interested in sponsoring?
+            </span>
+            <a
+              className="font-franklinGothic underline decoration-red-400/60 underline-offset-4 transition hover:text-white"
+              href="mailto:sponsor@hackuta.org"
+            >
+              sponsor@hackuta.org
+            </a>
           </div>
         </div>
       </div>
