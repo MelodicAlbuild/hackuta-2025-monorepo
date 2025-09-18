@@ -38,9 +38,7 @@ const pixelsPerHour = 100; // Each hour is 100px tall
 const DISPLAY_TZ = 'America/Chicago';
 
 const formatCategoryLabel = (value: string): string =>
-  value
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  value.replace(/[-_]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 
 const formatScheduleTime = (value: Date | string): string => {
   const date = typeof value === 'string' ? new Date(value) : value;
@@ -139,7 +137,10 @@ export function LiveSchedulePreview({
       day: 'numeric',
     });
 
-    const groups = new Map<string, { label: string; events: ScheduleEvent[] }>();
+    const groups = new Map<
+      string,
+      { label: string; events: ScheduleEvent[] }
+    >();
 
     events.forEach((event) => {
       const start = new Date(event.start_time);
@@ -165,7 +166,9 @@ export function LiveSchedulePreview({
           firstEventStart: firstEvent ? firstEvent.start : new Date(),
         } satisfies DayGroup;
       })
-      .sort((a, b) => a.firstEventStart.getTime() - b.firstEventStart.getTime());
+      .sort(
+        (a, b) => a.firstEventStart.getTime() - b.firstEventStart.getTime(),
+      );
   }, [events]);
 
   useEffect(() => {
@@ -215,8 +218,8 @@ export function LiveSchedulePreview({
             Schedule Coming Soon
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            We're putting together an amazing lineup of events for you. Check
-            back soon to see what's planned!
+            We&apos;re putting together an amazing lineup of events for you.
+            Check back soon to see what&apos;s planned!
           </p>
         </div>
       </div>
@@ -268,10 +271,13 @@ export function LiveSchedulePreview({
   return (
     <div className="space-y-8">
       <header>
-        <h2 className="text-2xl font-semibold text-foreground">Event Schedule</h2>
+        <h2 className="text-2xl font-semibold text-foreground">
+          Event Schedule
+        </h2>
         <p className="text-sm text-muted-foreground">
-          {events.length} event{events.length !== 1 ? 's' : ''} across {dayGroups.length}{' '}
-          day{dayGroups.length !== 1 ? 's' : ''}. Stay on track with the live calendar view.
+          {events.length} event{events.length !== 1 ? 's' : ''} across{' '}
+          {dayGroups.length} day{dayGroups.length !== 1 ? 's' : ''}. Stay on
+          track with the live calendar view.
         </p>
       </header>
 
@@ -332,7 +338,8 @@ export function LiveSchedulePreview({
               >
                 {formatChipLabel(group)}
                 <span className="ml-2 text-xs font-normal">
-                  {group.events.length} event{group.events.length !== 1 ? 's' : ''}
+                  {group.events.length} event
+                  {group.events.length !== 1 ? 's' : ''}
                 </span>
               </button>
             );
@@ -579,7 +586,9 @@ function EventCard({ event }: { event: ProcessedEvent }) {
     >
       <div className="space-y-1">
         <div className="flex items-start justify-between gap-2">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${style.badge}`}>
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${style.badge}`}
+          >
             {formatCategoryLabel(event.category)}
           </span>
           <span className="text-[10px] font-medium text-muted-foreground">

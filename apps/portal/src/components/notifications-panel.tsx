@@ -112,7 +112,7 @@ export function NotificationsPanel({
     return () => {
       supabase.removeAllChannels();
     };
-  }, [supabase, initialNotifications]);
+  }, [supabase, initialNotifications, role]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
