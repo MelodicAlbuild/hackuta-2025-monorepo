@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { createSupabaseBrowserClient } from '@repo/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
 import { startOfDay, differenceInMinutes } from 'date-fns';
 
@@ -36,6 +35,32 @@ type DayGroup = {
 
 // --- Constants ---
 const pixelsPerHour = 100; // Each hour is 100px tall
+const DISPLAY_TZ = 'America/Chicago';
+
+const formatCategoryLabel = (value: string): string =>
+  value
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+const formatScheduleTime = (value: Date | string): string => {
+  const date = typeof value === 'string' ? new Date(value) : value;
+  return date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: DISPLAY_TZ,
+  });
+};
+
+const formatScheduleRange = (
+  start: Date | string,
+  end: Date | string | null | undefined,
+): string => {
+  const startLabel = formatScheduleTime(start);
+  if (!end) {
+    return startLabel;
+  }
+  return `${startLabel} – ${formatScheduleTime(end)}`;
+};
 
 // --- Main Component ---
 export function LiveSchedulePreview({
@@ -95,21 +120,20 @@ export function LiveSchedulePreview({
   }, [supabase]);
 
   // Group events by day and process their layout
-  const displayTZ = 'America/Chicago';
   const dayGroups = useMemo(() => {
     if (events.length === 0) {
       return [] as DayGroup[];
     }
 
     const dayFormatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: displayTZ,
+      timeZone: DISPLAY_TZ,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     });
 
     const labelFormatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: displayTZ,
+      timeZone: DISPLAY_TZ,
       weekday: 'long',
       month: 'long',
       day: 'numeric',
@@ -142,7 +166,7 @@ export function LiveSchedulePreview({
         } satisfies DayGroup;
       })
       .sort((a, b) => a.firstEventStart.getTime() - b.firstEventStart.getTime());
-  }, [events, displayTZ]);
+  }, [events]);
 
   useEffect(() => {
     if (dayGroups.length === 0) {
@@ -211,13 +235,6 @@ export function LiveSchedulePreview({
     return now >= start && now <= end;
   });
 
-  const upNext = events
-    .filter((event) => {
-      const start = new Date(event.start_time);
-      return start > now;
-    })
-    .slice(0, 3); // Show next 3 events
-
   const selectedGroup =
     dayGroups.find((group) => group.key === selectedDayKey) ?? dayGroups[0];
 
@@ -225,13 +242,7 @@ export function LiveSchedulePreview({
     value: Date | string | null | undefined,
   ): string => {
     if (!value) return '';
-    const date = typeof value === 'string' ? new Date(value) : value;
-
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      timeZone: displayTZ,
-    });
+    return formatScheduleTime(value);
   };
 
   const formatChipLabel = (group: DayGroup): string => {
@@ -240,9 +251,12 @@ export function LiveSchedulePreview({
       weekday: 'short',
       month: 'short',
       day: 'numeric',
-      timeZone: displayTZ,
+      timeZone: DISPLAY_TZ,
     });
   };
+
+  const formatEventRange = (event: ScheduleEvent): string =>
+    formatScheduleRange(event.start_time, event.end_time);
 
   const firstEventOfDay = selectedGroup?.events[0];
   const lastEventOfDay = selectedGroup?.events[selectedGroup.events.length - 1];
@@ -262,46 +276,47 @@ export function LiveSchedulePreview({
       </header>
 
       {happeningNow.length > 0 && (
-        <section className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-destructive" />
-            <h3 className="text-lg font-semibold text-foreground">Happening Now</h3>
+        <section className="rounded-3xl border border-destructive/20 bg-destructive/5 p-5 shadow-inner">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-destructive-foreground">
+            <div className="flex items-center gap-3">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-destructive" />
+              <h3 className="text-sm font-semibold uppercase tracking-wide">
+                Happening Now
+              </h3>
+            </div>
+            <span className="text-xs font-medium">
+              {happeningNow.length} live event
+              {happeningNow.length !== 1 ? 's' : ''}
+            </span>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+          <ul className="mt-4 space-y-3 text-sm text-foreground">
             {happeningNow.map((event) => (
-              <EventCardNew key={event.id} event={event} isLive={true} />
+              <li
+                key={event.id}
+                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-background/80 px-4 py-3 ring-1 ring-destructive/15 backdrop-blur"
+              >
+                <div className="flex min-w-0 flex-col">
+                  <span className="font-semibold tracking-tight text-foreground">
+                    {event.title}
+                  </span>
+                  {event.location ? (
+                    <span className="text-xs text-muted-foreground">
+                      {event.location}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-destructive-foreground">
+                  <span className="rounded-full bg-destructive/10 px-2 py-0.5 font-semibold uppercase tracking-wide">
+                    {formatCategoryLabel(event.category)}
+                  </span>
+                  <span className="font-medium">{formatEventRange(event)}</span>
+                </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
-
-      {upNext.length > 0 && (
-        <section className="space-y-4">
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <svg
-              className="h-5 w-5 text-muted-foreground"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Up Next
-          </h3>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {upNext.map((event) => (
-              <EventCardNew key={event.id} event={event} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="space-y-6">
+      <section className="space-y-8">
         <div className="flex flex-wrap gap-2">
           {dayGroups.map((group) => {
             const isActive = group.key === selectedGroup?.key;
@@ -326,8 +341,8 @@ export function LiveSchedulePreview({
 
         {selectedGroup ? (
           <div className="space-y-6">
-            <section className="overflow-hidden rounded-lg border border-border bg-card">
-              <div className="flex flex-col gap-3 border-b border-border bg-muted/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <section className="overflow-hidden rounded-3xl border border-border/60 bg-card/95 backdrop-blur shadow-sm">
+              <div className="flex flex-col gap-3 border-b border-border/60 bg-muted/20 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">
                     {selectedGroup.label}
@@ -337,7 +352,7 @@ export function LiveSchedulePreview({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <svg
                       className="h-3.5 w-3.5"
@@ -380,23 +395,13 @@ export function LiveSchedulePreview({
                 </div>
               </div>
 
-              <div className="max-h-[520px] overflow-auto px-4 py-6">
+              <div className="max-h-[600px] overflow-auto px-4 py-6 sm:px-6">
                 <DayTimeline
                   day={selectedGroup.label}
                   events={selectedGroup.events}
                   showNowBar={showNow}
                 />
               </div>
-            </section>
-
-            <section className="grid gap-4 md:grid-cols-2">
-              {selectedGroup.events.map((event) => (
-                <EventCardNew
-                  key={event.id}
-                  event={event}
-                  isLive={happeningNow.some((live) => live.id === event.id)}
-                />
-              ))}
             </section>
           </div>
         ) : (
@@ -437,7 +442,6 @@ function DayTimeline({
   );
 
   // Live-updating current time bar (America/Chicago)
-  const displayTZ = 'America/Chicago';
   const [now, setNow] = useState<Date>(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000);
@@ -447,10 +451,10 @@ function DayTimeline({
     weekday: 'long',
     month: 'long',
     day: 'numeric',
-    timeZone: displayTZ,
+    timeZone: DISPLAY_TZ,
   });
   const isToday = nowDayLabel === day;
-  const nowZoned = zonedDate(now, displayTZ);
+  const nowZoned = zonedDate(now, DISPLAY_TZ);
   const windowEnd = new Date(baseStart.getTime() + hoursCount * 60 * 60 * 1000);
   const inWindow =
     showNowBar && isToday && nowZoned >= baseStart && nowZoned <= windowEnd;
@@ -460,7 +464,7 @@ function DayTimeline({
   const nowLabel = now.toLocaleTimeString([], {
     hour: 'numeric',
     minute: '2-digit',
-    timeZone: displayTZ,
+    timeZone: DISPLAY_TZ,
   });
 
   if (events.length === 0) {
@@ -479,16 +483,16 @@ function DayTimeline({
   };
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-6">
       {/* Time Gutter */}
-      <div className="w-20 flex-shrink-0 text-right text-xs text-muted-foreground">
+      <div className="w-20 flex-shrink-0 text-right text-[11px] font-medium text-muted-foreground">
         {hours.map((hour, index) => (
           <div
             key={`${hour}-${index}`}
             style={{ height: `${pixelsPerHour}px` }}
             className="relative flex items-start justify-end pr-2"
           >
-            <span className="translate-y-[-10px] font-semibold text-foreground">
+            <span className="translate-y-[-10px] uppercase tracking-wide text-muted-foreground">
               {formatHourLabel(startHour + index)}
             </span>
           </div>
@@ -496,7 +500,7 @@ function DayTimeline({
       </div>
 
       {/* Event Container */}
-      <div className="relative flex-1 overflow-hidden rounded-lg border border-border/60 bg-muted/20">
+      <div className="relative flex-1 overflow-hidden rounded-2xl border border-border/50 bg-background/95 shadow-inner">
         <div className="absolute inset-0">
           {hours.map((hour, index) => (
             <div
@@ -505,7 +509,7 @@ function DayTimeline({
                 top: `${index * pixelsPerHour}px`,
                 height: `${pixelsPerHour}px`,
               }}
-              className="absolute inset-x-0 border-b border-border/60"
+              className="absolute inset-x-0 border-b border-border/40"
             />
           ))}
         </div>
@@ -518,7 +522,7 @@ function DayTimeline({
           >
             <div className="relative">
               <div className="border-t-2 border-destructive/60" />
-              <div className="absolute -top-3 right-0 rounded-full bg-destructive/80 px-2 py-0.5 text-[10px] font-semibold text-destructive-foreground shadow">
+              <div className="absolute -top-3 right-0 rounded-full bg-destructive px-2 py-0.5 text-[10px] font-semibold text-destructive-foreground shadow">
                 Now {nowLabel}
               </div>
             </div>
@@ -538,25 +542,25 @@ function DayTimeline({
 
 // --- Event Card Component ---
 function EventCard({ event }: { event: ProcessedEvent }) {
-  const categoryStyles: Record<string, { card: string; badge: string }> = {
+  const categoryStyles: Record<string, { container: string; badge: string }> = {
     workshop: {
-      card: 'border-primary/40 bg-primary/10',
+      container: 'border-primary/40 bg-primary/10',
       badge: 'bg-primary/20 text-primary',
     },
     food: {
-      card: 'border-secondary/40 bg-secondary/10',
+      container: 'border-secondary/40 bg-secondary/10',
       badge: 'bg-secondary/20 text-secondary',
     },
     keynote: {
-      card: 'border-accent/40 bg-accent/10',
+      container: 'border-accent/40 bg-accent/10',
       badge: 'bg-accent/20 text-accent-foreground',
     },
     social: {
-      card: 'border-muted-foreground/30 bg-muted/40',
+      container: 'border-muted-foreground/30 bg-muted/40',
       badge: 'bg-muted-foreground/10 text-muted-foreground',
     },
     general: {
-      card: 'border-border/60 bg-background/95',
+      container: 'border-border/60 bg-muted/20',
       badge: 'bg-border/40 text-muted-foreground',
     },
   };
@@ -564,8 +568,8 @@ function EventCard({ event }: { event: ProcessedEvent }) {
   const style = categoryStyles[event.category] || categoryStyles.general;
 
   return (
-    <Card
-      className={`absolute overflow-hidden rounded-lg border shadow-sm transition-colors ${style.card}`}
+    <div
+      className={`absolute flex h-full flex-col justify-between gap-2 rounded-2xl border px-3 py-3 shadow-sm backdrop-blur-sm transition-[box-shadow,transform] ${style.container}`}
       style={{
         top: `${event.top}px`,
         height: `${event.height}px`,
@@ -573,184 +577,45 @@ function EventCard({ event }: { event: ProcessedEvent }) {
         width: `calc(${event.width}% - 1%)`,
       }}
     >
-      <CardContent className="flex h-full flex-col justify-between gap-2 p-3">
-        <div className="space-y-1">
-          <div className="flex items-start justify-between gap-2">
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${style.badge}`}>
-              {event.category}
-            </span>
-            <span className="text-[10px] font-medium text-muted-foreground">
-              {new Date(event.start_time).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'America/Chicago',
-              })}
-            </span>
-          </div>
-          <p className="text-sm font-semibold leading-tight text-foreground line-clamp-2">
-            {event.title}
-          </p>
+      <div className="space-y-1">
+        <div className="flex items-start justify-between gap-2">
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${style.badge}`}>
+            {formatCategoryLabel(event.category)}
+          </span>
+          <span className="text-[10px] font-medium text-muted-foreground">
+            {formatScheduleTime(event.start)}
+          </span>
         </div>
+        <p className="text-sm font-semibold leading-tight text-foreground line-clamp-2">
+          {event.title}
+        </p>
+      </div>
 
-        {event.location && (
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-            <svg
-              className="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <span className="truncate">{event.location}</span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-// --- New Event Card Component ---
-function EventCardNew({
-  event,
-  isLive = false,
-}: {
-  event: ScheduleEvent;
-  isLive?: boolean;
-}) {
-  const getCategoryStyle = (category: string) => {
-    const styles = {
-      workshop: 'border-primary/20 bg-primary/5',
-      food: 'border-secondary/20 bg-secondary/5',
-      keynote: 'border-accent/20 bg-accent/5',
-      social: 'border-muted-foreground/20 bg-muted/50',
-      general: 'border-border bg-card',
-    };
-    return styles[category as keyof typeof styles] || styles.general;
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      workshop: 'text-primary',
-      food: 'text-secondary',
-      keynote: 'text-accent-foreground',
-      social: 'text-muted-foreground',
-      general: 'text-foreground',
-    };
-    return colors[category as keyof typeof colors] || colors.general;
-  };
-
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      timeZone: 'America/Chicago',
-    });
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      timeZone: 'America/Chicago',
-    });
-  };
-
-  return (
-    <Card
-      className={`relative p-4 transition-all hover:shadow-md border ${getCategoryStyle(event.category)} ${isLive ? 'ring-2 ring-destructive/50' : ''}`}
-    >
-      <CardContent className="p-0">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              {isLive && (
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium text-destructive uppercase tracking-wide">
-                    LIVE
-                  </span>
-                </div>
-              )}
-              <span
-                className={`text-xs font-medium px-2 py-1 rounded-full ${getCategoryColor(event.category)} bg-current/10 capitalize`}
-              >
-                {event.category}
-              </span>
-            </div>
-            <h4 className="font-semibold text-foreground text-base mb-2 line-clamp-2">
-              {event.title}
-            </h4>
-            {event.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                {event.description}
-              </p>
-            )}
-          </div>
+      {event.location && (
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <svg
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          <span className="truncate">{event.location}</span>
         </div>
-
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{formatTime(event.start_time)}</span>
-              {event.end_time && <span>- {formatTime(event.end_time)}</span>}
-            </div>
-            <div className="hidden sm:block text-muted-foreground">
-              {formatDate(event.start_time)}
-            </div>
-          </div>
-          {event.location && (
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <span className="truncate max-w-[120px]">{event.location}</span>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
 
@@ -760,13 +625,13 @@ function processDayLayout(dayEvents: ScheduleEvent[]): ProcessedEvent[] {
     .map((e) => ({
       ...e,
       // Convert the stored UTC time into America/Chicago wall time Date objects
-      start: zonedDate(new Date(e.start_time), 'America/Chicago'),
+      start: zonedDate(new Date(e.start_time), DISPLAY_TZ),
       end: zonedDate(
         new Date(
           e.end_time ||
             new Date(new Date(e.start_time).getTime() + 60 * 60 * 1000),
         ),
-        'America/Chicago',
+        DISPLAY_TZ,
       ), // Default 1 hour
       top: 0,
       height: 0,

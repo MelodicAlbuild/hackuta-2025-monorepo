@@ -51,7 +51,7 @@ export function PointsCard({ initialPoints }: { initialPoints: number }) {
           <p className="text-5xl font-bold">{initialPoints}</p>
         </CardContent>
         <CardFooter>
-          <Button variant="outline" onClick={handleHistoryClick}>
+          <Button onClick={handleHistoryClick}>
             View History
           </Button>
         </CardFooter>

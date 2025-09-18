@@ -6,7 +6,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { QrCodeModal } from '@/components/qr-code-modal';
+import { QrCodeDisplay } from '@/components/qr-code-display';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cookies } from 'next/headers';
@@ -26,7 +26,7 @@ export default async function PortalPage() {
     .single();
 
   const userPoints = profile?.points?.score ?? 0;
-  const accountSettingsUrl = `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/dashboard`;
+  const accountSettingsUrl = '/settings';
 
   return (
     <div className="p-4 sm:p-8 space-y-8">
@@ -39,39 +39,40 @@ export default async function PortalPage() {
         </p>
       </header>
 
-      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {/* QR Code Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Event Pass</CardTitle>
-            <CardDescription>
-              Use this QR code for check-in and interactions.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <QrCodeModal />
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <Card className="lg:h-full">
+            <CardHeader>
+              <CardTitle>Your Event Pass</CardTitle>
+              <CardDescription>
+                Use this QR code for check-in and interactions.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <QrCodeDisplay />
+            </CardContent>
+          </Card>
 
-        {/* Points Card */}
-        <PointsCard initialPoints={userPoints} />
+          <div className="flex flex-col gap-6">
+            <PointsCard initialPoints={userPoints} />
 
-        {/* Account Settings Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Settings</CardTitle>
-            <CardDescription>Manage your profile and password.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link href="/settings">Go to Settings</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <div className="col-span-1 sm:col-span-1 md:col-span-2 lg:col-span-3">
-          <LiveSchedulePreview />
+            <Card>
+              <CardHeader>
+                <CardTitle>Account Settings</CardTitle>
+                <CardDescription>
+                  Manage your profile and password.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild>
+                  <Link href={accountSettingsUrl}>Go to Settings</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
+
+        <LiveSchedulePreview />
       </div>
     </div>
   );
