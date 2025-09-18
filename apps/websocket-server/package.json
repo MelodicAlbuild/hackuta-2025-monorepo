@@ -1,0 +1,19 @@
+{
+  "name": "websocket-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [],
+  "author": "MelodicAlbuild <alex@melodicalbuild.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "amqplib": "^0.10.9",
+    "jsonwebtoken": "^9.0.2",
+    "ws": "^8.18.3"
+  }
+}

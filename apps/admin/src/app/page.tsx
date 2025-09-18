@@ -1,4 +1,6 @@
 import { LiveSchedulePreview } from '@/components/live-schedule-preview';
+import { SystemStatusCard } from '@/components/system-status-card';
+import { WebsiteStatusCard } from '@/components/website-status-card';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { createSupabaseServerClient } from '@repo/supabase/server';
 import { Users } from 'lucide-react';
@@ -83,6 +85,14 @@ export default async function AdminDashboard() {
                 </p>
               </CardContent>
             </Card>
+            {user && user.email === 'ralexdrum@gmail.com' && (
+              <>
+                {/* System Status Card */}
+                <SystemStatusCard />
+                {/* Website Status Card */}
+                <WebsiteStatusCard />
+              </>
+            )}
           </>
         )}
         <div className="col-span-2">

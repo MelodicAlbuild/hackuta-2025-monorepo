@@ -1,4 +1,5 @@
 require('dotenv').config();
+const http = require('http');
 const {
   Client,
   GatewayIntentBits,
@@ -8,11 +9,12 @@ const {
 } = require('discord.js');
 const { createClient } = require('@supabase/supabase-js');
 
-// Local Running of the Discord Bot is DISABLED
-const disabled = true;
+// Enable the bot automatically when running in Docker containers
+const disabled = !(process.env.IN_DOCKER === 'true');
 
 // --- Clients ---
 const discordClient = new Client({ intents: [GatewayIntentBits.Guilds] });
+let discordReady = false;
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -34,6 +36,7 @@ const commands = [
 // --- Bot Logic ---
 discordClient.once('clientReady', async () => {
   console.log(`Logged in as ${discordClient.user.tag}!`);
+  discordReady = true;
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
   try {
     await rest.put(Routes.applicationCommands(discordClient.user.id), {
@@ -78,3 +81,27 @@ discordClient.on('interactionCreate', async (interaction) => {
 if (!disabled) {
   discordClient.login(process.env.DISCORD_TOKEN);
 }
+
+// Simple health server
+const HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '3000', 10);
+const server = http.createServer((req, res) => {
+  if (req.method === 'GET' && req.url === '/healthz') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('ok');
+    return;
+  }
+  if (req.method === 'GET' && req.url === '/readyz') {
+    const ready = discordReady && !!process.env.DISCORD_TOKEN;
+    res.writeHead(ready ? 200 : 503, { 'Content-Type': 'text/plain' });
+    res.end(ready ? 'ready' : 'not-ready');
+    return;
+  }
+  res.writeHead(404, { 'Content-Type': 'text/plain' });
+  res.end('not-found');
+});
+
+server.listen(HEALTH_PORT, () => {
+  console.log(
+    `[health] discord-bot health server listening on :${HEALTH_PORT}`,
+  );
+});

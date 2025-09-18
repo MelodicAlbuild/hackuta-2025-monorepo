@@ -1,0 +1,44 @@
+# Folders to keep Docker contexts lean
+# Exclude dependency folders everywhere
+node_modules
+**/node_modules
+
+# pnpm store/cache
+.pnpm-store
+.pnpm
+**/.pnpm-store
+**/.pnpm
+
+# Turbo / Next / build artifacts
+.turbo
+**/.turbo
+.next
+**/.next
+out
+**/out
+build
+**/build
+dist
+**/dist
+.tmp
+.temp
+.cache
+coverage
+
+# VCS
+.git
+.gitignore
+
+# OS/Editor
+.DS_Store
+*.log
+.vscode
+.idea
+
+# Env
+.env
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+**/.env.test

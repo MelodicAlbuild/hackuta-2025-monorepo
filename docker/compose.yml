@@ -1,0 +1,81 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: hackuta-rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  websocket-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.websocket-server
+      args:
+        - NODE_VERSION=20-alpine
+        - PNPM_VERSION=8.15.6
+        - TURBO_VERSION=2.5.6
+    container_name: hackuta-websocket
+    environment:
+      - NODE_ENV=production
+      - IN_DOCKER=true
+      - PORT=8090
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      # Provide your Supabase JWT secret via .env or override here
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - '8090:8090'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:8080/readyz']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  discord-bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.discord-bot
+      args:
+        - NODE_VERSION=20-alpine
+        - PNPM_VERSION=8.15.6
+        - TURBO_VERSION=2.5.6
+    container_name: hackuta-discord-bot
+    environment:
+      - NODE_ENV=production
+      - IN_DOCKER=true
+      - HEALTH_PORT=3090
+      # Provide via .env file in docker directory or env vars
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      websocket-server:
+        condition: service_started
+    restart: unless-stopped
+    ports:
+      - '3090:3090'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/readyz']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+networks:
+  default:
+    name: hackuta-net

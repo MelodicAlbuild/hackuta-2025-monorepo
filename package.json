@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=auth --filter=admin --filter=frontpage --filter=portal",
     "dev:auth": "turbo run dev --filter=auth",
     "dev:admin": "turbo run dev --filter=admin",
     "dev:frontpage": "turbo run dev --filter=frontpage",

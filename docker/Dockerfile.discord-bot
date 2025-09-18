@@ -1,0 +1,43 @@
+# syntax=docker/dockerfile:1.7-labs
+
+ARG NODE_VERSION=20-alpine
+ARG PNPM_VERSION=8.15.6
+ARG TURBO_VERSION=2.5.6
+
+# 1) Prune the monorepo to only what's needed for discord-bot
+FROM node:${NODE_VERSION} AS pruner
+WORKDIR /repo
+
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+
+# Copy the full repo (filtered by .dockerignore) so Turbo sees the graph
+COPY . .
+
+# Run turbo prune to generate a minimal workspace in /repo/out
+RUN pnpm dlx turbo@${TURBO_VERSION} prune --scope=discord-bot --docker
+
+# 2) Install production deps inside the pruned workspace so package-level node_modules are created
+FROM node:${NODE_VERSION} AS installer
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+
+# Copy pruned sources and manifests
+COPY --from=pruner /repo/out/full/ ./
+COPY --from=pruner /repo/out/json/ ./
+
+# Install only production deps for minimal runtime size
+RUN pnpm install -r --prod
+
+# 3) Runtime image: copy pruned sources + node_modules
+FROM node:${NODE_VERSION} AS runner
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Copy the fully prepared workspace including node_modules
+COPY --from=installer /app ./
+
+# Drop privileges to non-root user
+USER node
+
+# Run the discord bot
+CMD ["node", "apps/discord-bot/index.js"]
