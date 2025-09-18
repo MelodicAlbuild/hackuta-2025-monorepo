@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,
@@ -16,11 +16,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { inviteUser } from "../app/registrations/actions";
-import { Icons } from "@/components/icons";
-import { createSupabaseBrowserClient } from "@repo/supabase/client";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { inviteUser } from '../app/registrations/actions';
+import { Icons } from '@/components/icons';
+import { createSupabaseBrowserClient } from '@repo/supabase/client';
 
 // The type definition remains the same
 type Registration = {
@@ -31,25 +31,25 @@ type Registration = {
 
 // Helper function to format camelCase keys into readable labels
 function formatLabel(key: string) {
-  const result = key.replace(/([A-Z])/g, " $1");
+  const result = key.replace(/([A-Z])/g, ' $1');
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
 
 async function downloadResume(url: string) {
   const supabase = createSupabaseBrowserClient();
   const article = await supabase.storage
-    .from("interest-form-resumes")
+    .from('interest-form-resumes')
     .download(url);
 
   if (article.error) {
-    console.error("Error downloading resume:", article.error);
+    console.error('Error downloading resume:', article.error);
     return;
   }
 
   const blobUrl = URL.createObjectURL(article.data!);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = blobUrl;
-  a.download = url.split("/")[1] || "resume.pdf";
+  a.download = url.split('/')[1] || 'resume.pdf';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -60,11 +60,11 @@ async function downloadResume(url: string) {
 function DetailItem({ label, value }: { label: string; value: any }) {
   let displayValue: React.ReactNode = value;
 
-  if (label === "Resume") {
-    if (displayValue && displayValue.toString() != "") {
+  if (label === 'Resume') {
+    if (displayValue && displayValue.toString() != '') {
       const updatedValue = displayValue!
         .toString()
-        .substring(displayValue!.toString().indexOf("/") + 1);
+        .substring(displayValue!.toString().indexOf('/') + 1);
 
       displayValue = (
         <a
@@ -88,23 +88,23 @@ function DetailItem({ label, value }: { label: string; value: any }) {
     );
   }
 
-  if (typeof value === "boolean") {
+  if (typeof value === 'boolean') {
     displayValue = (
       <span
         className={`px-2 py-1 text-xs font-medium rounded-full ${
-          value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}
       >
-        {value ? "Yes" : "No"}
+        {value ? 'Yes' : 'No'}
       </span>
     );
-  } else if (value === null || value === "") {
+  } else if (value === null || value === '') {
     displayValue = <span className="text-gray-400">N/A</span>;
   } else if (value === undefined) {
-    if (label.toLowerCase().includes("mlh")) {
+    if (label.toLowerCase().includes('mlh')) {
       displayValue = (
         <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${"bg-red-100 text-red-800"}`}
+          className={`px-2 py-1 text-xs font-medium rounded-full ${'bg-red-100 text-red-800'}`}
         >
           No
         </span>
@@ -131,7 +131,7 @@ export function RegistrationsTable({
 
   const handleInvite = async (registration: Registration) => {
     if (!registration.email) {
-      alert("This user does not have an email to invite.");
+      alert('This user does not have an email to invite.');
       return;
     }
     setIsInviting(registration.id);
@@ -141,32 +141,32 @@ export function RegistrationsTable({
 
   // Define the order and grouping of fields for the dialog
   const fieldGroups = {
-    "Personal Info": [
-      "firstName",
-      "lastName",
-      "age",
-      "pronouns",
-      "genderIdentity",
-      "raceOrEthnicity",
-      "lgbtqiaPlus",
-      "underrepresented",
+    'Personal Info': [
+      'firstName',
+      'lastName',
+      'age',
+      'pronouns',
+      'genderIdentity',
+      'raceOrEthnicity',
+      'lgbtqiaPlus',
+      'underrepresented',
     ],
-    "Contact & Location": [
-      "email",
-      "phoneNumber",
-      "linkedInUrl",
-      "countryOfResidence",
-      "shippingAddress",
+    'Contact & Location': [
+      'email',
+      'phoneNumber',
+      'linkedInUrl',
+      'countryOfResidence',
+      'shippingAddress',
     ],
-    "Academic Info": [
-      "school",
-      "levelOfStudy",
-      "majorFieldOfStudy",
-      "completedEducation",
-      "resume",
+    'Academic Info': [
+      'school',
+      'levelOfStudy',
+      'majorFieldOfStudy',
+      'completedEducation',
+      'resume',
     ],
-    "Event Specifics": ["tShirtSize", "dietaryRestrictions"],
-    Agreements: ["codeOfConduct", "mlhDataHandling", "mlhPromotion"],
+    'Event Specifics': ['tShirtSize', 'dietaryRestrictions'],
+    Agreements: ['codeOfConduct', 'mlhDataHandling', 'mlhPromotion'],
   };
 
   return (
@@ -201,15 +201,15 @@ export function RegistrationsTable({
                   <TableCell>
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        reg.status === "invited"
-                          ? "bg-blue-100 text-blue-800"
-                          : reg.status === "confirmed"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                        reg.status === 'invited'
+                          ? 'bg-blue-100 text-blue-800'
+                          : reg.status === 'confirmed'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {reg.status == "" || reg.status == undefined
-                        ? "None"
+                      {reg.status == '' || reg.status == undefined
+                        ? 'None'
                         : reg.status.charAt(0).toUpperCase() +
                           reg.status.slice(1)}
                     </span>
@@ -220,18 +220,17 @@ export function RegistrationsTable({
                     variant="outline"
                     size="sm"
                     onClick={() => handleInvite(reg)}
-                    // disabled={
-                    //   isInviting === reg.id ||
-                    //   (reg.status != "pending" && reg.status != undefined)
-                    // }
-                    disabled={true}
+                    disabled={
+                      isInviting === reg.id ||
+                      (reg.status != 'pending' && reg.status != undefined)
+                    }
                   >
                     {isInviting === reg.id && (
                       <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {reg.status === "pending" || reg.status == undefined
-                      ? "Invite"
-                      : "Invited"}
+                    {reg.status === 'pending' || reg.status == undefined
+                      ? 'Invite'
+                      : 'Invited'}
                   </Button>
                 </TableCell>
               </TableRow>
