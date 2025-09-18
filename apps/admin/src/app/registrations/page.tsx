@@ -26,16 +26,33 @@ export default async function RegistrationsPage() {
     );
   }
 
-  const filteredRegistrations = registrations
+  const baseFiltered = (registrations ?? [])
     .filter(
       (reg) =>
-        reg.age >= 18 && reg.firstName + ' ' + reg.lastName !== 'Alex Drum',
+        reg.age >= 18 && `${reg.firstName} ${reg.lastName}` !== 'Alex Drum',
     )
-    .sort((a, b) => {
-      return (
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-    });
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+
+  const seenEmails = new Set<string>();
+  const seenNames = new Set<string>();
+  const dedupedRegistrations = [];
+  for (const reg of baseFiltered) {
+    const emailKey = (reg.email ?? '').trim().toLowerCase();
+    const nameKey = `${reg.firstName ?? ''} ${reg.lastName ?? ''}`
+      .trim()
+      .toLowerCase();
+
+    if (emailKey && seenEmails.has(emailKey)) continue;
+    if (nameKey && seenNames.has(nameKey)) continue;
+
+    if (emailKey) seenEmails.add(emailKey);
+    if (nameKey) seenNames.add(nameKey);
+
+    dedupedRegistrations.push(reg);
+  }
 
   return (
     <Card>
@@ -47,7 +64,7 @@ export default async function RegistrationsPage() {
       </CardHeader>
       <CardContent>
         <div className="overflow-y-auto h-md">
-          <RegistrationsTable registrations={filteredRegistrations || []} />
+          <RegistrationsTable registrations={dedupedRegistrations || []} />
         </div>
       </CardContent>
     </Card>
