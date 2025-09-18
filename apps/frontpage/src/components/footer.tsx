@@ -27,7 +27,7 @@ export default function Footer() {
       Icon: Linkedin,
     },
     { name: 'GitHub', href: 'https://github.com/hackuta', Icon: Github },
-    { name: 'Email', href: 'mailto:contact@hackuta.org', Icon: Mail },
+    { name: 'Email', href: 'mailto:hello@hackuta.org', Icon: Mail },
   ];
 
   const peerHackathons = [
