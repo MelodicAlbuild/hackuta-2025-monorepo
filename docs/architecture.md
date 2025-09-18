@@ -26,8 +26,8 @@ flowchart LR
   end
 
   subgraph Packages
-    SupaPkg[@repo/supabase]
-    QRPkg[@repo/qr]
+    SupaPkg[repo-supabase]
+    QRPkg[repo-qr]
   end
 
   %% Client -> Apps
@@ -47,21 +47,21 @@ flowchart LR
   SupaPkg --> Supabase
 
   %% Auth redirect target
-  Admin -.- "Redirect if unauthenticated" -.-> Auth
-  Portal -.- "Redirect if unauthenticated" -.-> Auth
+  Admin -. Redirect if unauthenticated .-> Auth
+  Portal -. Redirect if unauthenticated .-> Auth
 
   %% Admin <-> Auth API
-  Admin -- "HTTP POST /api/invite" --> Auth
+  Admin -- HTTP POST /api/invite --> Auth
 
   %% Realtime pipeline
-  RabbitMQ -- "topic messages" --> WS
-  WS == "broadcast to subscribed clients" ==> Browser
-  WS -. "JWT verify with\nSUPABASE_JWT_SECRET" .-> Supabase
+  RabbitMQ -- topic messages --> WS
+  WS == broadcast to subscribed clients ==> Browser
+  WS -. JWT verify with<br/>SUPABASE_JWT_SECRET .-> Supabase
 
   %% Discord bot flows
-  DiscordUsers -- "Slash Commands" --> DiscordBot
+  DiscordUsers -- Slash Commands --> DiscordBot
   DiscordBot --> Supabase
-  DiscordBot -- "DM / Replies" --> DiscordUsers
+  DiscordBot -- DM / Replies --> DiscordUsers
 ```
 
 ## Workspace Dependency Graph
@@ -77,11 +77,11 @@ flowchart TD
   end
 
   subgraph Packages
-    P1[@repo/supabase]
-    P2[@repo/qr]
-    P3[@repo/tailwind-config]
-    P4[@repo/eslint-config]
-    P5[@repo/typescript-config]
+    P1[repo-supabase]
+    P2[repo-qr]
+    P3[repo-tailwind-config]
+    P4[repo-eslint-config]
+    P5[repo-typescript-config]
   end
 
   A --> P1
