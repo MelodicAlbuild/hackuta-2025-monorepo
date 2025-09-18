@@ -33,6 +33,9 @@ export function BulkInviteButton({
   const [failed, setFailed] = useState(0);
   const [dryRun, setDryRun] = useState(true);
   const [successfulEmails, setSuccessfulEmails] = useState<string[]>([]);
+  const [error, setError] = useState<{ email: string; message: string } | null>(
+    null,
+  );
 
   const eligible = useMemo(
     () =>
@@ -66,8 +69,11 @@ export function BulkInviteButton({
     setSucceeded(0);
     setFailed(0);
     setSuccessfulEmails([]);
+    setError(null);
 
+    let aborted = false;
     for (const r of eligible) {
+      let shouldAbort = false;
       try {
         if (dryRun) {
           setSucceeded((s) => s + 1);
@@ -80,17 +86,31 @@ export function BulkInviteButton({
           } else {
             setFailed((f) => f + 1);
             console.error('Failed to invite', r.email, res?.error);
+            setError({
+              email: r.email!,
+              message: res?.error || 'Unknown error',
+            });
+            shouldAbort = true;
           }
         }
       } catch (err) {
         setFailed((f) => f + 1);
         console.error('Error inviting', r.email, err);
+        setError({
+          email: r.email!,
+          message: err instanceof Error ? err.message : String(err),
+        });
+        shouldAbort = true;
       } finally {
         setCompleted((c) => c + 1);
       }
+      if (shouldAbort) {
+        aborted = true;
+        break;
+      }
     }
 
-    if (!dryRun) router.refresh();
+    if (!dryRun && !aborted) router.refresh();
     setIsRunning(false);
   }, [dryRun, eligible, isRunning, router, total]);
 
@@ -138,6 +158,12 @@ export function BulkInviteButton({
           </span>
         )}
       </div>
+
+      {error && (
+        <div className="mt-2 text-sm text-red-600">
+          Stopped due to error inviting {error.email}: {error.message}
+        </div>
+      )}
 
       {completed === total && total > 0 && (
         <div className="mt-3">

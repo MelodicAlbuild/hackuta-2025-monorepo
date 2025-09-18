@@ -63,8 +63,7 @@ export async function inviteNewUserWithRole(formData: { email: string, role: 'us
 
     // Use the Admin Client to send an invite with the role in the metadata
     const supabaseAdmin = createSupabaseAdminClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+    const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
         formData.email,
         {
             data: { role: formData.role }, // Pass the role here
@@ -155,9 +154,32 @@ export async function createDiscordUser(email: string, role: string) {
 
     if (error) throw new Error(`Failed to create user: ${error.message}`);
 
-    await supabaseAdmin
+    // Insert the temporary password
+    const { error: insertError } = await supabaseAdmin
         .from('temporary_passwords')
         .insert({ user_id: newUser.user.id, temp_password: password });
+    if (insertError) {
+        throw new Error(`Failed to store temporary password: ${insertError.message}`);
+    }
+
+    // Validate it was recorded correctly
+    const { data: tempRow, error: selectError } = await supabaseAdmin
+        .from('temporary_passwords')
+        .select('user_id, temp_password')
+        .eq('user_id', newUser.user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (selectError) {
+        throw new Error(`Could not verify temporary password record: ${selectError.message}`);
+    }
+    if (!tempRow) {
+        throw new Error('Temporary password record not found after insert.');
+    }
+    if (tempRow.temp_password !== password) {
+        throw new Error('Temporary password recorded does not match the generated value.');
+    }
 
     return { success: true, message: `User ${email} created for Discord flow.`, email: email, password: "The password has been stored in the Discord bot." };
 }
