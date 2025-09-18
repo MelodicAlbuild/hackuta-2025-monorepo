@@ -31,10 +31,10 @@ export default async function PortalPage() {
   return (
     <div className="p-4 sm:p-8 space-y-8">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Welcome back, {user?.email}!
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-muted-foreground mt-1">
           This is your central hub for the HackUTA hackathon.
         </p>
       </header>
@@ -69,7 +69,7 @@ export default async function PortalPage() {
           </CardContent>
         </Card>
 
-        <div className="col-span-2 lg:col-span-3">
+        <div className="col-span-1 sm:col-span-1 md:col-span-2 lg:col-span-3">
           <LiveSchedulePreview />
         </div>
       </div>
