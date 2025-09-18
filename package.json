@@ -1,5 +1,5 @@
 {
-  "name": "with-tailwind",
+  "name": "hackuta-monorepo",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -9,9 +9,11 @@
     "dev:frontpage": "turbo run dev --filter=frontpage",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "diagrams:build": "node scripts/build-diagrams.cjs"
   },
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^10.9.1",
     "prettier": "^3.6.0",
     "prettier-plugin-sql": "^0.19.2",
     "prettier-plugin-tailwindcss": "^0.6.11",

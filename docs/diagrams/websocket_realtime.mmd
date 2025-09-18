@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant Client as Browser WS Client
+  participant WSS as websocket-server
+  participant RMQ as RabbitMQ (topic exchange)
+  participant Supa as Supabase (JWT secret)
+
+  Client->>WSS: WS upgrade ?token=<JWT>
+  WSS->>Supa: jwt.verify(token, SUPABASE_JWT_SECRET)
+  alt Invalid token
+    WSS-->>Client: 401 Unauthorized (close)
+  else Valid
+    WSS-->>Client: Connection established
+    Client->>WSS: { type: "subscribe", channel }
+  end
+
+  RMQ-->>WSS: message(routingKey, payload)
+  WSS-->>Client: payload (if subscribed and OPEN)

@@ -1,0 +1,20 @@
+sequenceDiagram
+  participant U as User (Browser)
+  participant MW as Auth Middleware (SSR)
+  participant AuthApp as auth (Next.js)
+  participant Supa as Supabase Auth
+
+  U->>MW: Request protected route
+  MW->>Supa: getSession() (refresh if needed)
+  alt No session
+    MW-->>U: 302 to /login
+  else Has session
+    MW-->>U: Proceed
+  end
+
+  Note over AuthApp,Supa: Invite endpoint
+  participant AdminApp as admin (Next.js)
+  AdminApp->>AuthApp: POST /api/invite { email }
+  AuthApp->>Supa: validate current user via cookies
+  AuthApp->>Supa: admin.inviteUserByEmail(email)
+  AuthApp-->>AdminApp: 200 { message: "Invite sent" }

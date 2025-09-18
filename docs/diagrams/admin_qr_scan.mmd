@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant V as Volunteer/Admin UI
+  participant API as admin /api/scan-qr
+  participant SA as Supabase Admin Client
+  participant Supa as Supabase (DB + Auth Admin)
+
+  V->>API: POST { qr_token }
+  API->>SA: createAdminClient()
+  SA->>Supa: from(qr_identities).select(user_id).eq(qr_token)
+  alt Not found
+    API-->>V: 404 Invalid QR
+  else Found user_id
+    SA->>Supa: auth.admin.getUserById(user_id)
+    SA->>Supa: from(profiles).select(*, points(score))
+    API-->>V: 200 { user: id, email, role, score }
+  end

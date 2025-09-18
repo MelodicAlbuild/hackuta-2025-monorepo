@@ -1,0 +1,59 @@
+%%{init: {"theme":"neutral","themeVariables": {"primaryColor":"#ffffff","primaryTextColor":"#111827","primaryBorderColor":"#374151","secondaryColor":"#f3f4f6","tertiaryColor":"#e5e7eb","lineColor":"#6b7280","edgeLabelBackground":"#f9fafb"}}}%%
+flowchart LR
+  %% Groups
+  subgraph Clients
+    Browser[Users' Browsers]
+    DiscordUsers[Discord Users]
+  end
+
+  subgraph "Next.js Apps"
+    Frontpage[frontpage]
+    Auth[auth]
+    Admin[admin]
+    Portal[portal]
+  end
+
+  subgraph Services
+    WS[websocket-server\nNode + ws]
+    DiscordBot[discord-bot\nNode + discord.js]
+    RabbitMQ[(RabbitMQ\napp_events_topic)]
+    Supabase[(Supabase\nAuth + Postgres + Realtime)]
+  end
+
+  subgraph Packages
+    SupaPkg[@repo/supabase]
+    QRPkg[@repo/qr]
+  end
+
+  %% Client -> Apps
+  Browser --> Frontpage
+  Browser --> Auth
+  Browser --> Admin
+  Browser --> Portal
+
+  %% Shared packages used by apps
+  Frontpage --> SupaPkg
+  Auth --> SupaPkg
+  Admin --> SupaPkg
+  Portal --> SupaPkg
+  Portal --> QRPkg
+
+  %% Apps -> Supabase
+  SupaPkg --> Supabase
+
+  %% Auth redirect target
+  Admin -. Redirect if unauthenticated .-> Auth
+  Portal -. Redirect if unauthenticated .-> Auth
+
+  %% Admin <-> Auth API
+  Admin -- HTTP POST /api/invite --> Auth
+
+  %% Realtime pipeline
+  RabbitMQ -- topic messages --> WS
+  WS == broadcast to subscribed clients ==> Browser
+  WS -. JWT verify with<br/>SUPABASE_JWT_SECRET .-> Supabase
+
+  %% Discord bot flows
+  DiscordUsers -- Slash Commands --> DiscordBot
+  DiscordBot --> Supabase
+  DiscordBot -- DM / Replies --> DiscordUsers

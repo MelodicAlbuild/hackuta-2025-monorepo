@@ -1,0 +1,38 @@
+%%{init: {"theme":"neutral","themeVariables": {"primaryColor":"#ffffff","primaryTextColor":"#111827","primaryBorderColor":"#374151","secondaryColor":"#f3f4f6","tertiaryColor":"#e5e7eb","lineColor":"#6b7280","edgeLabelBackground":"#f9fafb"}}}%%
+flowchart TD
+  subgraph Apps
+    A[apps/frontpage]
+    B[apps/auth]
+    C[apps/admin]
+    D[apps/portal]
+    E[apps/websocket-server]
+    F[apps/discord-bot]
+  end
+
+  subgraph Packages
+    P1[@repo/supabase]
+    P2[@repo/qr]
+    P3[@repo/tailwind-config]
+    P4[@repo/eslint-config]
+    P5[@repo/typescript-config]
+  end
+
+  A --> P1
+  B --> P1
+  C --> P1
+  D --> P1
+  D --> P2
+
+  %% Dev-time configs (common but optional to visualize)
+  A -.-> P3
+  B -.-> P3
+  C -.-> P3
+  D -.-> P3
+  A -.-> P4
+  B -.-> P4
+  C -.-> P4
+  D -.-> P4
+  A -.-> P5
+  B -.-> P5
+  C -.-> P5
+  D -.-> P5

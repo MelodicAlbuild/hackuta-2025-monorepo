@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant DU as Discord User
+  participant Discord as Discord API
+  participant Bot as discord-bot
+  participant Supa as Supabase (Service Key)
+
+  DU->>Discord: /getpass | /stats | /check
+  Discord->>Bot: Interaction
+  alt getpass
+    Bot->>Supa: profiles.select(id).eq(email)
+    Bot->>Supa: temporary_passwords.select(*).eq(user_id)
+    Bot->>Discord: DM temp password
+    Bot->>Supa: temporary_passwords.update({ fetched_at })
+  else stats (admin only)
+    Bot->>Supa: temporary_passwords.count()
+    Bot->>Supa: temporary_passwords.count(not fetched)
+    Bot-->>Discord: Embed with counts
+  else check
+    Bot->>Supa: interest-form.select(id).eq(email)
+    Bot-->>Discord: Registered/Not Registered
+  end

@@ -1,0 +1,25 @@
+sequenceDiagram
+  participant U as User (Browser)
+  participant MW as Portal Middleware
+  participant API1 as portal /api/user-group
+  participant API2 as portal /api/my-qr
+  participant SSR as Supabase SSR Client
+  participant Supa as Supabase
+
+  U->>MW: Request any route
+  MW->>SSR: getSession()
+  alt No session
+    MW-->>U: 302 to auth /login?redirect_to=...
+  else Has session
+    MW-->>U: Proceed
+  end
+
+  U->>API1: GET
+  API1->>SSR: auth.getUser()
+  API1->>Supa: from(user_groups).select(user_group).eq(user_id)
+  API1-->>U: { group }
+
+  U->>API2: GET
+  API2->>SSR: auth.getUser()
+  API2->>Supa: query identity/QR data as needed
+  API2-->>U: image/png (generated via QRCode)
