@@ -37,8 +37,19 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-roboto, 'Roboto', system-ui, sans-serif);
+  --font-mono: var(
+    --font-fira-code,
+    'Fira Code',
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    'Liberation Mono',
+    'Courier New',
+    monospace
+  );
   --font-serif: var(--font-serif);
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -96,11 +107,11 @@
   --sidebar-accent-foreground: oklch(0.9842 0.0034 247.8575);
   --sidebar-border: oklch(0.2781 0.0296 256.848);
   --sidebar-ring: oklch(0.6137 0.2039 25.5645);
-  --font-sans: var(--font-geist-sans, 'Geist', system-ui, sans-serif);
+  --font-sans: var(--font-roboto, 'Roboto', system-ui, sans-serif);
   --font-serif: 'Georgia', 'Times New Roman', serif;
   --font-mono: var(
-    --font-geist-mono,
-    'Geist Mono',
+    --font-fira-code,
+    'Fira Code',
     ui-monospace,
     SFMono-Regular,
     Menlo,
@@ -161,11 +172,11 @@
   --sidebar-accent-foreground: oklch(0.9842 0.0034 247.8575);
   --sidebar-border: oklch(0.2795 0.0368 260.031);
   --sidebar-ring: oklch(0.6137 0.2039 25.5645);
-  --font-sans: var(--font-geist-sans, 'Geist', system-ui, sans-serif);
+  --font-sans: var(--font-roboto, 'Roboto', system-ui, sans-serif);
   --font-serif: 'Georgia', 'Times New Roman', serif;
   --font-mono: var(
-    --font-geist-mono,
-    'Geist Mono',
+    --font-fira-code,
+    'Fira Code',
     ui-monospace,
     SFMono-Regular,
     Menlo,

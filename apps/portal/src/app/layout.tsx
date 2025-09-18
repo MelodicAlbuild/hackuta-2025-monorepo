@@ -1,17 +1,21 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Roboto, Fira_Code } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/header';
 import { ThemeProvider } from '@/components/theme-provider';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const roboto = Roboto({
+  variable: '--font-roboto',
   subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const firaCode = Fira_Code({
+  variable: '--font-fira-code',
   subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -26,13 +30,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${roboto.variable} ${firaCode.variable} antialiased`}>
         <ThemeProvider>
           <div className="min-h-screen bg-background text-foreground flex flex-col">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 p-4 sm:p-8">
+              <div className="max-w-7xl mx-auto">{children}</div>
+            </main>
           </div>
         </ThemeProvider>
       </body>

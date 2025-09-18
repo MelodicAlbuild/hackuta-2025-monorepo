@@ -75,7 +75,9 @@ function DetailItem({ label, value }: { label: string; value: any }) {
         </a>
       );
     } else {
-      displayValue = <span className="text-muted-foreground">No Resume Uploaded</span>;
+      displayValue = (
+        <span className="text-muted-foreground">No Resume Uploaded</span>
+      );
     }
 
     return (
@@ -91,37 +93,21 @@ function DetailItem({ label, value }: { label: string; value: any }) {
   if (typeof value === 'boolean') {
     displayValue = (
       <span
-<<<<<<< Updated upstream
-        className={`px-2 py-1 text-xs font-medium rounded-full ${
-          value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-=======
         className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
           value
-            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
-            : "bg-red-500/15 text-red-600 dark:text-red-300"
->>>>>>> Stashed changes
+            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300'
+            : 'bg-red-500/15 text-red-600 dark:text-red-300'
         }`}
       >
         {value ? 'Yes' : 'No'}
       </span>
     );
-<<<<<<< Updated upstream
   } else if (value === null || value === '') {
-    displayValue = <span className="text-gray-400">N/A</span>;
-=======
-  } else if (value === null || value === "") {
     displayValue = <span className="text-muted-foreground">N/A</span>;
->>>>>>> Stashed changes
   } else if (value === undefined) {
     if (label.toLowerCase().includes('mlh')) {
       displayValue = (
-<<<<<<< Updated upstream
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${'bg-red-100 text-red-800'}`}
-        >
-=======
         <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-500/15 text-red-600 dark:text-red-300">
->>>>>>> Stashed changes
           No
         </span>
       );
@@ -133,7 +119,9 @@ function DetailItem({ label, value }: { label: string; value: any }) {
   return (
     <div className="flex flex-col py-2 border-b border-border">
       <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-sm text-foreground break-words">{displayValue}</dd>
+      <dd className="mt-1 text-sm text-foreground break-words">
+        {displayValue}
+      </dd>
     </div>
   );
 }
@@ -216,21 +204,12 @@ export function RegistrationsTable({
                 <DialogTrigger asChild>
                   <TableCell>
                     <span
-<<<<<<< Updated upstream
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        reg.status === 'invited'
-                          ? 'bg-blue-100 text-blue-800'
-                          : reg.status === 'confirmed'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-=======
                       className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
-                        reg.status === "invited"
-                          ? "bg-primary/10 text-primary"
-                          : reg.status === "confirmed"
-                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
-                            : "bg-muted text-muted-foreground"
->>>>>>> Stashed changes
+                        reg.status === 'invited'
+                          ? 'bg-primary/10 text-primary'
+                          : reg.status === 'confirmed'
+                            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300'
+                            : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {reg.status == '' || reg.status == undefined
