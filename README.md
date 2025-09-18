@@ -37,7 +37,7 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/). *Except 
 - ~~User Dashboard `portal`~~
 - Organizer Tools - **WIP (v1ish)**
 - Schedule Manager - **WIP (v1)**
-- ~~Announcements/Messages? `@repo/amqp`?~~
+- Announcements/Messages/Scheduling/Notifications - `@repo/amqp`
 - ~~Updates to the Auth Platform~~
 - ~~Submission Management?~~
 - Remove Supabase Realtime, It destroys DB Resources. _(80k calls at 328.23 seconds)_
