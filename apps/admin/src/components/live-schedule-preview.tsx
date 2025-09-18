@@ -153,12 +153,12 @@ function DayTimeline({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-center my-6 sticky top-0 backdrop-blur-sm z-20 py-2">
+      <h2 className="text-2xl font-bold text-center my-6 sticky top-0 backdrop-blur-sm z-20 py-2 text-foreground">
         {day}
       </h2>
       <div className="flex">
         {/* Time Gutter */}
-        <div className="w-20 text-right pr-4 text-sm text-gray-500 flex-shrink-0">
+        <div className="w-20 text-right pr-4 text-sm text-muted-foreground flex-shrink-0">
           {hours.map((hour) => (
             <div
               key={hour}
@@ -174,13 +174,13 @@ function DayTimeline({
         </div>
 
         {/* Event Container */}
-        <div className="flex-1 bg-gray-50 rounded-lg relative border-l border-gray-200">
+        <div className="flex-1 bg-muted/50 rounded-lg relative border-l border-border">
           {/* Hour Lines */}
           {hours.map((hour) => (
             <div
               key={hour}
               style={{ height: `${pixelsPerHour}px` }}
-              className="border-t border-gray-200"
+              className="border-t border-border"
             />
           ))}
           {/* Current time bar */}
@@ -210,11 +210,11 @@ function DayTimeline({
 // --- Event Card Component ---
 function EventCard({ event }: { event: ProcessedEvent }) {
   const categoryStyles: Record<string, string> = {
-    workshop: 'bg-indigo-100 border-indigo-500 text-indigo-800',
-    food: 'bg-orange-100 border-orange-500 text-orange-800',
-    keynote: 'bg-rose-100 border-rose-500 text-rose-800',
-    social: 'bg-teal-100 border-teal-500 text-teal-800',
-    general: 'bg-blue-100 border-blue-500 text-blue-800',
+    workshop: 'bg-indigo-100 dark:bg-indigo-900/50 border-indigo-500 text-indigo-800 dark:text-indigo-200',
+    food: 'bg-orange-100 dark:bg-orange-900/50 border-orange-500 text-orange-800 dark:text-orange-200',
+    keynote: 'bg-rose-100 dark:bg-rose-900/50 border-rose-500 text-rose-800 dark:text-rose-200',
+    social: 'bg-teal-100 dark:bg-teal-900/50 border-teal-500 text-teal-800 dark:text-teal-200',
+    general: 'bg-blue-100 dark:bg-blue-900/50 border-blue-500 text-blue-800 dark:text-blue-200',
   };
   const style = categoryStyles[event.category] || categoryStyles.general;
 
@@ -239,7 +239,7 @@ function EventCard({ event }: { event: ProcessedEvent }) {
             })}
           </p>
           {event.location && (
-            <p className="text-muted-foreground mt-1 truncate">
+            <p className="text-xs opacity-70 mt-1 truncate">
               {event.location}
             </p>
           )}

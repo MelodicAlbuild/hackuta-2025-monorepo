@@ -104,16 +104,19 @@ export function EventForm({ event, onComplete }: EventFormProps) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="category">Category</Label>
-          <Select name="category" defaultValue={event?.category || 'general'}>
+          <Select name="category" defaultValue={event?.category || 'activity'}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="general">General</SelectItem>
+              <SelectItem value="ceremony">Ceremony</SelectItem>
+              <SelectItem value="hacking">Hacking</SelectItem>
               <SelectItem value="workshop">Workshop</SelectItem>
               <SelectItem value="food">Food</SelectItem>
-              <SelectItem value="keynote">Keynote</SelectItem>
-              <SelectItem value="social">Social</SelectItem>
+              <SelectItem value="activity">Mini Event</SelectItem>
+              <SelectItem value="quiet">Quiet Hours</SelectItem>
+              <SelectItem value="judging">Judging</SelectItem>
+              <SelectItem value="milestone">Milestone</SelectItem>
             </SelectContent>
           </Select>
         </div>

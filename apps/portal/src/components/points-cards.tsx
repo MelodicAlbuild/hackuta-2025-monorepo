@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -8,16 +8,16 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
-import { getMyPointHistory } from "@/app/actions";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Icons } from '@/components/icons';
+import { getMyPointHistory } from '@/app/actions';
 
 type HistoryItem = {
   created_at: string;
@@ -51,7 +51,7 @@ export function PointsCard({ initialPoints }: { initialPoints: number }) {
           <p className="text-5xl font-bold">{initialPoints}</p>
         </CardContent>
         <CardFooter>
-          <Button variant="outline" onClick={handleHistoryClick}>
+          <Button onClick={handleHistoryClick}>
             View History
           </Button>
         </CardFooter>
@@ -82,9 +82,9 @@ export function PointsCard({ initialPoints }: { initialPoints: number }) {
                       </p>
                     </div>
                     <p
-                      className={`font-bold text-lg ${item.points_change >= 0 ? "text-green-600" : "text-red-600"}`}
+                      className={`font-bold text-lg ${item.points_change >= 0 ? 'text-primary' : 'text-destructive'}`}
                     >
-                      {item.points_change > 0 ? "+" : ""}
+                      {item.points_change > 0 ? '+' : ''}
                       {item.points_change}
                     </p>
                   </li>
