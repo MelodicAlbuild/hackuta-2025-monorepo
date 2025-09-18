@@ -1,0 +1,7 @@
+# Exclusions list for purge-users.cjs
+# One email per line. Case-insensitive. Blank lines ignored.
+# Lines starting with # are comments; inline comments after # are also supported.
+# Example:
+admin@example.com
+boss@domain.com   # Founder, never delete
+super.admin@uta.edu

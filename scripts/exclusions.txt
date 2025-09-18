@@ -1,0 +1,8 @@
+# Exclusions list for purge-users.cjs
+# One email per line. Case-insensitive. Blank lines ignored.
+# Lines starting with # are comments; inline comments after # are also supported.
+# Example:
+melodicalbuild@gmail.com
+dominic.lamanna@mavs.uta.edu
+rad7160@mavs.uta.edu
+demo@ionforgelabs.com
