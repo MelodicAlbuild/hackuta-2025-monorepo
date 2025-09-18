@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { cookies } from 'next/headers';
+import BulkInviteButton from '@/components/bulk-invite-button';
 
 export default async function RegistrationsPage() {
   const supabase = await createSupabaseServerClient(cookies);
@@ -56,11 +57,17 @@ export default async function RegistrationsPage() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Applicants</CardTitle>
-        <CardDescription>
-          A list of all users who have submitted an interest form.
-        </CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div>
+          <CardTitle>Applicants ({dedupedRegistrations.length})</CardTitle>
+          <CardDescription>
+            A list of all users who have submitted an interest form.
+          </CardDescription>
+        </div>
+        <BulkInviteButton
+          registrations={dedupedRegistrations}
+          className="mt-1 shrink-0"
+        />
       </CardHeader>
       <CardContent>
         <div className="overflow-y-auto h-md">
