@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   type LucideIcon,
   Sparkles,
@@ -11,15 +11,54 @@ import {
   Moon,
   Gavel,
   Flag,
+  Loader2,
 } from 'lucide-react';
 
-import {
-  schedule,
-  type ScheduleCategory,
-  type ScheduleDay,
-  type ScheduleEvent,
-  type ScheduleSlot,
-} from '@/data/schedule';
+// Database event type (what we get from the API)
+type DatabaseEvent = {
+  id: number;
+  title: string;
+  description: string | null;
+  start_time: string;
+  end_time: string | null;
+  location: string | null;
+  category: string;
+  created_by: string;
+  created_at: string;
+};
+
+// Types for schedule data structure
+export type ScheduleCategory =
+  | 'ceremony'
+  | 'hacking'
+  | 'workshop'
+  | 'food'
+  | 'activity'
+  | 'quiet'
+  | 'judging'
+  | 'milestone';
+
+export type ScheduleDay = {
+  id: string;
+  title: string;
+  date: string;
+  summary: string;
+  slots: ScheduleSlot[];
+};
+
+export type ScheduleSlot = {
+  timeRange: string;
+  highlight?: boolean;
+  events: ScheduleEvent[];
+};
+
+export type ScheduleEvent = {
+  title: string;
+  type: ScheduleCategory;
+  start: string;
+  end?: string;
+  location?: string;
+};
 
 const categoryStyles: Record<
   ScheduleCategory,
@@ -128,15 +167,211 @@ type DisplayEvent = {
   type: ScheduleCategory;
 };
 
+// Helper function to format time display
+function formatTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'America/Chicago',
+  });
+}
+
+// Helper function to format date for day titles
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'America/Chicago',
+  });
+}
+
+// Helper function to get day key for grouping
+function getDayKey(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    timeZone: 'America/Chicago',
+  });
+}
+
+// Map database category to ScheduleCategory
+function mapCategory(category: string): ScheduleCategory {
+  // Valid schedule categories
+  const validCategories: ScheduleCategory[] = [
+    'ceremony',
+    'hacking',
+    'workshop',
+    'food',
+    'activity',
+    'quiet',
+    'judging',
+    'milestone',
+  ];
+
+  // Return the category if it's valid, otherwise default to 'activity'
+  return validCategories.includes(category as ScheduleCategory)
+    ? (category as ScheduleCategory)
+    : 'activity';
+}
+
+// Transform database events into the day/slot structure
+function transformEventsToSchedule(events: DatabaseEvent[]): ScheduleDay[] {
+  // Group events by day
+  const eventsByDay = events.reduce(
+    (acc, event) => {
+      const dayKey = getDayKey(event.start_time);
+      if (!acc[dayKey]) {
+        acc[dayKey] = [];
+      }
+      acc[dayKey].push(event);
+      return acc;
+    },
+    {} as Record<string, DatabaseEvent[]>,
+  );
+
+  // Convert each day to ScheduleDay format
+  return Object.entries(eventsByDay).map(([dayKey, dayEvents]) => {
+    // Sort events by start time
+    const sortedEvents = dayEvents.sort(
+      (a, b) =>
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+    );
+
+    const firstEvent = sortedEvents[0];
+    const dayDate = formatDate(firstEvent.start_time);
+
+    // Create slots with events
+    const slots: ScheduleSlot[] = sortedEvents.map((event) => {
+      const startTime = formatTime(event.start_time);
+      const endTime = event.end_time ? formatTime(event.end_time) : null;
+      const timeRange = endTime ? `${startTime} – ${endTime}` : startTime;
+
+      return {
+        timeRange,
+        events: [
+          {
+            title: event.title,
+            type: mapCategory(event.category),
+            start: startTime,
+            end: endTime || undefined,
+            location: event.location || undefined,
+          },
+        ],
+      };
+    });
+
+    return {
+      id: `day-${dayKey}`,
+      title: `Day ${Object.keys(eventsByDay).indexOf(dayKey) + 1}`,
+      date: dayDate,
+      summary: `Events for ${dayDate}`,
+      slots,
+    };
+  });
+}
+
 export default function Schedule() {
+  const [events, setEvents] = useState<DatabaseEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch events from API
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await fetch('/api/events');
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const data = await response.json();
+        setEvents(data.events || []);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to load schedule',
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchEvents();
+  }, []);
+
+  // Transform events into schedule format
+  const schedule = useMemo(() => transformEventsToSchedule(events), [events]);
+
   const [activeDayId, setActiveDayId] = useState(() => schedule[0]?.id ?? '');
   const activeDay = useMemo(
     () => schedule.find((day) => day.id === activeDayId) ?? schedule[0],
-    [activeDayId],
+    [activeDayId, schedule],
   );
 
+  // Update active day when schedule changes
+  useEffect(() => {
+    if (schedule.length > 0 && !activeDayId) {
+      setActiveDayId(schedule[0].id);
+    }
+  }, [schedule, activeDayId]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 sm:mb-12 text-center">
+          <h2 className="text-3xl sm:text-5xl font-bold text-white">
+            HackUTA Schedule
+          </h2>
+          <p className="mt-3 text-base sm:text-lg text-gray-300 font-franklinGothic max-w-2xl mx-auto">
+            A clear look at everything happening across the weekend.
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-red-400" />
+          <span className="ml-3 text-gray-300">Loading schedule...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 sm:mb-12 text-center">
+          <h2 className="text-3xl sm:text-5xl font-bold text-white">
+            HackUTA Schedule
+          </h2>
+          <p className="mt-3 text-base sm:text-lg text-gray-300 font-franklinGothic max-w-2xl mx-auto">
+            A clear look at everything happening across the weekend.
+          </p>
+        </div>
+        <div className="text-center py-20">
+          <p className="text-red-400 mb-4">Failed to load schedule</p>
+          <p className="text-gray-300">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!schedule.length || !activeDay) {
-    return null;
+    return (
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 sm:mb-12 text-center">
+          <h2 className="text-3xl sm:text-5xl font-bold text-white">
+            HackUTA Schedule
+          </h2>
+          <p className="mt-3 text-base sm:text-lg text-gray-300 font-franklinGothic max-w-2xl mx-auto">
+            A clear look at everything happening across the weekend.
+          </p>
+        </div>
+        <div className="text-center py-20">
+          <p className="text-gray-300">
+            No events scheduled yet. Check back soon!
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -45,12 +45,12 @@ export function QrCodeModal() {
           <div className="relative h-[300px] w-[300px]">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <Icons.spinner className="h-12 w-12 animate-spin text-gray-500" />
+                <Icons.spinner className="h-12 w-12 animate-spin text-muted-foreground" />
               </div>
             )}
             {error && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-sm text-red-500">{error}</p>
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
             <Image
@@ -71,8 +71,9 @@ export function QrCodeModal() {
         {userGroup && (
           <DialogFooter>
             <div className="flex text-center font-franklinGothic">
-              <p className="font-franklinGothic text-gray-600">
-                Group: <span className="font-bold text-black">{userGroup}</span>
+              <p className="font-franklinGothic text-muted-foreground">
+                Group:{' '}
+                <span className="font-bold text-foreground">{userGroup}</span>
               </p>
             </div>
           </DialogFooter>
