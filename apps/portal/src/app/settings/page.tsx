@@ -1,15 +1,15 @@
-import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@repo/supabase/server";
-import { UserProfileForm } from "./_components/user-profile-form";
-import { UpdatePasswordForm } from "./_components/update-password-form";
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@repo/supabase/server';
+import { UserProfileForm } from './_components/user-profile-form';
+import { UpdatePasswordForm } from './_components/update-password-form';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { cookies } from "next/headers";
+} from '@/components/ui/card';
+import { cookies } from 'next/headers';
 
 export default async function SettingsPage() {
   const supabase = await createSupabaseServerClient(cookies);
@@ -19,16 +19,18 @@ export default async function SettingsPage() {
 
   if (!user) {
     // Middleware should handle this, but it's good practice for protection
-    return redirect("/");
+    return redirect('/');
   }
 
   return (
     <div className="space-y-8 p-8">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Account Settings
         </h1>
-        <p className="text-gray-600 mt-1">Manage your profile and password.</p>
+        <p className="text-muted-foreground mt-1">
+          Manage your profile and password.
+        </p>
       </header>
 
       <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2">

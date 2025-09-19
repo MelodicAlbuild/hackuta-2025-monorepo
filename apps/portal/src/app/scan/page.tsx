@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Scanner } from "@yudiel/react-qr-scanner";
+import { useState } from 'react';
+import { Scanner } from '@yudiel/react-qr-scanner';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Icons } from "@/components/icons";
-import { redeemVendorCode } from "./actions";
+} from '@/components/ui/card';
+import { Icons } from '@/components/icons';
+import { redeemVendorCode } from './actions';
 
-type ActionState = "idle" | "loading" | "success" | "failure";
+type ActionState = 'idle' | 'loading' | 'success' | 'failure';
 
 // Reusable overlay for visual feedback
 function ActionOverlay({
@@ -22,11 +22,11 @@ function ActionOverlay({
   state: ActionState;
   message?: string;
 }) {
-  if (state === "idle") return null;
+  if (state === 'idle') return null;
   const content = {
     loading: <Icons.spinner className="h-16 w-16 animate-spin text-white" />,
-    success: <Icons.checkCircle className="h-16 w-16 text-green-400" />,
-    failure: <Icons.xCircle className="h-16 w-16 text-red-400" />,
+    success: <Icons.checkCircle className="h-16 w-16 text-primary" />,
+    failure: <Icons.xCircle className="h-16 w-16 text-destructive" />,
   };
   return (
     <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10 rounded-lg">
@@ -39,29 +39,29 @@ function ActionOverlay({
 }
 
 export default function UserScannerPage() {
-  const [actionState, setActionState] = useState<ActionState>("idle");
-  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [actionState, setActionState] = useState<ActionState>('idle');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
   const handleScan = async (scannedToken: string) => {
     // Prevent new scans while an action is in progress
-    if (actionState !== "idle") return;
+    if (actionState !== 'idle') return;
 
-    setActionState("loading");
+    setActionState('loading');
 
     try {
       // Call the server action with the scanned code
       const result = await redeemVendorCode(scannedToken);
-      setActionState("success");
+      setActionState('success');
       setFeedbackMessage(`+${result.points_awarded} points!`);
     } catch (err) {
-      setActionState("failure");
+      setActionState('failure');
       setFeedbackMessage(
-        err instanceof Error ? err.message : "An unknown error occurred"
+        err instanceof Error ? err.message : 'An unknown error occurred',
       );
     }
 
     // Reset the overlay after 2.5 seconds to allow for another scan
-    setTimeout(() => setActionState("idle"), 2500);
+    setTimeout(() => setActionState('idle'), 2500);
   };
 
   return (
@@ -82,7 +82,7 @@ export default function UserScannerPage() {
                 if (result) handleScan(result[0].rawValue);
               }}
               sound={false}
-              constraints={{ facingMode: "environment" }}
+              constraints={{ facingMode: 'environment' }}
             />
           </div>
         </CardContent>

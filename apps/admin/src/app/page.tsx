@@ -46,8 +46,8 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Message */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-2">
+      <div className="bg-background border p-6 rounded-lg shadow-sm">
+        <h2 className="text-2xl font-semibold mb-2 text-foreground">
           Welcome,{' '}
           {userRole.includes('-')
             ? capitalizeStringArray(userRole.split('-')).join(' ')
@@ -56,11 +56,11 @@ export default async function AdminDashboard() {
         </h2>
         {user && (
           <div>
-            <p className="font-mono bg-gray-100 p-2 rounded mt-2">
-              <strong>User ID:</strong> {user.id}
+            <p className="font-mono bg-muted p-2 rounded mt-2 text-muted-foreground">
+              <strong className="text-foreground">User ID:</strong> {user.id}
             </p>
-            <p className="font-mono bg-gray-100 p-2 rounded mt-2">
-              <strong>Email:</strong> {user.email}
+            <p className="font-mono bg-muted p-2 rounded mt-2 text-muted-foreground">
+              <strong className="text-foreground">Email:</strong> {user.email}
             </p>
           </div>
         )}

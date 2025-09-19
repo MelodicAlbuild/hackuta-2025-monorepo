@@ -69,19 +69,21 @@ function DetailItem({ label, value }: { label: string; value: any }) {
       displayValue = (
         <a
           onClick={() => downloadResume(updatedValue)}
-          className="text-blue-500 hover:text-blue-700 hover:underline"
+          className="text-primary hover:text-primary/80 hover:underline"
         >
           Download Resume
         </a>
       );
     } else {
-      displayValue = <span className="text-gray-400">No Resume Uploaded</span>;
+      displayValue = (
+        <span className="text-muted-foreground">No Resume Uploaded</span>
+      );
     }
 
     return (
-      <div className="flex flex-col py-2 border-b border-gray-100">
-        <dt className="text-sm font-medium text-gray-500">{label}</dt>
-        <dd className="mt-1 text-sm text-gray-900 break-words">
+      <div className="flex flex-col py-2 border-b border-border">
+        <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
+        <dd className="mt-1 text-sm text-foreground break-words">
           {displayValue}
         </dd>
       </div>
@@ -91,33 +93,35 @@ function DetailItem({ label, value }: { label: string; value: any }) {
   if (typeof value === 'boolean') {
     displayValue = (
       <span
-        className={`px-2 py-1 text-xs font-medium rounded-full ${
-          value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+          value
+            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300'
+            : 'bg-red-500/15 text-red-600 dark:text-red-300'
         }`}
       >
         {value ? 'Yes' : 'No'}
       </span>
     );
   } else if (value === null || value === '') {
-    displayValue = <span className="text-gray-400">N/A</span>;
+    displayValue = <span className="text-muted-foreground">N/A</span>;
   } else if (value === undefined) {
     if (label.toLowerCase().includes('mlh')) {
       displayValue = (
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${'bg-red-100 text-red-800'}`}
-        >
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-500/15 text-red-600 dark:text-red-300">
           No
         </span>
       );
     } else {
-      displayValue = <span className="text-gray-400">N/A</span>;
+      displayValue = <span className="text-muted-foreground">N/A</span>;
     }
   }
 
   return (
-    <div className="flex flex-col py-2 border-b border-gray-100">
-      <dt className="text-sm font-medium text-gray-500">{label}</dt>
-      <dd className="mt-1 text-sm text-gray-900 break-words">{displayValue}</dd>
+    <div className="flex flex-col py-2 border-b border-border">
+      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
+      <dd className="mt-1 text-sm text-foreground break-words">
+        {displayValue}
+      </dd>
     </div>
   );
 }
@@ -185,7 +189,7 @@ export function RegistrationsTable({
         {registrations.map((reg) => {
           return (
             <Dialog key={reg.id}>
-              <TableRow className="cursor-pointer">
+              <TableRow className="cursor-pointer transition hover:bg-muted/50">
                 <DialogTrigger asChild>
                   <TableCell className="font-medium">
                     {reg.firstName} {reg.lastName}
@@ -200,12 +204,12 @@ export function RegistrationsTable({
                 <DialogTrigger asChild>
                   <TableCell>
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                      className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
                         reg.status === 'invited'
-                          ? 'bg-blue-100 text-blue-800'
+                          ? 'bg-primary/10 text-primary'
                           : reg.status === 'confirmed'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300'
+                            : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {reg.status == '' || reg.status == undefined
@@ -247,7 +251,7 @@ export function RegistrationsTable({
                 <div className="py-4 space-y-6">
                   {Object.entries(fieldGroups).map(([groupTitle, fields]) => (
                     <div key={groupTitle}>
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2 border-b pb-2">
+                      <h3 className="text-lg font-semibold text-foreground mb-2 border-b border-border pb-2">
                         {groupTitle}
                       </h3>
                       <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">

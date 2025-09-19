@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { createSupabaseBrowserClient } from "@repo/supabase/client";
+import { useEffect, useState } from 'react';
+import { createSupabaseBrowserClient } from '@repo/supabase/client';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { BellIcon } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { BellIcon } from 'lucide-react';
 
 type Notification = {
   id: number;
@@ -27,7 +27,7 @@ type Notification = {
 
 // Helper to truncate text
 const truncate = (str: string, length: number) => {
-  return str.length > length ? str.substring(0, length) + "..." : str;
+  return str.length > length ? str.substring(0, length) + '...' : str;
 };
 
 export function NotificationsPanel({
@@ -47,11 +47,11 @@ export function NotificationsPanel({
   const [seeTargets, setSeeTargets] = useState(false);
 
   useEffect(() => {
-    const lastChecked = localStorage.getItem("notifications_last_checked");
+    const lastChecked = localStorage.getItem('notifications_last_checked');
     if (initialNotifications.length > 0) {
       if (lastChecked) {
         const newCount = initialNotifications.filter(
-          (n) => new Date(n.created_at) > new Date(lastChecked)
+          (n) => new Date(n.created_at) > new Date(lastChecked),
         ).length;
         setUnreadCount(newCount);
       } else {
@@ -59,14 +59,14 @@ export function NotificationsPanel({
       }
     }
 
-    setSeeTargets(role === "super-admin");
+    setSeeTargets(role === 'super-admin');
 
     const fetchAndSubscribe = async () => {
       // Fetch initial notifications
       const { data } = await supabase
-        .from("notifications")
-        .select("*")
-        .order("created_at", { ascending: false })
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
         .limit(10);
 
       setNotifications(data || []);
@@ -74,7 +74,7 @@ export function NotificationsPanel({
       // Check for unread notifications
       if (lastChecked && data && data.length > 0) {
         const newCount = data.filter(
-          (n) => new Date(n.created_at) > new Date(lastChecked)
+          (n) => new Date(n.created_at) > new Date(lastChecked),
         ).length;
         setUnreadCount(newCount);
       }
@@ -83,15 +83,15 @@ export function NotificationsPanel({
     fetchAndSubscribe();
 
     const channel = supabase
-      .channel("notifications")
-      .on<Notification>("broadcast", { event: "shout" }, async (payload) => {
+      .channel('notifications')
+      .on<Notification>('broadcast', { event: 'shout' }, async (payload) => {
         if (payload.payload.target_user_id) {
           const {
             data: { user },
           } = await supabase.auth.getUser();
           if (!user) return;
           const target = payload.payload.target_user_id;
-          if (target === user.id || role === "super-admin") {
+          if (target === user.id || role === 'super-admin') {
             setNotifications((current) => [payload.payload, ...current]);
             setUnreadCount((current) => current + 1);
             setStateKey((current) => current + 1);
@@ -105,21 +105,21 @@ export function NotificationsPanel({
 
     channel.subscribe((state, err) => {
       if (err) {
-        console.error("Error subscribing to notifications:", err);
+        console.error('Error subscribing to notifications:', err);
       }
     });
 
     return () => {
       supabase.removeAllChannels();
     };
-  }, [supabase, initialNotifications]);
+  }, [supabase, initialNotifications, role]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setUnreadCount(0);
       localStorage.setItem(
-        "notifications_last_checked",
-        new Date().toISOString()
+        'notifications_last_checked',
+        new Date().toISOString(),
       );
     }
   };
@@ -135,7 +135,7 @@ export function NotificationsPanel({
           <Button variant="ghost" size="icon" className="relative">
             <BellIcon className="h-5 w-5" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
                 {unreadCount}
               </span>
             )}
@@ -158,7 +158,7 @@ export function NotificationsPanel({
                     </p>
                     {/* ** NEW: Conditionally display the recipient ** */}
                     {notif.recipient_email && seeTargets && (
-                      <p className="text-xs font-bold text-blue-600 mt-2">
+                      <p className="text-xs font-bold text-primary mt-2">
                         To: {notif.recipient_email}
                       </p>
                     )}
@@ -183,7 +183,7 @@ export function NotificationsPanel({
           {selectedNotification?.message}
         </div>
         {selectedNotification?.recipient_email && seeTargets && (
-          <p className="text-xs font-bold text-blue-600 mt-2">
+          <p className="text-xs font-bold text-primary mt-2">
             To: {selectedNotification?.recipient_email}
           </p>
         )}

@@ -1,10 +1,9 @@
 import {
   LucideProps,
-  Github,
   type Icon as LucideIcon,
   CheckCircle2,
   XCircle,
-} from "lucide-react";
+} from 'lucide-react';
 
 export type Icon = typeof LucideIcon;
 

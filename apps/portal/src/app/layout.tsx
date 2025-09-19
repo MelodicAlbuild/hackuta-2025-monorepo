@@ -1,21 +1,26 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Header } from "@/components/header";
+import type { Metadata } from 'next';
+import { Roboto, Fira_Code } from 'next/font/google';
+import './globals.css';
+import { Header } from '@/components/header';
+import { ThemeProvider } from '@/components/theme-provider';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const roboto = Roboto({
+  variable: '--font-roboto',
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const firaCode = Fira_Code({
+  variable: '--font-fira-code',
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "HackUTA Portal",
-  description: "Your gateway to HackUTA!",
+  title: 'HackUTA Portal',
+  description: 'Your gateway to HackUTA!',
 };
 
 export default function RootLayout({
@@ -24,12 +29,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Header />
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${roboto.variable} ${firaCode.variable} antialiased`}>
+        <ThemeProvider>
+          <div className="min-h-screen bg-background text-foreground flex flex-col">
+            <Header />
+            <main className="flex-1 p-4 sm:p-8">
+              <div className="max-w-7xl mx-auto">{children}</div>
+            </main>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
