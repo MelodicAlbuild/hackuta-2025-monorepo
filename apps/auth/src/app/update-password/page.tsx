@@ -121,7 +121,7 @@ export default function UpdatePasswordPage() {
         </div>
       ) : (
         <>
-          {session ? (
+          {!session ? (
             <div className="scrollbar-hide bg-gradient-to-b from-black to-gray-950 max-h-screen overflow-hidden relative">
               {/* HackUTA Logo at Top */}
               <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-[20]">
@@ -193,8 +193,8 @@ export default function UpdatePasswordPage() {
                           Create Your Password
                         </h1>
                         <p className="text-sm text-gray-300 font-franklinGothic">
-                          Welcome to HackUTA! Set a password to complete your
-                          registration.
+                          Welcome to HackUTA, {session!.user.email}! Set a
+                          password to complete your registration.
                         </p>
                       </div>
                       <div className="grid gap-6">
