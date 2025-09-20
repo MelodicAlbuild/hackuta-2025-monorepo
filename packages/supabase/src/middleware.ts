@@ -28,7 +28,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
             },
             auth: {
                 storageKey: 'sb-auth-token',
-                autoRefreshToken: true,
+                autoRefreshToken: false,
                 persistSession: true,
                 detectSessionInUrl: true,
             }

@@ -34,7 +34,7 @@ export async function createSupabaseServerClient(cookies: () => Promise<Readonly
             },
             auth: {
                 storageKey: 'sb-auth-token',
-                autoRefreshToken: true,
+                autoRefreshToken: false,
                 persistSession: true,
                 detectSessionInUrl: true,
             }
