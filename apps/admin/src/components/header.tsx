@@ -71,6 +71,9 @@ export async function Header() {
                       <DropdownMenuItem asChild>
                         <Link href="/users">User Management</Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/events">Events</Link>
+                      </DropdownMenuItem>
                     </>
                   ) : null}
 
