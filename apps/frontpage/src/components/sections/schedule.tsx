@@ -219,8 +219,52 @@ function mapCategory(category: string): ScheduleCategory {
 
 // Transform database events into the day/slot structure
 function transformEventsToSchedule(events: DatabaseEvent[]): ScheduleDay[] {
-  // Group events by day
-  const eventsByDay = events.reduce(
+  // Separate pre-workshop events (negative IDs) from regular events
+  const preWorkshopEvents = events.filter((event) => event.id < 0);
+  const regularEvents = events.filter((event) => event.id >= 0);
+
+  const scheduleDays: ScheduleDay[] = [];
+
+  // Create Pre-Event Workshops day if there are any pre-workshop events
+  if (preWorkshopEvents.length > 0) {
+    // Sort pre-workshop events by start time
+    const sortedPreEvents = preWorkshopEvents.sort(
+      (a, b) =>
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+    );
+
+    // Create slots for pre-workshop events
+    const preWorkshopSlots: ScheduleSlot[] = sortedPreEvents.map((event) => {
+      const startTime = formatTime(event.start_time);
+      const endTime = event.end_time ? formatTime(event.end_time) : null;
+      const timeRange = endTime ? `${startTime} – ${endTime}` : startTime;
+      const eventDate = formatDate(event.start_time);
+
+      return {
+        timeRange: `${eventDate} • ${timeRange}`,
+        events: [
+          {
+            title: event.title,
+            type: mapCategory(event.category),
+            start: startTime,
+            end: endTime || undefined,
+            location: event.location || undefined,
+          },
+        ],
+      };
+    });
+
+    scheduleDays.push({
+      id: 'pre-event-workshops',
+      title: 'Pre-Event Workshops',
+      date: 'Before HackUTA',
+      summary: 'Workshop sessions to prepare for the hackathon',
+      slots: preWorkshopSlots,
+    });
+  }
+
+  // Group regular events by day
+  const eventsByDay = regularEvents.reduce(
     (acc, event) => {
       const dayKey = getDayKey(event.start_time);
       if (!acc[dayKey]) {
@@ -233,7 +277,7 @@ function transformEventsToSchedule(events: DatabaseEvent[]): ScheduleDay[] {
   );
 
   // Convert each day to ScheduleDay format
-  return Object.entries(eventsByDay).map(([dayKey, dayEvents]) => {
+  const regularDays = Object.entries(eventsByDay).map(([dayKey, dayEvents]) => {
     // Sort events by start time
     const sortedEvents = dayEvents.sort(
       (a, b) =>
@@ -271,7 +315,60 @@ function transformEventsToSchedule(events: DatabaseEvent[]): ScheduleDay[] {
       slots,
     };
   });
+
+  // Return pre-event workshops first, then regular days
+  return [...scheduleDays, ...regularDays];
 }
+
+// Pre-HACKUTA workshops (hardcoded)
+const preHackutaWorkshops: DatabaseEvent[] = [
+  {
+    id: -1,
+    title: 'Intro to React w/ MOBI',
+    description:
+      'Pre-HACKUTA Workshop: Learn the fundamentals of React development',
+    start_time: '2025-09-29T17:30:00-05:00', // Sept 29, 2025, 5:30 PM CDT
+    end_time: '2025-09-29T18:30:00-05:00', // Sept 29, 2025, 6:30 PM CDT
+    location: 'SEIR 194',
+    category: 'workshop',
+    created_by: 'system',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: -2,
+    title: 'Full Stack Development',
+    description:
+      'Pre-HACKUTA Workshop: Complete web development from frontend to backend',
+    start_time: '2025-10-02T16:00:00-05:00', // Oct 2, 2025, 4:00 PM CDT
+    end_time: '2025-10-02T17:30:00-05:00', // Oct 2, 2025, 5:30 PM CDT
+    location: 'SEIR 198',
+    category: 'workshop',
+    created_by: 'system',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: -3,
+    title: 'Team Mixer',
+    description: 'Pre-HACKUTA Workshop: Meet other participants and form teams',
+    start_time: '2025-10-02T17:30:00-05:00', // Oct 2, 2025, 5:30 PM CDT
+    end_time: '2025-10-02T18:30:00-05:00', // Oct 2, 2025, 6:30 PM CDT
+    location: 'SEIR 198',
+    category: 'activity',
+    created_by: 'system',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: -4,
+    title: 'Intro to Python',
+    description: 'Pre-HACKUTA Workshop: Python programming fundamentals',
+    start_time: '2025-10-02T17:30:00-05:00', // Oct 2, 2025, 5:30 PM CDT
+    end_time: '2025-10-02T18:30:00-05:00', // Oct 2, 2025, 6:30 PM CDT
+    location: 'Online',
+    category: 'workshop',
+    created_by: 'system',
+    created_at: new Date().toISOString(),
+  },
+];
 
 export default function Schedule() {
   const [events, setEvents] = useState<DatabaseEvent[]>([]);
@@ -287,7 +384,9 @@ export default function Schedule() {
           throw new Error('Failed to fetch events');
         }
         const data = await response.json();
-        setEvents(data.events || []);
+        // Combine API events with hardcoded pre-HACKUTA workshops
+        const allEvents = [...preHackutaWorkshops, ...(data.events || [])];
+        setEvents(allEvents);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : 'Failed to load schedule',
@@ -430,11 +529,12 @@ function DayPanel({ day }: { day: ScheduleDay }) {
       })),
     [events],
   );
+  const showFilters = day.id !== 'pre-event-workshops';
   const activeFilterConfig =
     filterMeta.find((filter) => filter.id === activeFilter) ?? filterMeta[0];
-  const filteredEvents = events.filter((event) =>
-    activeFilterConfig.match(event.type),
-  );
+  const filteredEvents = showFilters
+    ? events.filter((event) => activeFilterConfig.match(event.type))
+    : events;
 
   return (
     <article className="faq-glow flex h-full flex-col rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-900/30 via-blue-900/20 to-black/60 backdrop-blur-xl overflow-hidden">
@@ -449,31 +549,33 @@ function DayPanel({ day }: { day: ScheduleDay }) {
           {day.summary}
         </p>
       </header>
-      <div className="border-b border-white/10 bg-black/20 px-6 py-4 sm:px-8 sm:py-5">
-        <div className="flex flex-wrap items-center gap-2">
-          {filterMeta.map((filter) => {
-            const isActive = filter.id === activeFilterConfig.id;
-            return (
-              <button
-                key={filter.id}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => setActiveFilter(filter.id)}
-                className={`flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] transition-colors duration-200 font-franklinGothic shadow-[0_0_20px_-15px_rgba(248,113,113,0.75)] ${
-                  isActive
-                    ? 'border-red-400/70 bg-red-500/20 text-white'
-                    : 'border-white/10 bg-white/5 text-gray-300 hover:border-red-400/50 hover:text-white'
-                }`}
-              >
-                <span>{filter.label}</span>
-                <span className="rounded-full bg-black/40 px-1.5 py-0.5 text-[10px] tracking-[0.15em]">
-                  {filter.count}
-                </span>
-              </button>
-            );
-          })}
+      {showFilters && (
+        <div className="border-b border-white/10 bg-black/20 px-6 py-4 sm:px-8 sm:py-5">
+          <div className="flex flex-wrap items-center gap-2">
+            {filterMeta.map((filter) => {
+              const isActive = filter.id === activeFilterConfig.id;
+              return (
+                <button
+                  key={filter.id}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => setActiveFilter(filter.id)}
+                  className={`flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] transition-colors duration-200 font-franklinGothic shadow-[0_0_20px_-15px_rgba(248,113,113,0.75)] ${
+                    isActive
+                      ? 'border-red-400/70 bg-red-500/20 text-white'
+                      : 'border-white/10 bg-white/5 text-gray-300 hover:border-red-400/50 hover:text-white'
+                  }`}
+                >
+                  <span>{filter.label}</span>
+                  <span className="rounded-full bg-black/40 px-1.5 py-0.5 text-[10px] tracking-[0.15em]">
+                    {filter.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {filteredEvents.length > 0 ? (
         <ul className="flex-1 divide-y divide-white/10 bg-black/30">
@@ -532,12 +634,13 @@ function ScheduleRow({ event }: { event: DisplayEvent }) {
 
 function buildDisplayEvents(day: ScheduleDay): DisplayEvent[] {
   const rows: DisplayEvent[] = [];
+  const includeDateWithTime = day.id === 'pre-event-workshops';
 
   day.slots.forEach((slot) => {
     slot.events.forEach((event, index) => {
       rows.push({
         id: `${day.id}-${slot.timeRange}-${event.title}-${index}`,
-        time: resolveTime(slot, event),
+        time: includeDateWithTime ? slot.timeRange : resolveTime(slot, event),
         title: event.title,
         location: event.location,
         type: event.type,
