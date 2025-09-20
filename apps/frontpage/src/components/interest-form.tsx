@@ -817,7 +817,17 @@ export default function InterestForm() {
                       <Button
                         type="button"
                         onClick={() => {
-                          closeLevelTwoRef.current!.click();
+                          if (
+                            form.formState.errors.codeOfConduct ||
+                            form.formState.errors.mlhDataHandling
+                          ) {
+                            toast.error(
+                              'Please agree to the required disclaimers to proceed.',
+                            );
+                            return;
+                          } else {
+                            closeLevelTwoRef.current!.click();
+                          }
                         }}
                       >
                         Submit
@@ -831,7 +841,13 @@ export default function InterestForm() {
                     ref={closeLevelTwoRef}
                     className="hidden"
                     onClick={() => {
-                      closeLevelOneRef.current!.click();
+                      if (form.formState.isValid) {
+                        closeLevelOneRef.current!.click();
+                      } else {
+                        toast.error(
+                          'Please fix the errors in the form before submitting.',
+                        );
+                      }
                     }}
                   >
                     Submit
@@ -847,7 +863,15 @@ export default function InterestForm() {
             type="button"
             className="hidden"
             onClick={() => {
-              form.handleSubmit(onSubmit)();
+              if (!form.formState.isValid) {
+                toast.error(
+                  'Please fix the errors in the form before submitting.',
+                );
+                return;
+              } else {
+                form.handleSubmit(onSubmit)();
+                form.reset();
+              }
             }}
           />
         </DialogClose>
