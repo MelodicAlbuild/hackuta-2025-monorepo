@@ -58,7 +58,16 @@ export function SystemStatusCard() {
             <div>
               <div className="text-sm font-medium">{s.name}</div>
               <div className="text-xs text-muted-foreground break-all">
-                {s.url}
+                {(() => {
+                  if (s.name === 'RabbitMQ') {
+                    const marker = '/api/health';
+                    const idx = s.url.indexOf(marker);
+                    if (idx !== -1) {
+                      return s.url.slice(0, idx + marker.length);
+                    }
+                  }
+                  return s.url;
+                })()}
               </div>
               {!s.up && s.error && (
                 <div className="text-xs text-red-600 mt-1">{s.error}</div>

@@ -65,6 +65,9 @@ importers:
       '@repo/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
+      '@repo/ws':
+        specifier: workspace:*
+        version: link:../../packages/ws
       '@supabase/ssr':
         specifier: ^0.6.1
         version: 0.6.1(@supabase/supabase-js@2.57.4)
@@ -390,6 +393,9 @@ importers:
       '@repo/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
+      '@repo/ws':
+        specifier: workspace:*
+        version: link:../../packages/ws
       '@supabase/supabase-js':
         specifier: ^2.56.0
         version: 2.57.4
@@ -469,6 +475,9 @@ importers:
       amqplib:
         specifier: ^0.10.9
         version: 0.10.9
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -569,6 +578,19 @@ importers:
         version: 4.1.13
 
   packages/typescript-config: {}
+
+  packages/ws:
+    dependencies:
+      '@repo/supabase':
+        specifier: workspace:*
+        version: link:../supabase
+      react:
+        specifier: ^18 || ^19
+        version: 19.1.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.1.12
 
 packages:
 

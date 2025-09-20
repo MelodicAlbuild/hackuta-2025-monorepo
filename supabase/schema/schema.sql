@@ -233,6 +233,39 @@ ALTER FUNCTION "public"."update_points_and_log"(
     "change_source" "text"
 ) OWNER TO "postgres";
 
+-- Escalation: Admins can mark a chat thread escalated and notify super-admins
+CREATE OR REPLACE FUNCTION "public"."escalate_chat"(thread_id uuid, reason text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE rec RECORD;
+BEGIN
+    -- Only admins/super-admins can escalate
+    IF public.get_user_role() NOT IN ('admin','super-admin') THEN
+        RAISE EXCEPTION 'Insufficient privileges';
+    END IF;
+
+    UPDATE public.chat_threads
+    SET escalated = true
+    WHERE id = thread_id;
+
+    -- Notify all super-admins
+    FOR rec IN SELECT id FROM public.profiles WHERE role = 'super-admin' LOOP
+        INSERT INTO public.notifications(title, message, type, target_user_id, metadata)
+        VALUES (
+            'Chat Escalation Requested',
+            COALESCE('Thread ' || thread_id::text || ' escalated. ' || COALESCE(reason,''), 'Thread escalated'),
+            'direct',
+            rec.id,
+            jsonb_build_object('thread_id', thread_id, 'reason', reason)
+        );
+    END LOOP;
+END;
+$$;
+
+ALTER FUNCTION "public"."escalate_chat"(thread_id uuid, reason text) OWNER TO "postgres";
+
 -- Tablespace Methods use an inherant default tablespace, set it to empty to force tablespace lookup
 SET default_tablespace = '';
 -- Heap access prevents caching on low frequency methods
@@ -378,6 +411,32 @@ ADD GENERATED ALWAYS AS IDENTITY (
         SEQUENCE NAME "public"."temporary_passwords_id_seq" START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1
     );
 
+-- Chat: Threads represent a user's conversation with admins
+CREATE TABLE IF NOT EXISTS "public"."chat_threads" (
+    "id" uuid NOT NULL, -- Use the user's UUID as the thread id
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "created_by" uuid NOT NULL,
+    "assigned_admin_id" uuid,
+    "status" text DEFAULT 'open'::text NOT NULL,
+    "escalated" boolean DEFAULT false NOT NULL,
+    "last_message_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "last_message_preview" text
+);
+
+ALTER TABLE "public"."chat_threads" OWNER TO "postgres";
+
+-- Chat: Individual messages in a thread
+CREATE TABLE IF NOT EXISTS "public"."chat_messages" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "thread_id" uuid NOT NULL,
+    "sender_id" uuid NOT NULL,
+    "type" text NOT NULL,
+    "content" jsonb NOT NULL
+);
+
+ALTER TABLE "public"."chat_messages" OWNER TO "postgres";
+
 CREATE TABLE IF NOT EXISTS "public"."vendor_codes" (
     "id" bigint NOT NULL,
     "name" "text" NOT NULL,
@@ -460,6 +519,12 @@ ADD CONSTRAINT "vendor_scan_logs_code_id_user_id_key" UNIQUE ("code_id", "user_i
 ALTER TABLE ONLY "public"."vendor_scan_logs"
 ADD CONSTRAINT "vendor_scan_logs_pkey" PRIMARY KEY ("id");
 
+ALTER TABLE ONLY "public"."chat_threads"
+ADD CONSTRAINT "chat_threads_pkey" PRIMARY KEY ("id");
+
+ALTER TABLE ONLY "public"."chat_messages"
+ADD CONSTRAINT "chat_messages_pkey" PRIMARY KEY ("id");
+
 ALTER TABLE ONLY "public"."notifications"
 ADD CONSTRAINT "notifications_target_user_id_fkey" FOREIGN KEY ("target_user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
@@ -489,6 +554,18 @@ ADD CONSTRAINT "vendor_scan_logs_code_id_fkey" FOREIGN KEY ("code_id") REFERENCE
 
 ALTER TABLE ONLY "public"."vendor_scan_logs"
 ADD CONSTRAINT "vendor_scan_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "public"."chat_threads"
+ADD CONSTRAINT "chat_threads_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "public"."chat_threads"
+ADD CONSTRAINT "chat_threads_assigned_admin_id_fkey" FOREIGN KEY ("assigned_admin_id") REFERENCES "public"."profiles"("id") ON DELETE SET NULL;
+
+ALTER TABLE ONLY "public"."chat_messages"
+ADD CONSTRAINT "chat_messages_thread_id_fkey" FOREIGN KEY ("thread_id") REFERENCES "public"."chat_threads"("id") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "public"."chat_messages"
+ADD CONSTRAINT "chat_messages_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
 -- Supabase Supports Row Level Security on a global scale, manage all of those properties here (there are a lot).
 CREATE POLICY "Admins and Super-Admins can update interest forms" ON "public"."interest-form" FOR
@@ -610,6 +687,40 @@ ALTER TABLE "public"."temporary_passwords" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."vendor_codes" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."vendor_scan_logs" ENABLE ROW LEVEL SECURITY;
 
+-- Enable RLS for chat tables
+ALTER TABLE "public"."chat_threads" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."chat_messages" ENABLE ROW LEVEL SECURITY;
+
+-- Policies for chat_threads
+CREATE POLICY "Users see their own thread; admins see all" ON "public"."chat_threads" FOR SELECT TO "authenticated" USING (
+    ("id" = auth.uid()) OR ("public"."get_user_role"() = ANY (ARRAY['admin'::text,'super-admin'::text]))
+);
+
+CREATE POLICY "Users can create their thread" ON "public"."chat_threads" FOR INSERT TO "authenticated" WITH CHECK (
+    ("id" = auth.uid()) AND ("created_by" = auth.uid())
+);
+
+CREATE POLICY "Admins can update threads" ON "public"."chat_threads" FOR UPDATE TO "authenticated" USING (
+    ("public"."get_user_role"() = ANY (ARRAY['admin'::text,'super-admin'::text]))
+);
+
+-- Policies for chat_messages
+CREATE POLICY "Users and admins can read messages for their thread" ON "public"."chat_messages" FOR SELECT TO "authenticated" USING (
+    EXISTS (
+        SELECT 1 FROM public.chat_threads ct
+        WHERE ct.id = chat_messages.thread_id
+          AND (ct.id = auth.uid() OR (public.get_user_role() = ANY (ARRAY['admin'::text,'super-admin'::text])))
+    )
+);
+
+CREATE POLICY "Participants can send messages" ON "public"."chat_messages" FOR INSERT TO "authenticated" WITH CHECK (
+    (sender_id = auth.uid()) AND EXISTS (
+        SELECT 1 FROM public.chat_threads ct
+        WHERE ct.id = chat_messages.thread_id
+          AND (ct.id = auth.uid() OR (public.get_user_role() = ANY (ARRAY['admin'::text,'super-admin'::text])))
+    )
+);
+
 -- Realtime publications are an extension to postgres, assign its ownership
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
 
@@ -676,6 +787,10 @@ GRANT ALL ON FUNCTION "public"."update_points_and_log"(
         "points_change_amount" integer,
         "change_source" "text"
     ) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."escalate_chat"(thread_id uuid, reason text) TO "anon";
+GRANT ALL ON FUNCTION "public"."escalate_chat"(thread_id uuid, reason text) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."escalate_chat"(thread_id uuid, reason text) TO "service_role";
 
 GRANT ALL ON TABLE "public"."feature_flags" TO "anon";
 GRANT ALL ON TABLE "public"."feature_flags" TO "authenticated";
@@ -748,6 +863,25 @@ GRANT ALL ON TABLE "public"."vendor_scan_logs" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."vendor_scan_logs_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."vendor_scan_logs_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."vendor_scan_logs_id_seq" TO "service_role";
+
+-- Grants for chat tables
+GRANT ALL ON TABLE "public"."chat_threads" TO "anon";
+GRANT ALL ON TABLE "public"."chat_threads" TO "authenticated";
+GRANT ALL ON TABLE "public"."chat_threads" TO "service_role";
+
+GRANT ALL ON TABLE "public"."chat_messages" TO "anon";
+GRANT ALL ON TABLE "public"."chat_messages" TO "authenticated";
+GRANT ALL ON TABLE "public"."chat_messages" TO "service_role";
+
+ALTER TABLE "public"."chat_messages"
+ALTER COLUMN "id"
+ADD GENERATED ALWAYS AS IDENTITY (
+        SEQUENCE NAME "public"."chat_messages_id_seq" START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1
+    );
+
+-- Helpful indexes
+CREATE INDEX IF NOT EXISTS chat_threads_last_message_at_idx ON public.chat_threads (last_message_at DESC);
+CREATE INDEX IF NOT EXISTS chat_messages_thread_id_created_at_idx ON public.chat_messages (thread_id, created_at DESC);
 
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public"
 GRANT ALL ON SEQUENCES TO "postgres";

@@ -1,20 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { createSupabaseBrowserClient } from "@repo/supabase/client";
+import { useEffect, useState } from 'react';
+import { createSupabaseBrowserClient } from '@repo/supabase/client';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { BellIcon } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { BellIcon } from 'lucide-react';
+import { useWS } from '@repo/ws';
 
 type Notification = {
   id: number;
@@ -27,7 +28,7 @@ type Notification = {
 
 // Helper to truncate text
 const truncate = (str: string, length: number) => {
-  return str.length > length ? str.substring(0, length) + "..." : str;
+  return str.length > length ? str.substring(0, length) + '...' : str;
 };
 
 export function NotificationsPanel({
@@ -38,6 +39,7 @@ export function NotificationsPanel({
   role: string | null;
 }) {
   const supabase = createSupabaseBrowserClient();
+  const { on, subscribe } = useWS();
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -47,11 +49,11 @@ export function NotificationsPanel({
   const [seeTargets, setSeeTargets] = useState(false);
 
   useEffect(() => {
-    const lastChecked = localStorage.getItem("notifications_last_checked");
+    const lastChecked = localStorage.getItem('notifications_last_checked');
     if (initialNotifications.length > 0) {
       if (lastChecked) {
         const newCount = initialNotifications.filter(
-          (n) => new Date(n.created_at) > new Date(lastChecked)
+          (n) => new Date(n.created_at) > new Date(lastChecked),
         ).length;
         setUnreadCount(newCount);
       } else {
@@ -59,14 +61,14 @@ export function NotificationsPanel({
       }
     }
 
-    setSeeTargets(role === "super-admin");
+    setSeeTargets(role === 'super-admin');
 
     const fetchAndSubscribe = async () => {
       // Fetch initial notifications
       const { data } = await supabase
-        .from("notifications")
-        .select("*")
-        .order("created_at", { ascending: false })
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
         .limit(10);
 
       setNotifications(data || []);
@@ -74,7 +76,7 @@ export function NotificationsPanel({
       // Check for unread notifications
       if (lastChecked && data && data.length > 0) {
         const newCount = data.filter(
-          (n) => new Date(n.created_at) > new Date(lastChecked)
+          (n) => new Date(n.created_at) > new Date(lastChecked),
         ).length;
         setUnreadCount(newCount);
       }
@@ -82,16 +84,35 @@ export function NotificationsPanel({
 
     fetchAndSubscribe();
 
+    // Subscribe to websocket user notifications channel
+    const subToWs = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const ch = `user.${user.id}`;
+      subscribe(ch);
+      on(ch, (msg) => {
+        if (msg.data && typeof msg.data === 'object') {
+          const n = msg.data as Notification;
+          setNotifications((current) => [n, ...current]);
+          setUnreadCount((current) => current + 1);
+          setStateKey((current) => current + 1);
+        }
+      });
+    };
+    subToWs();
+
     const channel = supabase
-      .channel("notifications")
-      .on<Notification>("broadcast", { event: "shout" }, async (payload) => {
+      .channel('notifications')
+      .on<Notification>('broadcast', { event: 'shout' }, async (payload) => {
         if (payload.payload.target_user_id) {
           const {
             data: { user },
           } = await supabase.auth.getUser();
           if (!user) return;
           const target = payload.payload.target_user_id;
-          if (target === user.id || role === "super-admin") {
+          if (target === user.id || role === 'super-admin') {
             setNotifications((current) => [payload.payload, ...current]);
             setUnreadCount((current) => current + 1);
             setStateKey((current) => current + 1);
@@ -105,21 +126,21 @@ export function NotificationsPanel({
 
     channel.subscribe((state, err) => {
       if (err) {
-        console.error("Error subscribing to notifications:", err);
+        console.error('Error subscribing to notifications:', err);
       }
     });
 
     return () => {
       supabase.removeAllChannels();
     };
-  }, [supabase, initialNotifications]);
+  }, [supabase, initialNotifications, on, subscribe, role]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setUnreadCount(0);
       localStorage.setItem(
-        "notifications_last_checked",
-        new Date().toISOString()
+        'notifications_last_checked',
+        new Date().toISOString(),
       );
     }
   };
