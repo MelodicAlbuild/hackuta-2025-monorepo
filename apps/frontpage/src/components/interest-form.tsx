@@ -54,7 +54,6 @@ import {
 } from './ui/select';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -67,7 +66,19 @@ import { iso31661 } from 'iso-3166';
 
 import { createSupabaseBrowserClient } from '@repo/supabase/client';
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useMemo, useState } from 'react';
+
+// Minimal country calling codes with US first
+type CountryCodeOption = { id: string; label: string; dial: string };
+const COUNTRY_CODES: CountryCodeOption[] = [
+  { id: 'US', label: 'US (+1)', dial: '+1' },
+  { id: 'CA', label: 'CA (+1)', dial: '+1' },
+  { id: 'UK', label: 'UK (+44)', dial: '+44' },
+  { id: 'IN', label: 'IN (+91)', dial: '+91' },
+  { id: 'DE', label: 'DE (+49)', dial: '+49' },
+  { id: 'AU', label: 'AU (+61)', dial: '+61' },
+  { id: 'custom', label: 'Custom code…', dial: 'custom' },
+];
 
 const FormSchema = z.object({
   // General Information
@@ -77,11 +88,15 @@ const FormSchema = z.object({
     .string()
     .min(1, 'Age is required')
     .max(3, 'Age must be a valid number'),
-  phoneNumber: z
-    .string()
-    .regex(/^\d{9,13}$/, 'Phone number must be 9 to 13 digits'),
+  phoneNumber: z.string().refine(
+    (value) => {
+      const digitsOnly = value.replace(/\D/g, '');
+      return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+    },
+    { message: 'Enter a valid phone number (7–15 digits, any format)' },
+  ),
   email: z.string().email('Invalid email address'),
-  school: z.string().optional(),
+  school: z.string().min(1, 'School is required'),
   levelOfStudy: z.string({ error: 'Level of study is required' }),
   countryOfResidence: z.string({
     error: 'Country of residence is required',
@@ -99,31 +114,80 @@ const FormSchema = z.object({
   shippingAddress: z.string().optional(),
   majorFieldOfStudy: z.string().optional(),
   // MLH Required Fields
-  codeOfConduct: z.boolean(),
-  mlhDataHandling: z.boolean(),
+  codeOfConduct: z.boolean().refine((val) => val === true, {
+    message: 'Code of Conduct agreement is required',
+  }),
+  mlhDataHandling: z.boolean().refine((val) => val === true, {
+    message: 'MLH Data Handling agreement is required',
+  }),
   mlhPromotionalEmails: z.boolean().optional(),
 });
 
 function removeDuplicates<T>(arr: T[]): T[] {
-  return arr.filter((item, index) => arr.indexOf(item) === index);
+  return Array.from(new Set(arr));
 }
 
 export default function InterestForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
-  const closeLevelOneRef = useRef<HTMLButtonElement>(null);
-  const closeLevelTwoRef = useRef<HTMLButtonElement>(null);
 
   const supabase = createSupabaseBrowserClient();
 
-  // Remove duplicates from schools
-  const uniqueSchools = removeDuplicates(schools);
+  // Remove duplicates from schools (fast) and memoize
+  const uniqueSchools = useMemo(() => removeDuplicates(schools), []);
+
+  // Typeahead state for large lists
+  const [schoolQuery, setSchoolQuery] = useState('');
+  const filteredSchools = useMemo(() => {
+    const query = schoolQuery.trim().toLowerCase();
+    const list = query
+      ? uniqueSchools.filter((s) => s.toLowerCase().includes(query))
+      : uniqueSchools;
+    return list.slice(0, 50);
+  }, [schoolQuery, uniqueSchools]);
+
+  const [countryQuery, setCountryQuery] = useState('');
+  const filteredCountries = useMemo(() => {
+    const query = countryQuery.trim().toLowerCase();
+    const list = query
+      ? iso31661.filter(
+          (iso) =>
+            iso.name.toLowerCase().includes(query) ||
+            iso.alpha3.toLowerCase().includes(query),
+        )
+      : iso31661;
+    return list.slice(0, 100);
+  }, [countryQuery]);
+
+  // Phone input UX state
+  const [phoneCcKey, setPhoneCcKey] = useState<string>('US');
+  const [phoneCc, setPhoneCc] = useState<string>('+1');
+  const [customCc, setCustomCc] = useState<string>('+');
+  const [phoneP1, setPhoneP1] = useState<string>('');
+  const [phoneP2, setPhoneP2] = useState<string>('');
+  const [phoneP3, setPhoneP3] = useState<string>('');
+  const [phoneIntl, setPhoneIntl] = useState<string>('');
+
+  // Dialog state control
+  const [isDemographicsOpen, setIsDemographicsOpen] = useState(false);
+  const [isDisclaimersOpen, setIsDisclaimersOpen] = useState(false);
+
+  function composeAndSetPhone() {
+    const ccRaw = phoneCc === 'custom' ? customCc : phoneCc;
+    const ccDigits = ccRaw.replace(/\D/g, '');
+    const local =
+      phoneCc === '+1' ? `${phoneP1}${phoneP2}${phoneP3}` : phoneIntl;
+    const digitsOnly = `${ccDigits}${local.replace(/\D/g, '')}`;
+    form.setValue('phoneNumber', digitsOnly, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (data.school === undefined) {
-      data.school = 'Other';
-    }
+    // Sanitize phone number to digits only before storing
+    data.phoneNumber = data.phoneNumber.replace(/\D/g, '');
 
     supabase
       .from('interest-form')
@@ -135,6 +199,16 @@ export default function InterestForm() {
         } else {
           toast.success('Form submitted successfully!');
           form.reset();
+          setPhoneCcKey('US');
+          setPhoneCc('+1');
+          setPhoneP1('');
+          setPhoneP2('');
+          setPhoneP3('');
+          setPhoneIntl('');
+          setCustomCc('+');
+          // Reset dialog states
+          setIsDemographicsOpen(false);
+          setIsDisclaimersOpen(false);
         }
       });
   }
@@ -158,7 +232,9 @@ export default function InterestForm() {
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name</FormLabel>
+                    <FormLabel>
+                      First Name <span className="text-red-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -175,7 +251,9 @@ export default function InterestForm() {
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last Name</FormLabel>
+                    <FormLabel>
+                      Last Name <span className="text-red-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -192,7 +270,9 @@ export default function InterestForm() {
                 name="age"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Age</FormLabel>
+                    <FormLabel>
+                      Age <span className="text-red-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -210,16 +290,143 @@ export default function InterestForm() {
               <FormField
                 control={form.control}
                 name="phoneNumber"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        className="input"
-                        placeholder="Enter your phone number (10 digits + Country Code)"
-                      />
-                    </FormControl>
+                    <FormLabel>
+                      Phone Number <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={phoneCcKey}
+                        onValueChange={(val) => {
+                          setPhoneCcKey(val);
+                          const selected = COUNTRY_CODES.find(
+                            (c) => c.id === val,
+                          );
+                          setPhoneCc(selected?.dial ?? '+1');
+                          // Reset local parts when switching CC
+                          setPhoneP1('');
+                          setPhoneP2('');
+                          setPhoneP3('');
+                          setPhoneIntl('');
+                          if ((selected?.dial ?? '') !== 'custom') {
+                            setCustomCc('+');
+                          }
+                          composeAndSetPhone();
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-[160px]">
+                            <SelectValue placeholder="Country code" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {COUNTRY_CODES.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {phoneCc === '+1' ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={3}
+                            placeholder="123"
+                            className="w-[70px] text-center"
+                            value={phoneP1}
+                            onChange={(e) => {
+                              const val = e.target.value
+                                .replace(/\D/g, '')
+                                .slice(0, 3);
+                              setPhoneP1(val);
+                              if (val.length === 3)
+                                (
+                                  e.target as HTMLInputElement
+                                ).nextElementSibling
+                                  ?.querySelector('input')
+                                  ?.focus?.();
+                              composeAndSetPhone();
+                            }}
+                          />
+                          <span className="text-gray-400">-</span>
+                          <Input
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={3}
+                            placeholder="456"
+                            className="w-[70px] text-center"
+                            value={phoneP2}
+                            onChange={(e) => {
+                              const val = e.target.value
+                                .replace(/\D/g, '')
+                                .slice(0, 3);
+                              setPhoneP2(val);
+                              composeAndSetPhone();
+                            }}
+                          />
+                          <span className="text-gray-400">-</span>
+                          <Input
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={4}
+                            placeholder="7890"
+                            className="w-[84px] text-center"
+                            value={phoneP3}
+                            onChange={(e) => {
+                              const val = e.target.value
+                                .replace(/\D/g, '')
+                                .slice(0, 4);
+                              setPhoneP3(val);
+                              composeAndSetPhone();
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          {phoneCc === 'custom' && (
+                            <Input
+                              inputMode="tel"
+                              maxLength={5}
+                              placeholder="+CC"
+                              className="w-[70px] text-center"
+                              value={customCc}
+                              onChange={(e) => {
+                                // Keep a leading + and up to 3-4 digits
+                                const raw = e.target.value.replace(
+                                  /[^+\d]/g,
+                                  '',
+                                );
+                                const hasPlus = raw.startsWith('+') ? '+' : '+';
+                                const digits = raw
+                                  .replace(/\D/g, '')
+                                  .slice(0, 4);
+                                const next = `${hasPlus}${digits}`;
+                                setCustomCc(next);
+                                composeAndSetPhone();
+                              }}
+                            />
+                          )}
+                          <Input
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={15}
+                            placeholder="Local number"
+                            className="w-[220px]"
+                            value={phoneIntl}
+                            onChange={(e) => {
+                              const val = e.target.value
+                                .replace(/\D/g, '')
+                                .slice(0, 15);
+                              setPhoneIntl(val);
+                              composeAndSetPhone();
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -229,7 +436,9 @@ export default function InterestForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>
+                      Email <span className="text-red-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -246,7 +455,9 @@ export default function InterestForm() {
                 name="school"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>School</FormLabel>
+                    <FormLabel>
+                      School <span className="text-red-500">*</span>
+                    </FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -267,16 +478,18 @@ export default function InterestForm() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
+                      <PopoverContent className="w-[260px] p-0">
                         <Command>
                           <CommandInput
                             placeholder="Search schools..."
+                            value={schoolQuery}
+                            onValueChange={setSchoolQuery}
                             className="h-9"
                           />
                           <CommandList>
                             <CommandEmpty>No school found.</CommandEmpty>
                             <CommandGroup>
-                              {uniqueSchools.map((school) => (
+                              {filteredSchools.map((school) => (
                                 <CommandItem
                                   value={school}
                                   key={school}
@@ -295,6 +508,16 @@ export default function InterestForm() {
                                   />
                                 </CommandItem>
                               ))}
+                              {schoolQuery &&
+                                uniqueSchools.filter((s) =>
+                                  s
+                                    .toLowerCase()
+                                    .includes(schoolQuery.trim().toLowerCase()),
+                                ).length > filteredSchools.length && (
+                                  <CommandItem value="more" disabled>
+                                    Refine search to see more results...
+                                  </CommandItem>
+                                )}
                             </CommandGroup>
                           </CommandList>
                         </Command>
@@ -312,7 +535,9 @@ export default function InterestForm() {
                 name="levelOfStudy"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Level of Study</FormLabel>
+                    <FormLabel>
+                      Level of Study <span className="text-red-500">*</span>
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -339,7 +564,10 @@ export default function InterestForm() {
                 name="countryOfResidence"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Country of Residence</FormLabel>
+                    <FormLabel>
+                      Country of Residence{' '}
+                      <span className="text-red-500">*</span>
+                    </FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -360,16 +588,18 @@ export default function InterestForm() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
+                      <PopoverContent className="w-[260px] p-0">
                         <Command>
                           <CommandInput
-                            placeholder="Search schools..."
+                            placeholder="Search countries..."
+                            value={countryQuery}
+                            onValueChange={setCountryQuery}
                             className="h-9"
                           />
                           <CommandList>
                             <CommandEmpty>No country found.</CommandEmpty>
                             <CommandGroup>
-                              {iso31661.map((iso) => (
+                              {filteredCountries.map((iso) => (
                                 <CommandItem
                                   value={iso.alpha3}
                                   key={iso.alpha3}
@@ -391,6 +621,24 @@ export default function InterestForm() {
                                   />
                                 </CommandItem>
                               ))}
+                              {countryQuery &&
+                                iso31661.filter(
+                                  (iso) =>
+                                    iso.name
+                                      .toLowerCase()
+                                      .includes(
+                                        countryQuery.trim().toLowerCase(),
+                                      ) ||
+                                    iso.alpha3
+                                      .toLowerCase()
+                                      .includes(
+                                        countryQuery.trim().toLowerCase(),
+                                      ),
+                                ).length > filteredCountries.length && (
+                                  <CommandItem value="more-countries" disabled>
+                                    Refine search to see more results...
+                                  </CommandItem>
+                                )}
                             </CommandGroup>
                           </CommandList>
                         </Command>
@@ -422,10 +670,41 @@ export default function InterestForm() {
               />
             </DialogHeader>
 
-            <Dialog>
-              <DialogTrigger className="border rounded-lg py-1 px-2 text-center bg-zinc-700 text-white hover:bg-zinc-900 transition-colors">
-                Next
-              </DialogTrigger>
+            <Button
+              type="button"
+              onClick={async () => {
+                // Validate required fields for first page
+                const requiredFields = [
+                  'firstName',
+                  'lastName',
+                  'age',
+                  'phoneNumber',
+                  'email',
+                  'school',
+                  'levelOfStudy',
+                  'countryOfResidence',
+                ] as const;
+                const isValid = await form.trigger(requiredFields);
+
+                if (!isValid) {
+                  toast.error(
+                    'Please fill in all required fields (marked with *) before proceeding.',
+                  );
+                  return;
+                }
+
+                // Only open dialog if validation passes
+                setIsDemographicsOpen(true);
+              }}
+              className="border rounded-lg py-1 px-2 text-center bg-zinc-700 text-white hover:bg-zinc-900 transition-colors"
+            >
+              Next
+            </Button>
+
+            <Dialog
+              open={isDemographicsOpen}
+              onOpenChange={setIsDemographicsOpen}
+            >
               <DialogContent className="max-h-[75%] overflow-y-scroll">
                 <DialogHeader>
                   <DialogTitle>Optional Demographic Information</DialogTitle>
@@ -703,10 +982,22 @@ export default function InterestForm() {
                   )}
                 />
 
-                <Dialog>
-                  <DialogTrigger className="border rounded-lg py-1 px-2 text-center bg-zinc-700 text-white hover:bg-zinc-900 transition-colors">
-                    Next
-                  </DialogTrigger>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    // All fields on second page are optional, so no validation needed
+                    // Just proceed to next page
+                    setIsDisclaimersOpen(true);
+                  }}
+                  className="border rounded-lg py-1 px-2 text-center bg-zinc-700 text-white hover:bg-zinc-900 transition-colors"
+                >
+                  Next
+                </Button>
+
+                <Dialog
+                  open={isDisclaimersOpen}
+                  onOpenChange={setIsDisclaimersOpen}
+                >
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Disclaimers</DialogTitle>
@@ -722,7 +1013,10 @@ export default function InterestForm() {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                           <div className="space-y-0.5">
-                            <FormLabel>Code of Conduct</FormLabel>
+                            <FormLabel>
+                              Code of Conduct{' '}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormDescription>
                               I have read and agree to the{' '}
                               <Link
@@ -750,7 +1044,10 @@ export default function InterestForm() {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                           <div className="space-y-0.5">
-                            <FormLabel>MLH Data Handling</FormLabel>
+                            <FormLabel>
+                              MLH Data Handling{' '}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormDescription>
                               I authorize you to share my
                               application/registration information with Major
@@ -813,68 +1110,46 @@ export default function InterestForm() {
                         </FormItem>
                       )}
                     />
-                    <DialogClose asChild>
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          if (
-                            form.formState.errors.codeOfConduct ||
-                            form.formState.errors.mlhDataHandling
-                          ) {
-                            toast.error(
-                              'Please agree to the required disclaimers to proceed.',
-                            );
-                            return;
-                          } else {
-                            closeLevelTwoRef.current!.click();
-                          }
-                        }}
-                      >
-                        Submit
-                      </Button>
-                    </DialogClose>
+                    <Button
+                      type="button"
+                      onClick={async () => {
+                        // Validate required disclaimer fields
+                        const disclaimerFields = [
+                          'codeOfConduct',
+                          'mlhDataHandling',
+                        ] as const;
+                        const isValid = await form.trigger(disclaimerFields);
+
+                        const values = form.getValues();
+
+                        if (
+                          !isValid ||
+                          !values.codeOfConduct ||
+                          !values.mlhDataHandling
+                        ) {
+                          toast.error(
+                            'Please agree to the required disclaimers (marked with *) to proceed.',
+                          );
+                          return;
+                        } else {
+                          // Close all dialogs and submit the form
+                          setIsDisclaimersOpen(false);
+                          setIsDemographicsOpen(false);
+
+                          // Submit the form
+                          const finalFormData = form.getValues();
+                          onSubmit(finalFormData);
+                        }
+                      }}
+                    >
+                      Submit
+                    </Button>
                   </DialogContent>
                 </Dialog>
-                <DialogClose asChild>
-                  <Button
-                    type="button"
-                    ref={closeLevelTwoRef}
-                    className="hidden"
-                    onClick={() => {
-                      if (form.formState.isValid) {
-                        closeLevelOneRef.current!.click();
-                      } else {
-                        toast.error(
-                          'Please fix the errors in the form before submitting.',
-                        );
-                      }
-                    }}
-                  >
-                    Submit
-                  </Button>
-                </DialogClose>
               </DialogContent>
             </Dialog>
           </form>
         </Form>
-        <DialogClose asChild>
-          <Button
-            ref={closeLevelOneRef}
-            type="button"
-            className="hidden"
-            onClick={() => {
-              if (!form.formState.isValid) {
-                toast.error(
-                  'Please fix the errors in the form before submitting.',
-                );
-                return;
-              } else {
-                form.handleSubmit(onSubmit)();
-                form.reset();
-              }
-            }}
-          />
-        </DialogClose>
       </DialogContent>
     </Dialog>
   );
