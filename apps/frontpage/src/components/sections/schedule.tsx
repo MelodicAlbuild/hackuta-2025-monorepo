@@ -359,10 +359,10 @@ const preHackutaWorkshops: DatabaseEvent[] = [
   },
   {
     id: -4,
-    title: 'Intro to Python',
+    title: 'Intro to Python w/ Donna French',
     description: 'Pre-HACKUTA Workshop: Python programming fundamentals',
-    start_time: '2025-10-02T17:30:00-05:00', // Oct 2, 2025, 5:30 PM CDT
-    end_time: '2025-10-02T18:30:00-05:00', // Oct 2, 2025, 6:30 PM CDT
+    start_time: '2025-09-30T17:30:00-05:00', // Sept 30, 2025, 5:30 PM CDT
+    end_time: '2025-09-30T18:30:00-05:00', // Sept 30, 2025, 6:30 PM CDT
     location: 'Online',
     category: 'workshop',
     created_by: 'system',
