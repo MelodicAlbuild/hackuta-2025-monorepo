@@ -61,13 +61,29 @@ export async function inviteNewUserWithRole(formData: { email: string, role: 'us
         throw new Error('You do not have permission to invite new users.')
     }
 
+    const { data: flag } = await supabase
+        .from('feature_flags')
+        .select('value')
+        .eq('name', 'invite_method')
+        .single();
+
+    const inviteMethod = flag?.value || 'email'; // Default to 'email'
+
+    const options: { data: { role: string }, redirectTo?: string } = {
+        data: {
+            role: 'user'
+        }
+    }
+
+    if (inviteMethod === 'email-otp') {
+        options.redirectTo = "https://auth.hackuta.org/otp"
+    }
+
     // Use the Admin Client to send an invite with the role in the metadata
     const supabaseAdmin = createSupabaseAdminClient()
     const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
         formData.email,
-        {
-            data: { role: formData.role }, // Pass the role here
-        }
+        options
     )
 
     if (error) {

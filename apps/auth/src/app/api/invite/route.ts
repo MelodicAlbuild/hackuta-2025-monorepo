@@ -19,6 +19,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { data: flag } = await supabase
+        .from('feature_flags')
+        .select('value')
+        .eq('name', 'invite_method')
+        .single();
+
+    let inviteMethod = flag?.value || 'email';
+
     // 2. TODO: Check if the user has an 'organizer' role
     // We will add this logic in a later step once roles are defined.
     // For now, we'll assume any logged-in user can invite.
@@ -29,13 +37,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
-    // 4. Use the Admin client to send the invite
-    const supabaseAdmin = createSupabaseAdminClient()
-    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+    const options: { data: { role: string }, redirectTo?: string } = {
         data: {
             role: 'user'
         }
-    })
+    }
+
+    if (inviteMethod === 'email-otp') {
+        options.redirectTo = "https://auth.hackuta.org/otp"
+    }
+
+    // 4. Use the Admin client to send the invite
+    const supabaseAdmin = createSupabaseAdminClient()
+    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, options)
 
     if (error) {
         console.error('Supabase invite error:', error)
