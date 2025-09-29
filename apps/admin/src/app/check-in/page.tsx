@@ -59,7 +59,6 @@ export default function CheckInPage() {
   const [assignError, setAssignError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [pointsToAward, setPointsToAward] = useState<number>(50);
-  const [usedToken, setUsedToken] = useState<string | null>(null);
 
   const performLookup = useCallback(
     async (payload: { qr_token?: string; email?: string; name?: string }) => {
@@ -70,7 +69,6 @@ export default function CheckInPage() {
       setSuccessMessage(null);
       setRegistrationToken('');
       setLastTokenScan('');
-      setUsedToken(null);
       setPointsToAward(50);
       setMatchOptions(null);
 
@@ -160,6 +158,22 @@ export default function CheckInPage() {
     [attendee, lastTokenScan],
   );
 
+  const handleReset = useCallback((options?: { preserveSuccess?: boolean }) => {
+    setLookupError(null);
+    setAssignError(null);
+    if (!options?.preserveSuccess) {
+      setSuccessMessage(null);
+    }
+    setAttendee(null);
+    setEmailInput('');
+    setNameInput('');
+    setRegistrationToken('');
+    setLastTokenScan('');
+    setLastUserScan('');
+    setPointsToAward(50);
+    setMatchOptions(null);
+  }, []);
+
   const handleCompleteCheckIn = useCallback(async () => {
     if (!attendee) {
       setAssignError('Lookup a user before completing check-in.');
@@ -189,11 +203,13 @@ export default function CheckInPage() {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to complete check-in.');
       }
-      setAttendee(data.user);
-      setSuccessMessage(`Check-in complete for ${data.user.email}.`);
-      setUsedToken(cleanedToken);
-      setRegistrationToken('');
-      setLastTokenScan('');
+      const awardedPointsText = pointsToAward
+        ? ` Awarded ${pointsToAward} point${pointsToAward === 1 ? '' : 's'}.`
+        : '';
+      setSuccessMessage(
+        `Check-in complete for ${data.user.email}. Token ${cleanedToken} assigned.${awardedPointsText}`,
+      );
+      handleReset({ preserveSuccess: true });
     } catch (error) {
       console.error('Check-in assignment failed', error);
       setAssignError(
@@ -203,25 +219,15 @@ export default function CheckInPage() {
     } finally {
       setAssignLoading(false);
     }
-  }, [attendee, registrationToken, pointsToAward]);
-
-  const handleReset = useCallback(() => {
-    setLookupError(null);
-    setAssignError(null);
-    setSuccessMessage(null);
-    setAttendee(null);
-    setEmailInput('');
-    setNameInput('');
-    setRegistrationToken('');
-    setLastTokenScan('');
-    setLastUserScan('');
-    setUsedToken(null);
-    setPointsToAward(50);
-    setMatchOptions(null);
-  }, []);
+  }, [attendee, handleReset, pointsToAward, registrationToken]);
 
   return (
     <div className="space-y-8">
+      {successMessage && (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+          {successMessage}
+        </div>
+      )}
       {!attendee ? (
         <Card>
           <CardHeader>
@@ -397,7 +403,7 @@ export default function CheckInPage() {
                   Selected Token
                 </p>
                 <p className="text-sm font-medium break-all">
-                  {registrationToken || usedToken || (
+                  {registrationToken || (
                     <span className="text-muted-foreground">None</span>
                   )}
                 </p>
@@ -425,7 +431,7 @@ export default function CheckInPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <Button variant="ghost" onClick={handleReset}>
+            <Button variant="ghost" onClick={() => handleReset()}>
               Start Over
             </Button>
             <div className="text-sm text-muted-foreground sm:text-right">
@@ -440,16 +446,9 @@ export default function CheckInPage() {
               )}
             </Button>
           </CardFooter>
-          {(assignError || successMessage) && (
+          {assignError && (
             <CardFooter>
-              {assignError && (
-                <p className="text-sm text-destructive">{assignError}</p>
-              )}
-              {successMessage && (
-                <p className="text-sm text-emerald-600 font-medium">
-                  {successMessage}
-                </p>
-              )}
+              <p className="text-sm text-destructive">{assignError}</p>
             </CardFooter>
           )}
         </Card>

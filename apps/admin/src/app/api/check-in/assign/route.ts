@@ -83,6 +83,18 @@ export async function POST(request: Request) {
 
         const supabase = await createSupabaseServerClient(cookies);
 
+        const {
+            data: sessionUser,
+            error: sessionUserError,
+        } = await supabase.auth.getUser();
+
+        if (sessionUserError) {
+            console.error("Failed to determine current admin user", sessionUserError);
+        }
+
+        const adminUserId = sessionUser?.user?.id ?? null;
+        const adminEmail = sessionUser?.user?.email ?? null;
+
         if (pointsValue !== 0) {
             const { error: pointsError } = await supabase.rpc("update_points_and_log", {
                 target_user_id: userId,
@@ -101,6 +113,40 @@ export async function POST(request: Request) {
                     { status: 500 },
                 );
             }
+        }
+
+        const { error: checkInLogError } = await supabaseAdmin.from("check_ins").insert({
+            user_id: userId,
+            registration_token: registrationToken,
+            points_awarded: pointsValue,
+            performed_by: adminUserId,
+            performed_by_email: adminEmail,
+            source: "admin-check-in",
+        });
+
+        if (checkInLogError) {
+            console.error("Failed to record check-in; reverting prior changes", checkInLogError);
+            await supabaseAdmin
+                .from("qr_identities")
+                .update({ sign_up_token: previousToken })
+                .eq("user_id", userId);
+
+            if (pointsValue !== 0) {
+                const { error: revertError } = await supabase.rpc("update_points_and_log", {
+                    target_user_id: userId,
+                    points_change_amount: -pointsValue,
+                    change_source: "Check-in Bonus Revert (log failure)",
+                });
+
+                if (revertError) {
+                    console.error("Failed to revert points after check-in log error", revertError);
+                }
+            }
+
+            return NextResponse.json(
+                { error: "Failed to record check-in. No changes were saved." },
+                { status: 500 },
+            );
         }
 
         const [
