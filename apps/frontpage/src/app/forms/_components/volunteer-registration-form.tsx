@@ -5,7 +5,7 @@ import Navbar from '@/components/navbar';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import z from 'zod';
+import { z } from 'zod';
 import { createSupabaseBrowserClient } from '@repo/supabase/client';
 import { iso31661 } from 'iso-3166';
 import { toast } from 'sonner';
@@ -41,6 +41,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { ChevronsUpDown, Check } from 'lucide-react';
 import NextLink from 'next/link';
@@ -70,25 +78,62 @@ const FormSchema = z.object({
   mlhPromotionalEmails: z.boolean().optional(),
 });
 
+const AccountFormSchema = z
+  .object({
+    password: z.string().min(8, 'Password must be at least 8 characters long'),
+    confirmPassword: z
+      .string()
+      .min(8, 'Confirm password must be at least 8 characters long'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords must match',
+  });
+
+export type VolunteerFormValues = z.infer<typeof FormSchema>;
+export type AccountFormValues = z.infer<typeof AccountFormSchema>;
+
+const DEFAULT_FORM_VALUES: VolunteerFormValues = {
+  firstName: '',
+  lastName: '',
+  age: '',
+  phoneNumber: '',
+  email: '',
+  countryOfResidence: '',
+  codeOfConduct: false,
+  mlhDataHandling: false,
+  mlhPromotionalEmails: false,
+};
+
+const ACCOUNT_FORM_DEFAULTS: AccountFormValues = {
+  password: '',
+  confirmPassword: '',
+};
+
 export default function VolunteerRegistration() {
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<VolunteerFormValues>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      age: '',
-      phoneNumber: '',
-      email: '',
-      countryOfResidence: '',
-      codeOfConduct: false,
-      mlhDataHandling: false,
-      mlhPromotionalEmails: false,
-    },
+    defaultValues: DEFAULT_FORM_VALUES,
+  });
+
+  const accountForm = useForm<AccountFormValues>({
+    resolver: zodResolver(AccountFormSchema),
+    defaultValues: ACCOUNT_FORM_DEFAULTS,
   });
 
   const supabase = createSupabaseBrowserClient();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const [pendingVolunteer, setPendingVolunteer] = useState<Pick<
+    VolunteerFormValues,
+    'email' | 'firstName' | 'lastName'
+  > | null>(null);
+  const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+
+  const { isSubmitting } = form.formState;
 
   const handleMobileMenuToggle = (isOpen: boolean) => {
     setIsMobileMenuOpen(isOpen);
@@ -107,7 +152,7 @@ export default function VolunteerRegistration() {
     return list.slice(0, 100);
   }, [countryQuery]);
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: VolunteerFormValues) {
     const { error } = await supabase.from('volunteer_signups').insert(data);
 
     if (error) {
@@ -116,9 +161,101 @@ export default function VolunteerRegistration() {
       return;
     }
 
-    toast.success('Form submitted successfully!');
-    form.reset();
+    toast.success('Volunteer form submitted! Let’s secure your account.');
+    setPendingVolunteer({
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
+    setAccountError(null);
+    accountForm.reset(ACCOUNT_FORM_DEFAULTS);
+    setIsAccountDialogOpen(true);
+    form.reset(DEFAULT_FORM_VALUES);
+    setCountryQuery('');
   }
+
+  const handleAccountCreation = accountForm.handleSubmit(
+    async ({ password }) => {
+      if (!pendingVolunteer) {
+        setAccountError(
+          'We could not find your volunteer details. Please submit the form again.',
+        );
+        return;
+      }
+
+      setIsCreatingAccount(true);
+      setAccountError(null);
+
+      try {
+        const response = await fetch('/api/volunteer-registration/account', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: pendingVolunteer.email,
+            password,
+            firstName: pendingVolunteer.firstName,
+            lastName: pendingVolunteer.lastName,
+          }),
+        });
+
+        let payload: unknown = null;
+
+        try {
+          payload = await response.json();
+        } catch (parseError) {
+          console.error(
+            'Failed to parse account creation response',
+            parseError,
+          );
+        }
+
+        const resolvedError =
+          (typeof payload === 'object' && payload && 'error' in payload
+            ? (payload as { error?: string }).error
+            : undefined) ??
+          'Unable to create your account right now. Please try again later.';
+
+        if (!response.ok) {
+          setAccountError(resolvedError);
+          return;
+        }
+
+        if (
+          !payload ||
+          typeof payload !== 'object' ||
+          !('success' in payload) ||
+          !payload.success
+        ) {
+          setAccountError(resolvedError);
+          return;
+        }
+
+        const status =
+          'status' in payload && typeof payload.status === 'string'
+            ? payload.status
+            : 'created';
+
+        const successMessage =
+          status === 'existing-updated'
+            ? 'Your account is already set up! We refreshed your volunteer access—sign in when you’re ready.'
+            : 'Account created! You can now sign in with your email and new password.';
+
+        toast.success(successMessage);
+        setIsAccountDialogOpen(false);
+        setPendingVolunteer(null);
+        accountForm.reset(ACCOUNT_FORM_DEFAULTS);
+      } catch (error) {
+        console.error('Failed to create volunteer account', error);
+        setAccountError(
+          'Unexpected error while creating your account. Please try again.',
+        );
+      } finally {
+        setIsCreatingAccount(false);
+      }
+    },
+  );
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-foreground">
@@ -486,15 +623,119 @@ export default function VolunteerRegistration() {
                   </p>
                   <Button
                     type="submit"
-                    className="h-11 w-full rounded-lg bg-primary px-6 text-base font-semibold text-black shadow-lg transition hover:bg-primary/90 sm:w-auto"
+                    disabled={isSubmitting}
+                    className="h-11 w-full rounded-lg bg-primary px-6 text-base font-semibold text-black shadow-lg transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                   >
-                    Submit Form
+                    {isSubmitting ? 'Submitting…' : 'Submit Form'}
                   </Button>
                 </div>
               </form>
             </Form>
           </CardContent>
         </Card>
+        <Dialog
+          open={isAccountDialogOpen}
+          onOpenChange={(open) => {
+            setIsAccountDialogOpen(open);
+            if (!open) {
+              setAccountError(null);
+              accountForm.reset(ACCOUNT_FORM_DEFAULTS);
+              setPendingVolunteer(null);
+            }
+          }}
+        >
+          <DialogContent className="border border-white/10 bg-black/85 text-foreground shadow-2xl backdrop-blur-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-semibold text-white">
+                Create your HackUTA account
+              </DialogTitle>
+              <DialogDescription>
+                {pendingVolunteer ? (
+                  <>
+                    We just saved your volunteer details. Set a password for{' '}
+                    <span className="font-medium text-white">
+                      {pendingVolunteer.email}
+                    </span>{' '}
+                    so you can manage your check-ins and updates.
+                  </>
+                ) : (
+                  'Set a password to finish creating your account.'
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...accountForm}>
+              <form className="space-y-6" onSubmit={handleAccountCreation}>
+                <FormField
+                  control={accountForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-white">
+                        Password
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder="Create a password"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-white">
+                        Confirm Password
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder="Repeat your password"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {accountError && (
+                  <p className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
+                    {accountError}
+                  </p>
+                )}
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isCreatingAccount}
+                    onClick={() => {
+                      setIsAccountDialogOpen(false);
+                      toast.info(
+                        'You can finish account setup later—just reach out to the HackUTA team when you’re ready.',
+                      );
+                    }}
+                  >
+                    Skip for now
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-primary text-black hover:bg-primary/90"
+                    disabled={isCreatingAccount}
+                  >
+                    {isCreatingAccount ? 'Creating account…' : 'Create account'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
