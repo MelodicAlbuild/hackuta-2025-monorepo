@@ -13,7 +13,7 @@ export async function GET() {
 
     const { data: identity, error } = await supabase
         .from('qr_identities')
-        .select('qr_token')
+        .select('qr_token, sign_up_token')
         .eq('user_id', user.id)
         .single()
 
@@ -21,8 +21,13 @@ export async function GET() {
         return new Response('QR token not found', { status: 404 })
     }
 
+    const tokenValue = identity.sign_up_token ?? identity.qr_token
+    if (!tokenValue) {
+        return new Response('QR token not configured', { status: 404 })
+    }
+
     // Generate the QR code image from the token
-    const qrCodeImageBuffer = await QRCode.toBuffer(identity.qr_token, {
+    const qrCodeImageBuffer = await QRCode.toBuffer(tokenValue, {
         type: 'png',
         width: 300,
         margin: 2,

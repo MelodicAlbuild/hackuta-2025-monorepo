@@ -62,9 +62,14 @@ export async function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/action-scanner">Scanner</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/check-in">Check-In</Link>
+                  </DropdownMenuItem>
 
                   {userRole === 'admin' || userRole === 'super-admin' ? (
                     <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel>Admin</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                         <Link href="/registrations">Registrations</Link>
                       </DropdownMenuItem>

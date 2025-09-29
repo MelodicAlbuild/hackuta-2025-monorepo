@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
         .single()
 
     const superAdminOnlyRoutes = ['/manage-roles', '/notifications', '/points', '/scanner', '/vendor-codes'];
-    const volunteerRoutes = ['/', '/action-scanner']
+    const volunteerRoutes = ['/', '/action-scanner', '/check-in']
 
     if (superAdminOnlyRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
         if (profile?.role !== 'super-admin') {

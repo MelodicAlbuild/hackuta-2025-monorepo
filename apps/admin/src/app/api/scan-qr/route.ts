@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const { data: identity } = await supabaseAdmin
         .from('qr_identities')
         .select('user_id')
-        .eq('qr_token', qr_token)
+        .or(`qr_token.eq.${qr_token},sign_up_token.eq.${qr_token}`)
         .single()
 
     if (!identity) {
