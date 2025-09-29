@@ -38,19 +38,13 @@ export default async function RegistrationsPage() {
     );
 
   const seenEmails = new Set<string>();
-  const seenNames = new Set<string>();
   const dedupedRegistrations = [];
   for (const reg of baseFiltered) {
     const emailKey = (reg.email ?? '').trim().toLowerCase();
-    const nameKey = `${reg.firstName ?? ''} ${reg.lastName ?? ''}`
-      .trim()
-      .toLowerCase();
 
     if (emailKey && seenEmails.has(emailKey)) continue;
-    if (nameKey && seenNames.has(nameKey)) continue;
 
     if (emailKey) seenEmails.add(emailKey);
-    if (nameKey) seenNames.add(nameKey);
 
     dedupedRegistrations.push(reg);
   }
