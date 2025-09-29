@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@repo/supabase/server";
+import { createSupabaseAdminClient, createSupabaseServerClient } from "@repo/supabase/server";
+import { cookies } from "next/headers";
 
 interface AssignRequestBody {
     user_id?: string;
@@ -80,8 +81,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Failed to update sign-up token." }, { status: 500 });
         }
 
+        const supabase = await createSupabaseServerClient(cookies);
+
         if (pointsValue !== 0) {
-            const { error: pointsError } = await supabaseAdmin.rpc("update_points_and_log", {
+            const { error: pointsError } = await supabase.rpc("update_points_and_log", {
                 target_user_id: userId,
                 points_change_amount: pointsValue,
                 change_source: "Check-in Bonus",
