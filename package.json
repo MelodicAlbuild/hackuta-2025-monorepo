@@ -11,7 +11,8 @@
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "diagrams:build": "node scripts/build-diagrams.cjs",
-    "purge:users": "node scripts/purge-users.cjs"
+    "purge:users": "node scripts/purge-users.cjs",
+    "interest-form:export": "node scripts/export-interest-form.cjs"
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^10.9.1",
