@@ -38,7 +38,10 @@ export async function Header() {
     initialNotifications = data || [];
   }
 
-  const isAdmin = userRole === 'admin' || userRole === 'super-admin';
+  const isAdmin =
+    userRole === 'volunteer' ||
+    userRole === 'admin' ||
+    userRole === 'super-admin';
   const adminPortalUrl = process.env.NEXT_PUBLIC_VIEWER_APP_URL || '/';
 
   return (

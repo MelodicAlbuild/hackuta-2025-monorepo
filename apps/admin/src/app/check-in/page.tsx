@@ -431,9 +431,6 @@ export default function CheckInPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <Button variant="ghost" onClick={() => handleReset()}>
-              Start Over
-            </Button>
             <div className="text-sm text-muted-foreground sm:text-right">
               Assigning a token will overwrite any existing sign-up token for
               the attendee.
@@ -444,6 +441,9 @@ export default function CheckInPage() {
               ) : (
                 'Complete Check-In'
               )}
+            </Button>
+            <Button variant="ghost" onClick={() => handleReset()}>
+              Start Over
             </Button>
           </CardFooter>
           {assignError && (
