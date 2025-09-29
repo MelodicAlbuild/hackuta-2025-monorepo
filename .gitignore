@@ -42,3 +42,4 @@ dist/
 docs/diagrams/dist/
 
 exports/
+scripts/qr-generation/output/

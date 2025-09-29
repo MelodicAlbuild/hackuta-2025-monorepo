@@ -12,7 +12,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "diagrams:build": "node scripts/build-diagrams.cjs",
     "purge:users": "node scripts/purge-users.cjs",
-    "interest-form:export": "node scripts/export-interest-form.cjs"
+    "interest-form:export": "node scripts/export-interest-form.cjs",
+    "qr:generate": "node scripts/qr-generation/generate.cjs"
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^10.9.1",
@@ -21,7 +22,8 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "turbo": "^2.5.6",
     "@supabase/supabase-js": "^2.45.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "qrcode": "^1.5.4"
   },
   "packageManager": "pnpm@8.15.6",
   "engines": {
