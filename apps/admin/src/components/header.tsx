@@ -53,31 +53,35 @@ export async function Header() {
                     <Menu className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/">Dashboard</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/action-scanner">Scanner</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/check-in">Check-In</Link>
-                  </DropdownMenuItem>
 
                   {userRole === 'admin' || userRole === 'super-admin' ? (
                     <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/check-in">Check-In</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/points-scanner">Points Scanner</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/shop-scanner">Shop Scanner</Link>
+                      </DropdownMenuItem>
+
                       <DropdownMenuSeparator />
                       <DropdownMenuLabel>Admin</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                         <Link href="/registrations">Registrations</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/users">User Management</Link>
+                        <Link href="/users">Users</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/events">Events</Link>
+                        <Link href="/events">Schedule Events</Link>
                       </DropdownMenuItem>
                     </>
                   ) : null}
@@ -87,19 +91,22 @@ export async function Header() {
                       <DropdownMenuSeparator />
                       <DropdownMenuLabel>Super Admin</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
-                        <Link href="/manage-roles">Manage Roles</Link>
+                        <Link href="/manage-scan-actions">Event Points Management</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/notifications">Send Notifications</Link>
+                        <Link href="/shop-items">Shop Items</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/points">Manage Points</Link>
+                        <Link href="/vendor-codes">Vendor Codes</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/scanner">Admin Scanner</Link>
+                        <Link href="/points">Points Management</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/vendor-codes">Manage Vendor Codes</Link>
+                        <Link href="/manage-roles">Roles</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/notifications">Notifications</Link>
                       </DropdownMenuItem>
                     </>
                   )}
