@@ -14,6 +14,13 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Icons } from '@/components/icons';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface CheckInUser {
   id: string;
@@ -51,6 +58,10 @@ export default function CheckInPage() {
   const [attendee, setAttendee] = useState<CheckInUser | null>(null);
   const [matchOptions, setMatchOptions] = useState<LookupMatchOption[] | null>(
     null,
+  );
+  // Controlled tab value for mobile select + desktop tabs
+  const [tabValue, setTabValue] = useState<'camera' | 'email' | 'name'>(
+    'camera',
   );
 
   const [registrationToken, setRegistrationToken] = useState('');
@@ -238,11 +249,52 @@ export default function CheckInPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="camera">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="camera">Scan QR Code</TabsTrigger>
-                <TabsTrigger value="email">Lookup by Email</TabsTrigger>
-                <TabsTrigger value="name">Lookup by Name</TabsTrigger>
+            <Tabs
+              value={tabValue}
+              onValueChange={(v) => setTabValue(v as typeof tabValue)}
+            >
+              {/* Mobile: ShadCN Select for better styling */}
+              <div className="sm:hidden">
+                <label htmlFor="check-in-tab" className="sr-only">
+                  Choose check-in method
+                </label>
+                <Select
+                  value={tabValue}
+                  onValueChange={(v) => setTabValue(v as typeof tabValue)}
+                >
+                  <SelectTrigger
+                    id="check-in-tab"
+                    className="w-full py-6 text-base"
+                  >
+                    <SelectValue placeholder="Choose check-in method" />
+                  </SelectTrigger>
+                  <SelectContent align="start">
+                    <SelectItem value="camera">Scan QR Code</SelectItem>
+                    <SelectItem value="email">Lookup by Email</SelectItem>
+                    <SelectItem value="name">Lookup by Name</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Desktop: centered, roomy tabs */}
+              <TabsList className="hidden sm:flex w-full justify-center gap-2">
+                <TabsTrigger
+                  value="camera"
+                  className="min-w-[160px] py-2 px-4 text-sm md:text-base"
+                >
+                  Scan QR Code
+                </TabsTrigger>
+                <TabsTrigger
+                  value="email"
+                  className="min-w-[160px] py-2 px-4 text-sm md:text-base"
+                >
+                  Lookup by Email
+                </TabsTrigger>
+                <TabsTrigger
+                  value="name"
+                  className="min-w-[160px] py-2 px-4 text-sm md:text-base"
+                >
+                  Lookup by Name
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="camera" className="mt-4">
                 <div className="w-full max-w-sm mx-auto p-4 border rounded-lg">
