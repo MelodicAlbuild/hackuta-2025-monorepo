@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useState, useCallback } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icons } from "@/components/icons";
 import { applyPointsAction } from "./actions";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,29 @@ export default function ActionScannerPage() {
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [isConfigLocked, setIsConfigLocked] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const [isLookingUp, setIsLookingUp] = useState(false);
+
+  const lookupUserByEmail = useCallback(async (email: string) => {
+    if (!email) return null;
+
+    setIsLookingUp(true);
+    try {
+      const response = await fetch("/api/check-in/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to find user");
+      return data.user?.qr_token || null;
+    } catch (error) {
+      console.error("Email lookup failed", error);
+      return null;
+    } finally {
+      setIsLookingUp(false);
+    }
+  }, []);
 
   // Main handler for when a QR code is successfully decoded
   const handleScan = async (scannedToken: string) => {
@@ -107,41 +131,128 @@ export default function ActionScannerPage() {
     setTimeout(() => {
       setActionState("idle");
       setFeedbackMessage("");
+      setEmailInput("");
     }, 2500);
   };
 
+  const handleEmailLookup = useCallback(async () => {
+    if (!emailInput.trim()) {
+      setActionState("failure");
+      setFeedbackMessage("Please enter an email address");
+      setTimeout(() => {
+        setActionState("idle");
+        setFeedbackMessage("");
+      }, 1500);
+      return;
+    }
+
+    const qrToken = await lookupUserByEmail(emailInput);
+    if (qrToken) {
+      handleScan(qrToken);
+    } else {
+      setActionState("failure");
+      setFeedbackMessage("No user found for that email");
+      setTimeout(() => {
+        setActionState("idle");
+        setFeedbackMessage("");
+      }, 1500);
+    }
+  }, [emailInput, lookupUserByEmail, handleScan]);
+
   const ScannerView = memo(function ScannerView({
     onScan,
+    onEmailLookup,
     actionState,
     feedbackMessage,
+    emailInput,
+    setEmailInput,
+    isLookingUp,
   }: {
     onScan: (result: string) => void;
+    onEmailLookup: () => void;
     actionState: ActionState;
     feedbackMessage: string;
+    emailInput: string;
+    setEmailInput: (value: string) => void;
+    isLookingUp: boolean;
   }) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Scanner</CardTitle>
           <CardDescription>
-            The action configured on the left will be applied to each user you
-            scan.
+            Scan participant QR code or enter email. The action configured on the left will be applied.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative w-full max-w-sm mx-auto overflow-hidden border rounded-lg">
-            <ActionOverlay state={actionState} message={feedbackMessage} />
-            <Scanner
-              constraints={{ facingMode: "environment" }}
-              sound={false}
-              onScan={(detectedBarcodes) => {
-                if (detectedBarcodes.length > 0) {
-                  const scannedText = detectedBarcodes[0].rawValue;
-                  onScan(scannedText);
-                }
-              }}
-            />
-          </div>
+          <Tabs defaultValue="camera">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="camera">Scan QR Code</TabsTrigger>
+              <TabsTrigger value="email">Lookup by Email</TabsTrigger>
+            </TabsList>
+            <TabsContent value="camera" className="mt-4">
+              <div className="relative w-full max-w-sm mx-auto overflow-hidden border rounded-lg">
+                <ActionOverlay state={actionState} message={feedbackMessage} />
+                <Scanner
+                  constraints={{ facingMode: "environment" }}
+                  sound={false}
+                  onScan={(detectedBarcodes) => {
+                    if (detectedBarcodes.length > 0) {
+                      const scannedText = detectedBarcodes[0].rawValue;
+                      onScan(scannedText);
+                    }
+                  }}
+                />
+              </div>
+            </TabsContent>
+            <TabsContent value="email" className="mt-4">
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    placeholder="participant@example.com"
+                    onKeyDown={(e) => e.key === "Enter" && onEmailLookup()}
+                    type="email"
+                    disabled={actionState !== "idle" || isLookingUp}
+                  />
+                  <Button
+                    onClick={onEmailLookup}
+                    disabled={actionState !== "idle" || isLookingUp}
+                  >
+                    {isLookingUp ? (
+                      <Icons.spinner className="animate-spin" />
+                    ) : (
+                      "Lookup"
+                    )}
+                  </Button>
+                </div>
+                {actionState !== "idle" && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    {actionState === "loading" && (
+                      <Icons.spinner className="h-16 w-16 animate-spin" />
+                    )}
+                    {actionState === "success" && (
+                      <>
+                        <Icons.checkCircle className="h-16 w-16 text-green-500" />
+                        <p className="mt-4 font-semibold text-center">
+                          {feedbackMessage}
+                        </p>
+                      </>
+                    )}
+                    {actionState === "failure" && (
+                      <>
+                        <Icons.xCircle className="h-16 w-16 text-red-500" />
+                        <p className="mt-4 font-semibold text-center text-red-600">
+                          {feedbackMessage}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     );
@@ -239,8 +350,12 @@ export default function ActionScannerPage() {
       {isConfigLocked && (
         <ScannerView
           onScan={handleScan}
+          onEmailLookup={handleEmailLookup}
           actionState={actionState}
           feedbackMessage={feedbackMessage}
+          emailInput={emailInput}
+          setEmailInput={setEmailInput}
+          isLookingUp={isLookingUp}
         />
       )}
     </div>
