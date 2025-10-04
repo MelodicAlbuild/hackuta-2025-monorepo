@@ -58,6 +58,7 @@ export type ScheduleEvent = {
   start: string;
   end?: string;
   location?: string;
+  points?: string | null;
 };
 
 const categoryStyles: Record<
@@ -165,6 +166,7 @@ type DisplayEvent = {
   title: string;
   location?: string;
   type: ScheduleCategory;
+  points?: string | null;
 };
 
 // Helper function to format time display
@@ -249,6 +251,7 @@ function transformEventsToSchedule(events: DatabaseEvent[]): ScheduleDay[] {
             start: startTime,
             end: endTime || undefined,
             location: event.location || undefined,
+            points: event.description,
           },
         ],
       };
@@ -302,6 +305,7 @@ function transformEventsToSchedule(events: DatabaseEvent[]): ScheduleDay[] {
             start: startTime,
             end: endTime || undefined,
             location: event.location || undefined,
+            points: event.description,
           },
         ],
       };
@@ -320,55 +324,6 @@ function transformEventsToSchedule(events: DatabaseEvent[]): ScheduleDay[] {
   return [...scheduleDays, ...regularDays];
 }
 
-// Pre-HACKUTA workshops (hardcoded)
-const preHackutaWorkshops: DatabaseEvent[] = [
-  {
-    id: -1,
-    title: 'Intro to React w/ MOBI',
-    description:
-      'Pre-HACKUTA Workshop: Learn the fundamentals of React development',
-    start_time: '2025-09-29T17:30:00-05:00', // Sept 29, 2025, 5:30 PM CDT
-    end_time: '2025-09-29T18:30:00-05:00', // Sept 29, 2025, 6:30 PM CDT
-    location: 'SEIR 194',
-    category: 'workshop',
-    created_by: 'system',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: -2,
-    title: 'Full Stack Development',
-    description:
-      'Pre-HACKUTA Workshop: Complete web development from frontend to backend',
-    start_time: '2025-10-02T16:00:00-05:00', // Oct 2, 2025, 4:00 PM CDT
-    end_time: '2025-10-02T17:30:00-05:00', // Oct 2, 2025, 5:30 PM CDT
-    location: 'SEIR 198',
-    category: 'workshop',
-    created_by: 'system',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: -3,
-    title: 'Team Mixer',
-    description: 'Pre-HACKUTA Workshop: Meet other participants and form teams',
-    start_time: '2025-10-02T17:30:00-05:00', // Oct 2, 2025, 5:30 PM CDT
-    end_time: '2025-10-02T18:30:00-05:00', // Oct 2, 2025, 6:30 PM CDT
-    location: 'SEIR 198',
-    category: 'activity',
-    created_by: 'system',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: -4,
-    title: 'Intro to Python w/ Donna French',
-    description: 'Pre-HACKUTA Workshop: Python programming fundamentals',
-    start_time: '2025-09-30T17:30:00-05:00', // Sept 30, 2025, 5:30 PM CDT
-    end_time: '2025-09-30T18:30:00-05:00', // Sept 30, 2025, 6:30 PM CDT
-    location: 'Online',
-    category: 'workshop',
-    created_by: 'system',
-    created_at: new Date().toISOString(),
-  },
-];
 
 export default function Schedule() {
   const [events, setEvents] = useState<DatabaseEvent[]>([]);
@@ -384,9 +339,7 @@ export default function Schedule() {
           throw new Error('Failed to fetch events');
         }
         const data = await response.json();
-        // Combine API events with hardcoded pre-HACKUTA workshops
-        const allEvents = [...preHackutaWorkshops, ...(data.events || [])];
-        setEvents(allEvents);
+        setEvents(data.events || []);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : 'Failed to load schedule',
@@ -615,6 +568,11 @@ function ScheduleRow({ event }: { event: DisplayEvent }) {
               >
                 {category.label}
               </span>
+              {event.points && (
+                <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] bg-amber-500/20 text-amber-200 border border-amber-400/40">
+                  {event.points} pts
+                </span>
+              )}
             </div>
             <p className="mt-2 text-base sm:text-lg font-semibold text-white font-franklinGothic text-left">
               {event.title}
@@ -644,6 +602,7 @@ function buildDisplayEvents(day: ScheduleDay): DisplayEvent[] {
         title: event.title,
         location: event.location,
         type: event.type,
+        points: event.points,
       });
     });
   });

@@ -315,6 +315,11 @@ export function LiveSchedulePreview({
                   <span className="rounded-full bg-destructive/10 px-2 py-0.5 font-semibold uppercase tracking-wide">
                     {formatCategoryLabel(event.category)}
                   </span>
+                  {event.description && (
+                    <span className="rounded-full px-2 py-0.5 font-bold uppercase tracking-wide bg-amber-500/20 text-amber-200 border border-amber-400/40">
+                      {event.description} pts
+                    </span>
+                  )}
                   <span className="font-medium">{formatEventRange(event)}</span>
                 </div>
               </li>
@@ -507,41 +512,34 @@ function DayTimeline({
       </div>
 
       {/* Event Container */}
-      <div className="relative flex-1 overflow-hidden rounded-2xl border border-border/50 bg-background/95 shadow-inner">
-        <div className="absolute inset-0">
-          {hours.map((hour, index) => (
-            <div
-              key={`grid-${hour}-${index}`}
-              style={{
-                top: `${index * pixelsPerHour}px`,
-                height: `${pixelsPerHour}px`,
-              }}
-              className="absolute inset-x-0 border-b border-border/40"
-            />
-          ))}
-        </div>
+      <div className="flex-1 bg-muted/50 rounded-lg relative border-l border-border">
+        {/* Hour Lines */}
+        {hours.map((hour, index) => (
+          <div
+            key={`grid-${hour}-${index}`}
+            style={{ height: `${pixelsPerHour}px` }}
+            className="border-t border-border"
+          />
+        ))}
 
         {/* Current time bar */}
         {inWindow && (
           <div
-            className="pointer-events-none absolute inset-x-0 z-10"
+            className="absolute inset-x-0 z-10 pointer-events-none"
             style={{ top: `${nowTop}px` }}
           >
             <div className="relative">
-              <div className="border-t-2 border-destructive/60" />
-              <div className="absolute -top-3 right-0 rounded-full bg-destructive px-2 py-0.5 text-[10px] font-semibold text-destructive-foreground shadow">
+              <div className="border-t-2 border-red-500/60" />
+              <div className="absolute -top-3 right-0 bg-red-500/80 text-white/95 text-[10px] px-1.5 py-0.5 rounded">
                 Now {nowLabel}
               </div>
             </div>
           </div>
         )}
-
         {/* Render Events */}
-        <div className="relative z-10">
-          {events.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
+        {events.map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))}
       </div>
     </div>
   );
@@ -551,24 +549,24 @@ function DayTimeline({
 function EventCard({ event }: { event: ProcessedEvent }) {
   const categoryStyles: Record<string, { container: string; badge: string }> = {
     workshop: {
-      container: 'border-primary/40 bg-primary/10',
-      badge: 'bg-primary/20 text-primary',
+      container: 'border-l-indigo-500 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200',
+      badge: 'bg-indigo-500/20 text-indigo-200',
     },
     food: {
-      container: 'border-secondary/40 bg-secondary/10',
-      badge: 'bg-secondary/20 text-secondary',
+      container: 'border-l-orange-500 bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200',
+      badge: 'bg-orange-500/20 text-orange-200',
     },
     keynote: {
-      container: 'border-accent/40 bg-accent/10',
-      badge: 'bg-accent/20 text-accent-foreground',
+      container: 'border-l-rose-500 bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-200',
+      badge: 'bg-rose-500/20 text-rose-200',
     },
     social: {
-      container: 'border-muted-foreground/30 bg-muted/40',
-      badge: 'bg-muted-foreground/10 text-muted-foreground',
+      container: 'border-l-teal-500 bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-200',
+      badge: 'bg-teal-500/20 text-teal-200',
     },
     general: {
-      container: 'border-border/60 bg-muted/20',
-      badge: 'bg-border/40 text-muted-foreground',
+      container: 'border-l-blue-500 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200',
+      badge: 'bg-blue-500/20 text-blue-200',
     },
   };
 
@@ -576,7 +574,7 @@ function EventCard({ event }: { event: ProcessedEvent }) {
 
   return (
     <div
-      className={`absolute flex h-full flex-col justify-between gap-2 rounded-2xl border px-3 py-3 shadow-sm backdrop-blur-sm transition-[box-shadow,transform] ${style.container}`}
+      className={`absolute flex h-full flex-col justify-between gap-2 rounded-lg border-l-4 px-3 py-3 shadow-sm overflow-hidden ${style.container}`}
       style={{
         top: `${event.top}px`,
         height: `${event.height}px`,
@@ -586,11 +584,18 @@ function EventCard({ event }: { event: ProcessedEvent }) {
     >
       <div className="space-y-1">
         <div className="flex items-start justify-between gap-2">
-          <span
-            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${style.badge}`}
-          >
-            {formatCategoryLabel(event.category)}
-          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${style.badge}`}
+            >
+              {formatCategoryLabel(event.category)}
+            </span>
+            {event.description && (
+              <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-amber-500/20 text-amber-200 border border-amber-400/40">
+                {event.description} pts
+              </span>
+            )}
+          </div>
           <span className="text-[10px] font-medium text-muted-foreground">
             {formatScheduleTime(event.start)}
           </span>
