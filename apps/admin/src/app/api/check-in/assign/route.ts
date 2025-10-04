@@ -107,7 +107,7 @@ export async function POST(request: Request) {
             console.error("Failed to record check-in; reverting prior changes", checkInLogError);
             await supabaseAdmin
                 .from("qr_identities")
-                .update({ sign_up_token: previousToken })
+                .update({ sign_up_token: "" })
                 .eq("user_id", userId);
 
             if (pointsValue !== 0) {
