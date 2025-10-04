@@ -6,7 +6,6 @@ import Faq from '@/components/sections/faq';
 import Navbar from '@/components/navbar';
 import Hero from '@/components/sections/hero';
 import WhenWhere from '@/components/sections/when-where';
-import Countdown from '@/components/sections/countdown';
 import Apply from '@/components/sections/apply';
 import Sponsors from '@/components/sections/sponsors';
 import Footer from '@/components/footer';
@@ -44,13 +43,8 @@ export default function Home() {
       <MLHBadge isMobileMenuOpen={isMobileMenuOpen} />
       <Hero />
 
-      {/* Countdown Section */}
-      <Reveal>
-        <Countdown />
-      </Reveal>
-
       {/* Main Content */}
-      <div className="font-franklinCondensed text-white text-center w-[100vw] mx-auto px-6 sm:px-10 p-[20px] mt-[60px] sm:mt-[80px] md:mt-80px lg:mt-100px relative z-[10]">
+      <div className="font-franklinCondensed text-white text-center w-[100vw] mx-auto px-6 sm:px-10 p-[20px] relative z-[10]">
         <Reveal>
           <Apply />
         </Reveal>
