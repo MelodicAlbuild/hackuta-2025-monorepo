@@ -1,6 +1,14 @@
 import { createSupabaseAdminClient } from '@repo/supabase/server'
 import { NextResponse } from 'next/server'
 
+type PointsEntry = {
+    user_id: string
+    score: number
+    profiles: {
+        email: string
+    }[] | null
+}
+
 export async function GET() {
     const supabaseAdmin = createSupabaseAdminClient()
 
@@ -18,8 +26,8 @@ export async function GET() {
 
     // For each user, fetch their name from interest-form using their email
     const leaderboard = await Promise.all(
-        topScores?.map(async (entry, index) => {
-            const email = entry.profiles?.email
+        (topScores as PointsEntry[])?.map(async (entry, index) => {
+            const email = entry.profiles?.[0]?.email
             let name = 'Anonymous'
 
             if (email) {
