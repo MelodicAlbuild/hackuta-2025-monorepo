@@ -81,23 +81,20 @@ export default function PointsScannerPage() {
           action_id: parseInt(selectedActionId, 10),
         });
 
-        setScanState('success');
-        setFeedbackMessage(result.message || 'Points awarded successfully!');
-
-        // Return to idle and remount scanner
-        setTimeout(() => {
-          setScanState('idle');
-          setFeedbackMessage('');
-          setLastScannedToken('');
-          setScannerKey(prev => prev + 1);
-        }, 1500);
+        if (!result.success) {
+          setScanState('failure');
+          setFeedbackMessage(result.message || 'Scan failed');
+        } else {
+          setScanState('success');
+          setFeedbackMessage(result.message || 'Points awarded successfully!');
+        }
       } catch (error) {
         setScanState('failure');
         setFeedbackMessage(
           error instanceof Error ? error.message : 'Scan failed'
         );
-
-        // Return to idle and remount scanner
+      } finally {
+        // Return to idle and remount scanner regardless of outcome
         setTimeout(() => {
           setScanState('idle');
           setFeedbackMessage('');
