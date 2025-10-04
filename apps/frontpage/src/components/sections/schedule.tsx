@@ -579,12 +579,14 @@ function ScheduleRow({ event }: { event: DisplayEvent }) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-[10px] sm:text-sm text-gray-200 font-franklinGothic ml-11 sm:ml-0">
-          <span className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full ${category.dotClass}`} />
-          <span className="whitespace-nowrap font-semibold text-white/90">
-            {event.location ?? 'Room TBD'}
-          </span>
-        </div>
+        {event.location && (
+          <div className="flex items-center gap-2 text-[10px] sm:text-sm text-gray-200 font-franklinGothic ml-11 sm:ml-0">
+            <span className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full ${category.dotClass}`} />
+            <span className="whitespace-nowrap font-semibold text-white/90">
+              {event.location}
+            </span>
+          </div>
+        )}
       </div>
     </li>
   );
