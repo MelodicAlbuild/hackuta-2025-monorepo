@@ -24,9 +24,9 @@ export async function GET() {
   }
 
   // Get currently active actions
-  const now = new Date();
-  const nowISOMinus15Minutes = new Date(now.getTime() - 15 * 60000).toISOString();
-  const nowISOPlus15Minutes = new Date(now.getTime() + 15 * 60000).toISOString();
+  const now = new Date().toISOString();
+  //const nowISOMinus15Minutes = new Date(now.getTime() - 15 * 60000).toISOString();
+  //const nowISOPlus15Minutes = new Date(now.getTime() + 15 * 60000).toISOString();
   const { data: actions, error } = await supabase
     .from('scan_actions')
     .select('*')
@@ -37,7 +37,7 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch actions' },
+      { error: 'Failed to fetch actions', errorValue: error },
       { status: 500 }
     );
   }
