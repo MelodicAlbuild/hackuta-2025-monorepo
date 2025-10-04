@@ -16,11 +16,11 @@ async function callUpdateRpc(userId: string, amount: number, source: string) {
 }
 
 export async function addPoints(userId: string, amount: number) {
-    await callUpdateRpc(userId, amount, 'Manual Add')
+    await callUpdateRpc(userId, amount, 'Admin Add')
 }
 
 export async function removePoints(userId: string, amount: number) {
-    await callUpdateRpc(userId, -amount, 'Manual Remove') // Note: amount is negative
+    await callUpdateRpc(userId, -amount, 'Admin Remove') // Note: amount is negative
 }
 
 export async function setPoints(userId: string, amount: number) {
@@ -29,7 +29,7 @@ export async function setPoints(userId: string, amount: number) {
     const { data: pointData } = await supabase.from('points').select('score').eq('user_id', userId).single()
     if (pointData) {
         const difference = amount - pointData.score
-        await callUpdateRpc(userId, difference, 'Manual Set')
+        await callUpdateRpc(userId, difference, 'Admin Set')
     }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   addPoints,
   getPointHistory,
@@ -32,20 +32,19 @@ type UserWithPoints = {
   email?: string;
   role: string;
   score: number;
+  name?: string;
 };
 
 // ** 2. Typed the `users` prop **
 // The component now requires its `users` prop to be an array of `UserWithPoints`.
 export function PointsTable({ users }: { users: UserWithPoints[] }) {
   const [amounts, setAmounts] = useState<Record<string, number>>({});
+  const [searchQuery, setSearchQuery] = useState("");
 
   // ** 3. Added internal types for function arguments **
   const handleAmountChange = (userId: string, value: string) => {
     setAmounts((prev) => ({ ...prev, [userId]: Number(value) }));
   };
-
-  const isAdmin = (user: UserWithPoints) =>
-    user.role === "admin" || user.role === "super-admin";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [history, setHistory] = useState<any[]>([]);
@@ -60,65 +59,80 @@ export function PointsTable({ users }: { users: UserWithPoints[] }) {
     setIsLoadingHistory(false);
   };
 
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return users;
+
+    const query = searchQuery.toLowerCase();
+    return users.filter((user) =>
+      user.email?.toLowerCase().includes(query) ||
+      user.name?.toLowerCase().includes(query)
+    );
+  }, [users, searchQuery]);
+
   return (
     <>
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Search by name or email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-sm"
+        />
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Score</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <TableRow key={user.id}>
+              <TableCell>{user.name || "-"}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell className="font-bold">
-                {isAdmin(user) ? "∞" : user.score}
+                {user.score}
               </TableCell>
               <TableCell className="text-right space-x-2">
-                {isAdmin(user) ? (
-                  <span className="text-sm text-gray-500">N/A for Admins</span>
-                ) : (
-                  <>
-                    <Input
-                      type="number"
-                      className="w-24 inline-block"
-                      placeholder="Amount"
-                      onChange={(e) =>
-                        handleAmountChange(user.id, e.target.value)
-                      }
-                    />
-                    <Button
-                      size="sm"
-                      onClick={() => addPoints(user.id, amounts[user.id] || 0)}
-                    >
-                      +
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() =>
-                        removePoints(user.id, amounts[user.id] || 0)
-                      }
-                    >
-                      -
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => setPoints(user.id, amounts[user.id] || 0)}
-                    >
-                      Set
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleHistoryClick(user)}
-                    >
-                      View History
-                    </Button>
-                  </>
-                )}
+                <Input
+                  type="number"
+                  className="w-24 inline-block"
+                  placeholder="Amount"
+                  onChange={(e) =>
+                    handleAmountChange(user.id, e.target.value)
+                  }
+                />
+                <Button
+                  size="sm"
+                  onClick={() => addPoints(user.id, amounts[user.id] || 0)}
+                >
+                  +
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    removePoints(user.id, amounts[user.id] || 0)
+                  }
+                >
+                  -
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => setPoints(user.id, amounts[user.id] || 0)}
+                >
+                  Set
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleHistoryClick(user)}
+                >
+                  View History
+                </Button>
               </TableCell>
             </TableRow>
           ))}
