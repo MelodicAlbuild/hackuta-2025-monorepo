@@ -552,35 +552,35 @@ function ScheduleRow({ event }: { event: DisplayEvent }) {
   const Icon = category.icon;
 
   return (
-    <li className="px-6 py-5 sm:px-7 sm:py-6 transition-colors duration-300 hover:bg-red-500/10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-        <div className="flex items-start gap-4">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-red-400/30 bg-red-500/10 text-lg text-red-200">
-            <Icon className="h-5 w-5" strokeWidth={2} />
+    <li className="px-4 py-4 sm:px-7 sm:py-6 transition-colors duration-300 hover:bg-red-500/10">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-red-400/30 bg-red-500/10 text-lg text-red-200">
+            <Icon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2} />
           </span>
           <div className="min-w-[180px] sm:min-w-[220px]">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs uppercase tracking-[0.3em] text-gray-300 font-franklinGothic">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="text-[9px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.3em] text-gray-300 font-franklinGothic">
                 {event.time}
               </span>
               <span
-                className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${category.badgeClass}`}
+                className={`rounded-full px-2 py-0.5 sm:px-2.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.2em] sm:tracking-[0.3em] transition-colors duration-300 ${category.badgeClass}`}
               >
                 {category.label}
               </span>
               {event.points && (
-                <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] bg-amber-500/20 text-amber-200 border border-amber-400/40">
+                <span className="rounded-full px-2 py-0.5 sm:px-2.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] bg-amber-500/20 text-amber-200 border border-amber-400/40">
                   {event.points} pts
                 </span>
               )}
             </div>
-            <p className="mt-2 text-base sm:text-lg font-semibold text-white font-franklinGothic text-left">
+            <p className="mt-1.5 sm:mt-2 text-sm sm:text-lg font-semibold text-white font-franklinGothic text-left">
               {event.title}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-200 font-franklinGothic">
-          <span className={`h-2.5 w-2.5 rounded-full ${category.dotClass}`} />
+        <div className="flex items-center gap-2 text-[10px] sm:text-sm text-gray-200 font-franklinGothic ml-11 sm:ml-0">
+          <span className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full ${category.dotClass}`} />
           <span className="whitespace-nowrap font-semibold text-white/90">
             {event.location ?? 'Room TBD'}
           </span>
