@@ -30,7 +30,7 @@ export async function scanForPoints({
       .select('role')
       .eq('id', adminUser.id)
       .single();
-    if (!adminProfile || !['admin', 'super-admin'].includes(adminProfile.role)) {
+    if (!adminProfile || !['volunteer', 'admin', 'super-admin'].includes(adminProfile.role)) {
       return {
         success: false,
         message: 'You do not have permission to scan for points.',

@@ -24,7 +24,7 @@ export async function purchaseShopItem({
     .select('role')
     .eq('id', adminUser.id)
     .single();
-  if (!adminProfile || !['admin', 'super-admin'].includes(adminProfile.role)) {
+  if (!adminProfile || !['volunteer', 'admin', 'super-admin'].includes(adminProfile.role)) {
     throw new Error('You do not have permission to process purchases.');
   }
 

@@ -31,8 +31,8 @@ export async function middleware(request: NextRequest) {
         .select('role')
         .single()
 
-    const superAdminOnlyRoutes = ['/manage-roles', '/notifications', '/points', '/scanner', '/vendor-codes'];
-    const volunteerRoutes = ['/', '/action-scanner', '/check-in', '/points-scanner', '/shop-scanner']
+    const superAdminOnlyRoutes = ['/manage-roles', '/notifications', '/points', '/scanner', '/vendor-codes', '/check-in'];
+    const volunteerRoutes = ['/', '/action-scanner', '/points-scanner', '/shop-scanner']
 
     const isSuperAdminRoute = superAdminOnlyRoutes.some(route => {
         return request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(`${route}/`)
