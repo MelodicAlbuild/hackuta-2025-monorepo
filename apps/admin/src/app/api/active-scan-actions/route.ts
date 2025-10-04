@@ -31,8 +31,8 @@ export async function GET() {
     .from('scan_actions')
     .select('*')
     .eq('is_active', true)
-    .lte('start_time', nowISOMinus15Minutes)
-    .gte('end_time', nowISOPlus15Minutes)
+    .lte('start_time', now)
+    .gte('end_time', now)
     .order('start_time');
 
   if (error) {
