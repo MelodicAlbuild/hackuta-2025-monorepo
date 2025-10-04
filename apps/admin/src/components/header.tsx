@@ -59,19 +59,18 @@ export async function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/">Dashboard</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/check-in">Check-In</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/points-scanner">Points Scanner</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/shop-scanner">Shop Scanner</Link>
+                  </DropdownMenuItem>
 
                   {userRole === 'admin' || userRole === 'super-admin' ? (
                     <>
-                      <DropdownMenuItem asChild>
-                        <Link href="/check-in">Check-In</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/points-scanner">Points Scanner</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/shop-scanner">Shop Scanner</Link>
-                      </DropdownMenuItem>
-
                       <DropdownMenuSeparator />
                       <DropdownMenuLabel>Admin</DropdownMenuLabel>
                       <DropdownMenuItem asChild>

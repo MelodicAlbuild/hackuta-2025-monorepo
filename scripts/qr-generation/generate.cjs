@@ -21,7 +21,6 @@ function parseArgs(argv) {
   const args = {
     count: DEFAULT_COUNT,
     outputDir: '',
-    volunteersFile: '',
     includeGeneral: true,
     includeAdmins: true,
     includeVolunteers: true,
@@ -50,11 +49,9 @@ function parseArgs(argv) {
       }
       case '--volunteers':
       case '--volunteers-file': {
-        const next = argv[i + 1];
-        if (next && !next.startsWith('-')) {
-          args.volunteersFile = next;
-          i += 1;
-        }
+        console.warn(
+          '[DEPRECATED] --volunteers/--volunteers-file is no longer required; volunteers are now auto-discovered by role. Argument ignored.',
+        );
         break;
       }
       case '--no-general':
@@ -89,7 +86,7 @@ function printHelp() {
       'Options:',
       '  --count <n>              Number of general QR tokens to generate (default 500)',
       '  --out, --output <dir>    Output directory (defaults to scripts/qr-generation/output/<timestamp>)',
-      '  --volunteers <file>      Path to newline-delimited volunteer emails',
+      '  (volunteers file no longer needed; volunteers auto-detected by role)',
       '  --no-general             Skip generating general PNGs',
       '  --no-admins              Skip admin / super-admin PNGs',
       '  --no-volunteers          Skip volunteer PNGs (even if file provided)',
@@ -410,76 +407,70 @@ async function main() {
     }
   }
 
-  const volunteerEmails = args.includeVolunteers
-    ? loadEmailsFile(args.volunteersFile)
-    : [];
-  if (args.includeVolunteers && volunteerEmails.length > 0) {
-    console.log(
-      `Fetching volunteer QR tokens for ${volunteerEmails.length} email(s)...`,
-    );
-    const profiles = await fetchProfilesByEmails(supabase, volunteerEmails);
-    const tokensMap = await fetchQrTokensByUserIds(
-      supabase,
-      profiles.map((p) => p.id),
-    );
-
-    const foundEmails = new Set(profiles.map((p) => normalizeEmail(p.email)));
-    volunteerEmails.forEach((email) => {
-      if (!foundEmails.has(normalizeEmail(email))) {
-        console.warn('Volunteer email not found in profiles:', email);
+  if (args.includeVolunteers) {
+    console.log('Fetching volunteer QR tokens by role...');
+    const volunteerProfiles = await fetchProfilesByRoles(supabase, [
+      VOLUNTEER_ROLE,
+    ]);
+    if (!volunteerProfiles.length) {
+      console.log('No volunteer profiles found.');
+    } else {
+      const tokensMap = await fetchQrTokensByUserIds(
+        supabase,
+        volunteerProfiles.map((p) => p.id),
+      );
+      const volunteerEntries = [];
+      for (const profile of volunteerProfiles) {
+        const tokenRecord = tokensMap.get(profile.id);
+        const tokenValue =
+          tokenRecord?.sign_up_token || tokenRecord?.qr_token || null;
+        if (!tokenValue) {
+          console.warn(
+            'No QR token/sign_up_token found for volunteer:',
+            profile.email,
+          );
+          continue;
+        }
+        volunteerEntries.push({
+          email: profile.email,
+          role: profile.role || VOLUNTEER_ROLE,
+          tokenValue,
+          tokenSource: tokenRecord?.sign_up_token
+            ? 'sign_up_token'
+            : 'qr_token',
+        });
       }
-    });
 
-    const volunteerEntries = [];
-    for (const profile of profiles) {
-      const tokenRecord = tokensMap.get(profile.id);
-      const tokenValue = tokenRecord?.sign_up_token || tokenRecord?.qr_token;
-      if (!tokenValue) {
-        console.warn(
-          'No QR token/sign_up_token found for volunteer:',
-          profile.email,
-        );
-        continue;
-      }
-      volunteerEntries.push({
-        email: profile.email,
-        role: profile.role || VOLUNTEER_ROLE,
-        tokenValue,
-        tokenSource: tokenRecord?.sign_up_token ? 'sign_up_token' : 'qr_token',
+      const qrBuffers = await buildQrBuffers(
+        volunteerEntries.map((entry) => entry.tokenValue),
+      );
+
+      qrBuffers.forEach((bufferEntry, index) => {
+        volunteerEntries[index].buffer = bufferEntry.buffer;
+        volunteerEntries[index].value = bufferEntry.value;
       });
+
+      volunteerEntries.forEach((entry) => {
+        const emailSegment = normalizeForFilename(entry.email, {
+          allowAtDot: true,
+          fallback: 'volunteer',
+        });
+        const roleSegment = normalizeForFilename(entry.role || VOLUNTEER_ROLE, {
+          fallback: VOLUNTEER_ROLE,
+        });
+        const fileName = `${emailSegment}-${roleSegment}-qr.png`;
+        const destPath = path.join(volunteersDir, fileName);
+        fs.writeFileSync(destPath, entry.buffer);
+        const relativePath = toRelativePath(outputDir, destPath);
+        summary.volunteers.push({
+          email: entry.email,
+          role: entry.role,
+          file: relativePath,
+          tokenSource: entry.tokenSource,
+        });
+      });
+      console.log(`Created ${volunteerEntries.length} volunteer PNG(s).`);
     }
-
-    const qrBuffers = await buildQrBuffers(
-      volunteerEntries.map((entry) => entry.tokenValue),
-    );
-
-    qrBuffers.forEach((bufferEntry, index) => {
-      volunteerEntries[index].buffer = bufferEntry.buffer;
-      volunteerEntries[index].value = bufferEntry.value;
-    });
-
-    volunteerEntries.forEach((entry) => {
-      const emailSegment = normalizeForFilename(entry.email, {
-        allowAtDot: true,
-        fallback: 'volunteer',
-      });
-      const roleSegment = normalizeForFilename(entry.role || VOLUNTEER_ROLE, {
-        fallback: VOLUNTEER_ROLE,
-      });
-      const fileName = `${emailSegment}-${roleSegment}-qr.png`;
-      const destPath = path.join(volunteersDir, fileName);
-      fs.writeFileSync(destPath, entry.buffer);
-      const relativePath = toRelativePath(outputDir, destPath);
-      summary.volunteers.push({
-        email: entry.email,
-        role: entry.role,
-        file: relativePath,
-        tokenSource: entry.tokenSource,
-      });
-    });
-    console.log(`Created ${volunteerEntries.length} volunteer PNG(s).`);
-  } else if (args.includeVolunteers) {
-    console.log('No volunteer file provided; skipping volunteer PNGs.');
   } else {
     console.log('Skipping volunteer PNGs by request.');
   }
