@@ -22,9 +22,9 @@ export async function POST(request: Request) {
         typeof body.registration_token === "string" ? body.registration_token.trim() : "";
     const pointsValue = Number(body.points ?? 0);
 
-    if (!userId || !registrationToken) {
+    if (!userId) {
         return NextResponse.json(
-            { error: "Both user_id and registration_token are required." },
+            { error: "User ID is required." },
             { status: 400 },
         );
     }
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     try {
         const { data: identity, error: identityError } = await supabaseAdmin
             .from("qr_identities")
-            .select("qr_token, sign_up_token")
+            .select("qr_token")
             .eq("user_id", userId)
             .maybeSingle();
 
@@ -49,26 +49,6 @@ export async function POST(request: Request) {
 
         if (!identity) {
             return NextResponse.json({ error: "QR identity not found for user." }, { status: 404 });
-        }
-
-        const previousToken = identity.sign_up_token ?? null;
-
-        const { data: conflict, error: conflictError } = await supabaseAdmin
-            .from("qr_identities")
-            .select("user_id")
-            .eq("sign_up_token", registrationToken)
-            .maybeSingle();
-
-        if (conflictError) {
-            console.error("Failed to check for sign_up_token conflicts", conflictError);
-            return NextResponse.json({ error: "Failed to verify token uniqueness." }, { status: 500 });
-        }
-
-        if (conflict && conflict.user_id !== userId) {
-            return NextResponse.json(
-                { error: "That registration token is already assigned to another user." },
-                { status: 409 },
-            );
         }
 
         const { error: updateError } = await supabaseAdmin
@@ -106,7 +86,7 @@ export async function POST(request: Request) {
                 console.error("Failed to award check-in points; attempting to revert token", pointsError);
                 await supabaseAdmin
                     .from("qr_identities")
-                    .update({ sign_up_token: previousToken })
+                    .update({ sign_up_token: "" })
                     .eq("user_id", userId);
                 return NextResponse.json(
                     { error: "Failed to award points. No changes were saved." },
@@ -117,7 +97,6 @@ export async function POST(request: Request) {
 
         const { error: checkInLogError } = await supabaseAdmin.from("check_ins").insert({
             user_id: userId,
-            registration_token: registrationToken,
             points_awarded: pointsValue,
             performed_by: adminUserId,
             performed_by_email: adminEmail,
