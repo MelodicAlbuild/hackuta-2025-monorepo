@@ -153,7 +153,10 @@ export default function WalkInRegistration() {
   }, [countryQuery]);
 
   async function onSubmit(data: VolunteerFormValues) {
-    const { error } = await supabase.from('walk_ins').insert(data);
+    const { error } = await supabase.from('walk_ins').insert({
+      ...data,
+      age: parseInt(data.age, 10),
+    });
 
     if (error) {
       console.error('Error inserting data:', error);
