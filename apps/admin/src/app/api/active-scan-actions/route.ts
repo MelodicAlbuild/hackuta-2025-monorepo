@@ -24,13 +24,15 @@ export async function GET() {
   }
 
   // Get currently active actions
-  const now = new Date().toISOString();
+  const now = new Date();
+  const nowISOMinus15Minutes = new Date(now.getTime() - 15 * 60000).toISOString();
+  const nowISOPlus15Minutes = new Date(now.getTime() + 15 * 60000).toISOString();
   const { data: actions, error } = await supabase
     .from('scan_actions')
     .select('*')
     .eq('is_active', true)
-    .lte('start_time', now)
-    .gte('end_time', now)
+    .lte('start_time', nowISOMinus15Minutes)
+    .gte('end_time', nowISOPlus15Minutes)
     .order('start_time');
 
   if (error) {
