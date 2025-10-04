@@ -25,10 +25,19 @@ type HistoryItem = {
   source: string;
 };
 
+type LeaderboardEntry = {
+  rank: number;
+  name: string;
+  score: number;
+};
+
 export function PointsCard({ initialPoints }: { initialPoints: number }) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
 
   const handleHistoryClick = async () => {
     setIsHistoryOpen(true);
@@ -36,6 +45,20 @@ export function PointsCard({ initialPoints }: { initialPoints: number }) {
     const userHistory = await getMyPointHistory();
     setHistory(userHistory);
     setIsLoadingHistory(false);
+  };
+
+  const handleLeaderboardClick = async () => {
+    setIsLeaderboardOpen(true);
+    setIsLoadingLeaderboard(true);
+    try {
+      const response = await fetch('/api/leaderboard');
+      const data = await response.json();
+      setLeaderboard(data.leaderboard || []);
+    } catch (error) {
+      console.error('Failed to fetch leaderboard:', error);
+      setLeaderboard([]);
+    }
+    setIsLoadingLeaderboard(false);
   };
 
   return (
@@ -50,9 +73,12 @@ export function PointsCard({ initialPoints }: { initialPoints: number }) {
         <CardContent>
           <p className="text-5xl font-bold">{initialPoints}</p>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex gap-2">
           <Button onClick={handleHistoryClick}>
             View History
+          </Button>
+          <Button onClick={handleLeaderboardClick} variant="outline">
+            Leaderboard
           </Button>
         </CardFooter>
       </Card>
@@ -92,6 +118,43 @@ export function PointsCard({ initialPoints }: { initialPoints: number }) {
               </ul>
             ) : (
               <p>No point history found.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Leaderboard Modal */}
+      <Dialog open={isLeaderboardOpen} onOpenChange={setIsLeaderboardOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Points Leaderboard - Top 10</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 max-h-[60vh] overflow-y-auto">
+            {isLoadingLeaderboard ? (
+              <div className="flex justify-center items-center h-40">
+                <Icons.spinner className="h-8 w-8 animate-spin" />
+              </div>
+            ) : leaderboard.length > 0 ? (
+              <ul className="space-y-3">
+                {leaderboard.map((entry) => (
+                  <li
+                    key={entry.rank}
+                    className="flex justify-between items-center border-b pb-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold">
+                        {entry.rank}
+                      </div>
+                      <p className="font-medium">{entry.name}</p>
+                    </div>
+                    <p className="font-bold text-lg text-primary">
+                      {entry.score}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No leaderboard data available.</p>
             )}
           </div>
         </DialogContent>
