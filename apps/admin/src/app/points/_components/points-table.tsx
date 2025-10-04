@@ -40,6 +40,8 @@ type UserWithPoints = {
 export function PointsTable({ users }: { users: UserWithPoints[] }) {
   const [amounts, setAmounts] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   // ** 3. Added internal types for function arguments **
   const handleAmountChange = (userId: string, value: string) => {
@@ -69,9 +71,22 @@ export function PointsTable({ users }: { users: UserWithPoints[] }) {
     );
   }, [users, searchQuery]);
 
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredUsers.slice(startIndex, endIndex);
+  }, [filteredUsers, currentPage, itemsPerPage]);
+
+  // Reset to page 1 when search changes
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   return (
     <>
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <Input
           type="text"
           placeholder="Search by name or email..."
@@ -79,6 +94,9 @@ export function PointsTable({ users }: { users: UserWithPoints[] }) {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-sm"
         />
+        <div className="text-sm text-muted-foreground">
+          Showing {paginatedUsers.length} of {filteredUsers.length} users
+        </div>
       </div>
       <Table>
         <TableHeader>
@@ -90,7 +108,7 @@ export function PointsTable({ users }: { users: UserWithPoints[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredUsers.map((user) => (
+          {paginatedUsers.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.name || "-"}</TableCell>
               <TableCell>{user.email}</TableCell>
@@ -138,6 +156,35 @@ export function PointsTable({ users }: { users: UserWithPoints[] }) {
           ))}
         </TableBody>
       </Table>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* History Modal */}
       <Dialog
