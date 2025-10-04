@@ -7,14 +7,17 @@ export async function GET() {
     const supabase = await createSupabaseServerClient(cookies)
     const { data: { user } } = await supabase.auth.getUser()
 
+    const cookieStore = await cookies();
+
     if (!user) {
         return new Response('Unauthorized', { status: 401 })
     }
 
-    const localToken = localStorage.getItem('qr_token')
+    const localToken = cookieStore.get('qr_token')
     if (localToken) {
+        const tokenValue = localToken.value
         // If a local token exists, use it to fetch the QR code
-        const qrCodeImageBuffer = await QRCode.toBuffer(localToken, {
+        const qrCodeImageBuffer = await QRCode.toBuffer(tokenValue, {
             type: 'png',
             width: 300,
             margin: 2,
@@ -39,7 +42,7 @@ export async function GET() {
         return new Response('QR token not configured', { status: 404 })
     }
 
-    localStorage.setItem('qr_token', tokenValue)
+    cookieStore.set('qr_token', tokenValue)
 
     // Generate the QR code image from the token
     const qrCodeImageBuffer = await QRCode.toBuffer(tokenValue, {
