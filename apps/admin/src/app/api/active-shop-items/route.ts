@@ -19,7 +19,7 @@ export async function GET() {
     .eq('id', user.id)
     .single();
 
-  if (!profile || !['admin', 'super-admin'].includes(profile.role)) {
+  if (!profile || !['volunteer', 'admin', 'super-admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
