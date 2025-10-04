@@ -30,9 +30,6 @@ export async function GET() {
   const { data: actions, error } = await supabase
     .from('scan_actions')
     .select('*')
-    .eq('is_active', true)
-    .lte('start_time', now)
-    .gte('end_time', now)
     .order('start_time');
 
   if (error) {
