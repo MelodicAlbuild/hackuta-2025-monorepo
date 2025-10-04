@@ -190,11 +190,11 @@ export default function CheckInPage() {
       setAssignError('Lookup a user before completing check-in.');
       return;
     }
-    const cleanedToken = registrationToken.trim();
-    if (!cleanedToken) {
-      setAssignError('Scan a registration token.');
-      return;
-    }
+    //const cleanedToken = registrationToken.trim();
+    //if (!cleanedToken) {
+    //setAssignError('Scan a registration token.');
+    //return;
+    //}
 
     setAssignLoading(true);
     setAssignError(null);
@@ -206,7 +206,7 @@ export default function CheckInPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: attendee.id,
-          registration_token: cleanedToken,
+          //registration_token: cleanedToken,
           points: pointsToAward,
         }),
       });
@@ -218,7 +218,7 @@ export default function CheckInPage() {
         ? ` Awarded ${pointsToAward} point${pointsToAward === 1 ? '' : 's'}.`
         : '';
       setSuccessMessage(
-        `Check-in complete for ${data.user.email}. Token ${cleanedToken} assigned.${awardedPointsText}`,
+        `Check-in complete for ${data.user.email}. ${awardedPointsText}`,
       );
       handleReset({ preserveSuccess: true });
     } catch (error) {

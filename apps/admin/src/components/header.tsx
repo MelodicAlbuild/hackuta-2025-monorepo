@@ -60,9 +60,6 @@ export async function Header() {
                     <Link href="/">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/check-in">Check-In</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
                     <Link href="/points-scanner">Points Scanner</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -90,7 +87,9 @@ export async function Header() {
                       <DropdownMenuSeparator />
                       <DropdownMenuLabel>Super Admin</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
-                        <Link href="/manage-scan-actions">Event Points Management</Link>
+                        <Link href="/manage-scan-actions">
+                          Event Points Management
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href="/shop-items">Shop Items</Link>
