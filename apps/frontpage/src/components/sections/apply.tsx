@@ -23,26 +23,13 @@ export default function Apply() {
               >
                 <span className="relative z-10">JOIN DISCORD</span>
               </a>
-              <div className="font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white/50 rounded-2xl text-center min-w-[220px] bg-gradient-to-r from-red-950/10 to-blue-950/10 backdrop-blur-sm border border-red-600/20 faq-glow-nh shadow-[0_0_18px_rgba(239,68,68,0.4),0_0_28px_rgba(239,68,68,0.24)]">
-                <span className="relative z-10">REGISTRATIONS CLOSED</span>
-              </div>
-              {/* <InterestForm /> */}
-              {/* <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLSfb5P_NzBWblFOWQEA1yo6C2PIOy3wuH79TO4opo4A3yz4dmw/viewform"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cursor-target font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-white/30 shadow-lg hover:shadow-2xl hover:shadow-red-500/30"
-              >
-                <span className="relative z-10">BE A JUDGE</span>
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
-              </a> */}
               <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLSe9xRh8ZIAIZCoa5O-4lk3fbgdJ51szu__p5Huj9dCLQcdbzg/viewform"
+                href="https://hackuta7.devpost.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-gradient-to-r from-red-900/20 to-blue-900/20 backdrop-blur-sm border border-red-500/30 hover:border-red-500/50 faq-glow shadow-[0_0_18px_rgba(239,68,68,0.4),0_0_28px_rgba(239,68,68,0.24)] hover:shadow-[0_0_24px_rgba(239,68,68,0.5),0_0_36px_rgba(239,68,68,0.32)]"
+                className="cursor-target font-franklinGothic relative px-10 py-4 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 text-center min-w-[220px] bg-gradient-to-r from-red-900/20 to-blue-900/20 backdrop-blur-sm border border-red-500/30 hover:border-red-500/50 faq-glow shadow-[0_0_18px_rgba(239,68,68,0.4),0_0_28px_rgba(239,68,68,0.24)] hover:shadow-[0_0_24px_rgba(239,68,68,0.5),0_0_36px_rgba(239,68,68,0.32)]"
               >
-                <span className="relative z-10">VOLUNTEER</span>
+                <span className="relative z-10">DEVPOST</span>
               </a>
             </div>
 

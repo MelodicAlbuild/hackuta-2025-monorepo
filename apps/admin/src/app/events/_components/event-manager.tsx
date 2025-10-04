@@ -40,7 +40,14 @@ export function EventManager({
                 className="p-4 flex justify-between items-center"
               >
                 <div>
-                  <p className="font-semibold">{event.title}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold">{event.title}</p>
+                    {event.description && (
+                      <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-500/20 text-amber-700 border border-amber-400/40">
+                        {event.description} pts
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500">
                     {formatDate(event.start_time)}
                     {event.location ? ` - ${event.location}` : ''}

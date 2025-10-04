@@ -61,10 +61,12 @@ export function EventForm({ event, onComplete }: EventFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
+        <Label htmlFor="description">Points</Label>
+        <Input
           id="description"
           name="description"
+          type="number"
+          placeholder="Enter points value"
           defaultValue={event?.description ? event.description : ''}
         />
       </div>
