@@ -34,7 +34,11 @@ export async function middleware(request: NextRequest) {
     const superAdminOnlyRoutes = ['/manage-roles', '/notifications', '/points', '/scanner', '/vendor-codes'];
     const volunteerRoutes = ['/', '/action-scanner', '/check-in', '/points-scanner', '/shop-scanner']
 
-    if (superAdminOnlyRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
+    const isSuperAdminRoute = superAdminOnlyRoutes.some(route => {
+        return request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(`${route}/`)
+    });
+
+    if (isSuperAdminRoute) {
         if (profile?.role !== 'super-admin') {
             const unauthorizedUrl = new URL('/unauthorized', request.url)
             return NextResponse.redirect(unauthorizedUrl)
