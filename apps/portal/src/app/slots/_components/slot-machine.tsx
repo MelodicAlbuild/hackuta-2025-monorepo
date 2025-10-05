@@ -81,8 +81,9 @@ export function SlotMachine({ userId, initialBalance }: SlotMachineProps) {
       } else {
         setMessage(`Better luck next time. You lost ${betAmount} points`);
       }
-    } catch (error: any) {
-      setMessage(`Error: ${error.message || 'Failed to spin'}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to spin';
+      setMessage(`Error: ${errorMessage}`);
     } finally {
       setSpinning(false);
     }

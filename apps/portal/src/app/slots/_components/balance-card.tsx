@@ -60,8 +60,9 @@ export function BalanceCard({ userId, mainBalance: initialMainBalance, gamblingB
       setMessage(`Deposit successful: Deposited ${amount} points to gambling balance`);
 
       router.refresh();
-    } catch (error: any) {
-      setMessage(`Deposit failed: ${error.message || 'Failed to deposit points'}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to deposit points';
+      setMessage(`Deposit failed: ${message}`);
     } finally {
       setLoading(false);
     }
@@ -91,8 +92,9 @@ export function BalanceCard({ userId, mainBalance: initialMainBalance, gamblingB
       setMessage(`Withdrawal successful: Withdrew ${amount} points to main balance`);
 
       router.refresh();
-    } catch (error: any) {
-      setMessage(`Withdrawal failed: ${error.message || 'Failed to withdraw points'}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to withdraw points';
+      setMessage(`Withdrawal failed: ${message}`);
     } finally {
       setLoading(false);
     }
