@@ -48,6 +48,17 @@ export default async function SlotsPage() {
   // Check if gambling window is open
   if (!windowInfo.is_open) {
     const opensAt = windowInfo.opens_at ? new Date(windowInfo.opens_at) : null;
+    const formatChicagoDateTime = (date: Date) =>
+      new Intl.DateTimeFormat('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'America/Chicago',
+      }).format(date);
+
     return (
       <div className="p-4 sm:p-8">
         <Card>
@@ -59,7 +70,7 @@ export default async function SlotsPage() {
             <p>The portal opens every 3 hours at :30 for 30 minutes.</p>
             <p className="text-sm text-muted-foreground">Schedule: 23:30, 2:30, 5:30, 8:30, 11:30, 14:30, 17:30, 20:30</p>
             <p className="text-lg font-semibold">
-              Next opening: {opensAt ? opensAt.toLocaleString() : 'Loading...'}
+              Next opening (CT): {opensAt ? formatChicagoDateTime(opensAt) : 'Loading...'}
             </p>
           </CardContent>
         </Card>
