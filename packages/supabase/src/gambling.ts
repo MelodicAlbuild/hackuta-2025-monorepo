@@ -173,19 +173,168 @@ export async function acceptDisclaimer(supabase: SupabaseClient, userId: string)
 }
 
 // Check if gambling window is currently open
-export async function isGamblingWindowOpen(supabase: SupabaseClient) {
-  const { data, error } = await supabase.rpc('is_gambling_window_open');
-  if (error) throw error;
-  return data as boolean;
+export async function isGamblingWindowOpen(_supabase: SupabaseClient) {
+  const window = await getNextGamblingWindow(_supabase);
+  return window.is_open;
+}
+
+const CHICAGO_TIME_ZONE = 'America/Chicago';
+const WINDOW_START_MINUTES = [150, 330, 510, 690, 870, 1050, 1230, 1410];
+const WINDOW_DURATION_MINUTES = 30;
+const MS_PER_MINUTE = 60_000;
+const MS_PER_DAY = 86_400_000;
+
+type GamblingWindow = {
+  start: Date;
+  end: Date;
+};
+
+function parseOffsetMinutes(date: Date) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: CHICAGO_TIME_ZONE,
+    timeZoneName: 'shortOffset',
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+
+  const timeZonePart = formatter
+    .formatToParts(date)
+    .find((part) => part.type === 'timeZoneName')?.value;
+
+  if (!timeZonePart) {
+    throw new Error('Unable to determine Chicago timezone offset');
+  }
+
+  const match = timeZonePart.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+
+  if (!match) {
+    throw new Error(`Unexpected timezone offset format: ${timeZonePart}`);
+  }
+
+  const sign = match[1] === '-' ? -1 : 1;
+  const hours = Number(match[2]);
+  const minutes = Number(match[3] ?? '0');
+
+  return sign * (hours * 60 + minutes);
+}
+
+function createChicagoDate(
+  year: number,
+  month: number,
+  day: number,
+  hour = 0,
+  minute = 0,
+  second = 0
+) {
+  const utcGuess = Date.UTC(year, month - 1, day, hour, minute, second);
+  let offsetMinutes = parseOffsetMinutes(new Date(utcGuess));
+  let candidate = new Date(utcGuess - offsetMinutes * MS_PER_MINUTE);
+  const adjustedOffset = parseOffsetMinutes(candidate);
+
+  if (adjustedOffset !== offsetMinutes) {
+    offsetMinutes = adjustedOffset;
+    candidate = new Date(utcGuess - offsetMinutes * MS_PER_MINUTE);
+  }
+
+  return candidate;
+}
+
+function mapDateParts(date: Date) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: CHICAGO_TIME_ZONE,
+    hour12: false,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+  });
+
+  const parts = formatter.formatToParts(date);
+  const partMap: Record<string, number> = {};
+
+  for (const part of parts) {
+    if (part.type !== 'literal') {
+      partMap[part.type] = Number(part.value);
+    }
+  }
+
+  return partMap as {
+    year: number;
+    month: number;
+    day: number;
+    hour: number;
+    minute: number;
+    second: number;
+  };
+}
+
+function addMinutes(date: Date, minutes: number) {
+  return new Date(date.getTime() + minutes * MS_PER_MINUTE);
+}
+
+function addDays(date: Date, days: number) {
+  return new Date(date.getTime() + days * MS_PER_DAY);
+}
+
+function buildWindowSet(anchorMidnight: Date) {
+  const windows: GamblingWindow[] = [];
+
+  for (const offsetMinutes of WINDOW_START_MINUTES) {
+    const start = addMinutes(anchorMidnight, offsetMinutes);
+    const end = addMinutes(start, WINDOW_DURATION_MINUTES);
+    windows.push({ start, end });
+  }
+
+  return windows;
 }
 
 // Get next gambling window info
-export async function getNextGamblingWindow(supabase: SupabaseClient) {
-  const { data, error } = await supabase.rpc('get_next_gambling_window');
-  if (error) throw error;
-  return data as {
-    is_open: boolean;
-    opens_at: string | null;
-    closes_at: string;
+export async function getNextGamblingWindow(_supabase: SupabaseClient) {
+  const now = new Date();
+  const { year, month, day, hour, minute, second } = mapDateParts(now);
+  const nowChicago = createChicagoDate(year, month, day, hour, minute, second);
+  const midnightToday = createChicagoDate(year, month, day, 0, 0, 0);
+
+  const candidateWindows = [
+    ...buildWindowSet(addDays(midnightToday, -1)),
+    ...buildWindowSet(midnightToday),
+    ...buildWindowSet(addDays(midnightToday, 1)),
+  ].sort((a, b) => a.start.getTime() - b.start.getTime());
+
+  const currentWindow = candidateWindows.find(
+    (window) => window.start.getTime() <= nowChicago.getTime() && nowChicago.getTime() < window.end.getTime()
+  );
+
+  const nextWindow = candidateWindows.find((window) => window.start.getTime() > nowChicago.getTime());
+
+  if (currentWindow) {
+    return {
+      is_open: true,
+      opens_at: null,
+      closes_at: currentWindow.end.toISOString(),
+    };
+  }
+
+  if (!nextWindow) {
+    // Fallback: should not occur, but ensure we always return something reasonable
+    const defaultStart = addMinutes(addDays(midnightToday, 1), WINDOW_START_MINUTES[0]);
+    return {
+      is_open: false,
+      opens_at: defaultStart.toISOString(),
+      closes_at: addMinutes(defaultStart, WINDOW_DURATION_MINUTES).toISOString(),
+    };
+  }
+
+  return {
+    is_open: false,
+    opens_at: nextWindow.start.toISOString(),
+    closes_at: nextWindow.end.toISOString(),
   };
 }
