@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { createSupabaseBrowserClient } from '@repo/supabase/client';
 import { playSlot } from '@repo/supabase/client';
 
@@ -17,6 +18,7 @@ interface SlotMachineProps {
 export function SlotMachine({ userId, initialBalance }: SlotMachineProps) {
   const [balance, setBalance] = useState(initialBalance);
   const [betAmount, setBetAmount] = useState(50);
+  const [manualBet, setManualBet] = useState('');
   const [reels, setReels] = useState(['⚛️', '⚛️', '⚛️']);
   const [spinning, setSpinning] = useState(false);
   type SlotOutcome = 'win' | 'loss' | 'break_even' | 'big_win';
@@ -140,13 +142,45 @@ export function SlotMachine({ userId, initialBalance }: SlotMachineProps) {
                   key={amount}
                   variant={betAmount === amount ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setBetAmount(amount)}
+                  onClick={() => {
+                    setManualBet('');
+                    setBetAmount(amount);
+                  }}
                   disabled={spinning}
                 >
                   {amount}
                 </Button>
               ))}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="manual-bet" className="text-sm font-medium">
+              Custom Bet (must be greater than 250)
+            </label>
+            <Input
+              id="manual-bet"
+              type="number"
+              min={251}
+              step={1}
+              inputMode="numeric"
+              placeholder="Enter custom bet"
+              value={manualBet}
+              disabled={spinning}
+              onChange={(event) => {
+                const value = event.target.value;
+                setManualBet(value);
+                const parsed = Number(value);
+                if (!Number.isNaN(parsed) && parsed > 250) {
+                  setBetAmount(parsed);
+                }
+              }}
+            />
+            {manualBet !== '' && Number(manualBet) <= 250 && (
+              <p className="text-xs text-destructive">
+                Custom bet must be greater than 250 points.
+              </p>
+            )}
           </div>
 
           <Button
@@ -178,23 +212,23 @@ export function SlotMachine({ userId, initialBalance }: SlotMachineProps) {
           <div className="text-xs text-muted-foreground space-y-1">
             <div className="flex justify-between">
               <span>3x 🕷️</span>
-              <span>15x bet</span>
-            </div>
-            <div className="flex justify-between">
-              <span>3x 🤖</span>
               <span>10x bet</span>
             </div>
             <div className="flex justify-between">
-              <span>3x 🤓</span>
+              <span>3x 🤖</span>
               <span>5x bet</span>
             </div>
             <div className="flex justify-between">
-              <span>3x 💻</span>
+              <span>3x 🤓</span>
               <span>3x bet</span>
             </div>
             <div className="flex justify-between">
-              <span>3x ⚛️</span>
+              <span>3x 💻</span>
               <span>2x bet</span>
+            </div>
+            <div className="flex justify-between">
+              <span>3x ⚛️</span>
+              <span>1.5x bet</span>
             </div>
             <div className="flex justify-between">
               <span>2x same</span>
