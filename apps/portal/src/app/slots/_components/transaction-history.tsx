@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Icons } from '@/components/icons';
-import { createSupabaseBrowserClient } from '@repo/supabase/client';
-import { GamblingTransaction, SlotSpin } from '@repo/supabase/gambling';
+import {
+  createSupabaseBrowserClient,
+  type GamblingTransaction,
+  type SlotSpin,
+} from '@repo/supabase/client';
 
 interface TransactionHistoryProps {
   userId: string;
