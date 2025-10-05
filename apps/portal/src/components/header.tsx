@@ -67,6 +67,12 @@ export async function Header() {
             >
               Scan Code
             </Link>
+            <Link
+              href="/slots"
+              className="hover:text-primary font-semibold text-foreground"
+            >
+              🎰 Slots
+            </Link>
           </div>
         </div>
 
@@ -80,6 +86,13 @@ export async function Header() {
               role={userRole}
             />
             <ThemeToggle />
+
+            {/* Slots Button - Mobile Only */}
+            <Link href="/slots" className="md:hidden">
+              <Button variant="outline" size="icon" title="Slots">
+                <span className="text-xl">🎰</span>
+              </Button>
+            </Link>
 
             {/* Mobile Navigation Menu */}
             <div className="md:hidden">
